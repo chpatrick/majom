@@ -1,0 +1,7 @@
+src/dist
+src/run
+*.hi
+*.o
+*.pyc
+*.swp
+*.pyo
