@@ -11,7 +11,8 @@ Cabal-Version:  >=1.2
 
 Library
   Exposed-modules:
-    Majom.Graphics.Draw
+    Majom.Graphics.Draw,
+    Majom.Vision.Simple
   
   Extensions:
   Ghc-options: -O 
