@@ -21,7 +21,8 @@ Executable majom
   Main-is:      main.hs
   Build-depends:
     base >= 4,
-    gd
+    gd,
+    process
 
   Extensions:
   Ghc-options: -O 

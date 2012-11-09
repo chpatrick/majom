@@ -8,7 +8,10 @@ module Majom.Graphics.Draw (
   getSquare,
   draw,
   drawAndSave,
-  save
+  save,
+  red,
+  green,
+  blue
   ) where
 
 import qualified Graphics.GD as GD
@@ -22,6 +25,18 @@ type Drawing = [(GD.Point, GD.Color)]
 
 -- | Defines an object, composed of its position in space and its composite drawing.
 data Object = Object { objectGetPosition :: (Int, Int), objectGetPixels :: Drawing } 
+
+-- | Red color.
+red :: GD.Color
+red = GD.rgb 255 0 0
+
+-- | Green color.
+green :: GD.Color
+green = GD.rgb 0 255 0
+
+-- | Blue color.
+blue :: GD.Color
+blue = GD.rgb 0 0 255
 
 -- | Gets a simple drawing of a sphere, anchor point in its centre.
 getSphere :: Int -> GD.Color -> Drawing
