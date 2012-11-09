@@ -23,6 +23,7 @@ Executable majom
   Build-depends:
     base >= 4,
     gd,
+    array,
     process
 
   Extensions:
