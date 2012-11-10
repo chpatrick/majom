@@ -1,0 +1,25 @@
+simulate basic physics environment, analogy to helicopter
+  - ensure have abstract interfaces
+  - attach to GUI to visualize
+  - attach to flyer
+  - test in multiple scenarios (changing thrust / conditions)
+
+reverse engineer helicopter
+  - get parts
+  - send basic commands to helicopter
+  - attach to GUI with button/key commands
+  - fly helicopter from computer
+
+create simple vision software to track helicopter on plain background
+  - fabricate test environment
+  - locate helicopter
+  - fly manually and get movement and position statistics about helicopter
+
+combine vision and controller
+  - get helicopter to take off
+  - get helicopter to hover
+  - get helicopter to land
+  - specify height and positions, interact
+
+extend!
+  - ???
