@@ -1,17 +1,21 @@
 -- | Module for simple image processing, including simple computer vision
 -- tools.
-module Majom.Vision.Simple (
+module Majom.Vision.Simple
+(
   -- * Types
   Color,
   Size,
-  Image,
+  Image(imageValues),
   -- * Functions
   average,
   median,
+  createImage,
+  imageToGDImage
   ) where
 
 import Data.Array
 import Data.List(sort)
+import qualified Graphics.GD as GD
 
 -- | Basic RGB type.
 type Color = (Int, Int, Int)
@@ -32,14 +36,19 @@ reduce3 f =
 --   an array.
 sample3x3 :: Array (Int,Int) a -> (Int, Int) -> Array (Int,Int) a
 sample3x3 vals (i,j) = 
-  array ((0,0),(2,2)) 
-    [((x - (i-1), y - (j-1)), vals ! (x,y)) 
+  listArray ((0,0),(iX,iY)) 
+    [vals ! (x,y)
       |  x <- [i-1..i+1],
          y <- [j-1..j+1], 
          x >= 0, 
          y >= 0, 
-         x <= (fst (snd (bounds vals))), 
-         y <= (snd (snd (bounds vals)))]
+         x <= sizeX, 
+         y <= sizeY]
+  where
+    (sizeX, sizeY) = snd $ bounds vals
+    iX = 2 - (if i == 0 then 1 else 0) - (if i == sizeX then 1 else 0)  
+    iY = 2 - (if j == 0 then 1 else 0) - (if j == sizeY then 1 else 0)  
+    
 
 -- | Performs elementary noise reduction by getting the local average.
 average :: Image -> Image
@@ -72,3 +81,26 @@ filterImage sample convolute (Image size@(sizeX, sizeY) vals) =
       array (bounds vals) 
         [((i,j), operate (i,j)) | i <- [0..sizeX-1], j <- [0..sizeY-1]]
     operate = convolute . (sample vals)
+
+colorToGDColor :: Color -> GD.Color
+colorToGDColor (r,g,b) = GD.rgb r g b
+
+gdColorToColor :: GD.Color -> Color
+gdColorToColor = (\(r,g,b,_) -> (r,g,b)) . GD.toRGBA
+
+createImage :: Size -> [(GD.Point, GD.Color)] -> Image
+createImage size@(sizeX, sizeY) pixels =
+  Image size $ array ((0,0), (sizeX-1, sizeY-1)) $ zip points colors
+  where
+    (points, colorsGD) = unzip pixels
+    colors = map gdColorToColor colorsGD
+
+imageToGDImage :: Image -> IO GD.Image
+imageToGDImage img = do
+  gdImage <- GD.newImage $ imageSize img
+  sequence_ $ 
+    map (\(i,c) -> GD.setPixel i c gdImage) 
+      [(i, colorToGDColor ((imageValues img) ! i)) 
+        | i <- indices $ imageValues img]
+  return gdImage
+
