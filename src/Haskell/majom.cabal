@@ -1,0 +1,32 @@
+Name:           majom
+Version:        0.1
+Description:    Haskell helicopter flying
+License:        GPL-3
+License-file:   LICENSE
+Author:         Luke Tomlin
+Maintainer:     luke.tomlin@gmail.com
+Build-Type:     Simple
+Cabal-Version:  >=1.2
+
+
+Library
+  Exposed-modules:
+    Majom.Graphics.Draw,
+    Majom.Vision.Simple,
+    Majom.Simulation.SimplePhysics
+  
+  Extensions:
+  Ghc-options: -O 
+-- -prof -fprof-auto
+
+Executable majom
+  Main-is:      main.hs
+  Build-depends:
+    base >= 4,
+    gd,
+    array,
+    process
+
+  Extensions:
+  Ghc-options: -O 
+-- -prof -fprof-auto
