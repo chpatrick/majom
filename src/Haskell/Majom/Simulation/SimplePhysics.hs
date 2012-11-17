@@ -33,5 +33,5 @@ updatePosition t f (Object m p v) = Object m (p + (newV |*| t)) newV
     acc = f |*| (1/m)
 
 -- How do I want to use it?
-updatePosition :: Object -> Force -> Time -> Object
+--updatePosition :: Object -> Force -> Time -> Object
 -- Object `update` F1 `update` F2 `update` F3 

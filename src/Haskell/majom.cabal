@@ -13,7 +13,8 @@ Library
   Exposed-modules:
     Majom.Graphics.Draw,
     Majom.Vision.Simple,
-    Majom.Simulation.SimplePhysics
+    Majom.Simulation.SimplePhysics,
+    Majom.Comm.Serial
   
   Extensions:
   Ghc-options: -O 
@@ -25,7 +26,8 @@ Executable majom
     base >= 4,
     gd,
     array,
-    process
+    process,
+    bytestring
 
   Extensions:
   Ghc-options: -O 
