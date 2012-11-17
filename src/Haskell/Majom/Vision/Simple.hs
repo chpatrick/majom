@@ -82,12 +82,15 @@ filterImage sample convolute (Image size@(sizeX, sizeY) vals) =
         [((i,j), operate (i,j)) | i <- [0..sizeX-1], j <- [0..sizeY-1]]
     operate = convolute . (sample vals)
 
+-- | Converts a normal color tuple to a GD color.
 colorToGDColor :: Color -> GD.Color
 colorToGDColor (r,g,b) = GD.rgb r g b
 
+-- | Converts a GD color to a normal color tuple.
 gdColorToColor :: GD.Color -> Color
 gdColorToColor = (\(r,g,b,_) -> (r,g,b)) . GD.toRGBA
 
+-- | Creates a basic image from a set of points and colors.
 createImage :: Size -> [(GD.Point, GD.Color)] -> Image
 createImage size@(sizeX, sizeY) pixels =
   Image size $ array ((0,0), (sizeX-1, sizeY-1)) $ zip points colors
@@ -95,6 +98,7 @@ createImage size@(sizeX, sizeY) pixels =
     (points, colorsGD) = unzip pixels
     colors = map gdColorToColor colorsGD
 
+-- | Converts a basic image to a GD.Image, for saving.
 imageToGDImage :: Image -> IO GD.Image
 imageToGDImage img = do
   gdImage <- GD.newImage $ imageSize img
