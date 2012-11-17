@@ -1,7 +1,12 @@
-src/dist
-src/run
+src/Haskell/dist
+src/Haskell/run
+src/Arduino/libraries
+src/Arduino/modes
+src/Arduino/tools
+src/Arduino/sdf
 *.hi
 *.o
 *.pyc
 *.swp
+*.swo
 *.pyo
