@@ -3,7 +3,6 @@ src/Haskell/run
 src/Arduino/libraries
 src/Arduino/modes
 src/Arduino/tools
-src/Arduino/sdf
 *.hi
 *.o
 *.pyc

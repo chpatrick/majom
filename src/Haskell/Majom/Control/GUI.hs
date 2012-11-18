@@ -14,11 +14,11 @@ runGUI = do
   button <- Gtk.buttonNew
   Gtk.set window [ Gtk.containerBorderWidth := 10, Gtk.containerChild := button ]
   Gtk.set button [ Gtk.buttonLabel := "Hello, World!" ]
-  ref <- newIORef "Hi!"
+  ref <- newIORef 0
   Gtk.onClicked button $ do
     val <- readIORef ref
-    putStrLn val
-    writeIORef ref (val ++ "!")
+    set Throttle val
+    writeIORef ref (val + 10)
   Gtk.onDestroy window Gtk.mainQuit
   Gtk.widgetShowAll window
   Gtk.mainGUI

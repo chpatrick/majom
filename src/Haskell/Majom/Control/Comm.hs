@@ -3,7 +3,7 @@
 
 module Majom.Control.Comm (
   -- * Types
-  Option,
+  Option(..),
   -- * Functions
   set
   ) where
