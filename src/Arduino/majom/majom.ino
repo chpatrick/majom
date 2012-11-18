@@ -90,18 +90,10 @@ void loop() {
   while (Serial.available() > 0) {
     // read the incoming instruction byte
     incomingInstruction = Serial.read();
-
-    // say what you got:
-    Serial.print("I received instruction: ");
-    Serial.println(incomingInstruction, DEC);
-
+    //Serial.flush();
     if(Serial.available() > 0) {    
       // read the incoming value byte
       incomingValue = Serial.read();
-
-      // say what you got:
-      Serial.print("Value: ");
-      Serial.println(incomingValue, DEC);
 
       switch(incomingInstruction) {
       case YAW:

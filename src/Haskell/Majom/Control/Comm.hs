@@ -23,13 +23,16 @@ port = "/dev/ttyACM0"
 
 -- | Serial port to send data to.
 s :: IO SerialPort
-s = openSerial port defaultSerialSettings
-
+s = openSerial port defaultSerialSettings { 
+      flowControl = Software }
+              
 -- | Sets the option to the supplied value. Will fail if 
 -- the serial port could not be set, or other IO related stuff. 
 -- Returns the number of bytes sent.
 set :: Option -> Int -> IO Int
-set o v = flip send (pack [fromIntegral $ fromEnum o, fromIntegral v]) =<< s
+set o v = foo `seq` foo
+  where
+    foo = flip send (pack [fromIntegral $ fromEnum o, fromIntegral v]) =<< s
 
 -- | Sends many options at once, in list order (later commands in
 -- the list will be sent after (possibly overriding) previous commands).

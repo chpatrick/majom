@@ -44,6 +44,7 @@ runGUI = do
   Gtk.set buttonBox [Gtk.buttonBoxLayoutStyle := Gtk.ButtonboxCenter]
 
   ref <- newIORef 0
+  num <- newIORef 0
 
   vals <- fmap (Map.fromList . zip [Yaw, Pitch, Throttle, Correction])
         $ mapM newIORef [63, 63, 0, 63]
@@ -53,16 +54,18 @@ runGUI = do
     set Throttle val
     writeIORef ref (val + 10)
 
-  Gtk.widgetAddEvents window [Gtk.KeyPressMask]
   Gtk.on window Gtk.keyPressEvent $ do
-    interpretKeyPress vals
+    interpretKeyPress num vals
   Gtk.widgetSetCanFocus window True
   Gtk.widgetShowAll window
   Gtk.mainGUI
 
-interpretKeyPress :: Map.Map Option (IORef Int) -> Gtk.EventM Gtk.EKey Bool
-interpretKeyPress valMap = do
+interpretKeyPress :: IORef Int -> Map.Map Option (IORef Int) -> Gtk.EventM Gtk.EKey Bool
+interpretKeyPress num valMap = do
   keyName <- Gtk.eventKeyName
+  n <- liftIO $ readIORef num
+  liftIO $ putStrLn (show n)
+  liftIO $ writeIORef num (n+1)
   case keyName of
     "Up" -> do -- Pitch forwards
       liftIO $ putStrLn "Up"
