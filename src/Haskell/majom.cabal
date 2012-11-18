@@ -30,7 +30,9 @@ Executable majom
     process,
     bytestring,
     serialport,
-    gtk
+    gtk,
+    transformers,
+    containers
 
   Extensions:
   Ghc-options: -O 

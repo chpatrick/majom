@@ -5,7 +5,8 @@ module Majom.Control.Comm (
   -- * Types
   Option(..),
   -- * Functions
-  set
+  set,
+  setMany
   ) where
 
 import Data.ByteString(pack)
@@ -14,7 +15,7 @@ import System.Hardware.Serialport
 -- | Basic enumerated type for different orders. Corresponds to the 
 -- order types on the Arduino side.
 data Option = Yaw | Pitch | Throttle | Correction
-  deriving (Eq, Show, Enum)
+  deriving (Eq, Ord, Show, Enum)
 
 -- | The default port for the arduino.
 port :: String
