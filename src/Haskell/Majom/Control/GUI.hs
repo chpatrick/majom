@@ -1,71 +1,42 @@
+-- | Provides a GUI to take user input for flying the helicopter.
+-- d/f - Throttle
+-- a/s - Correction
+-- up/down - Pitch
+-- left/right - Yaw
 module Majom.Control.GUI (
+  -- * Functions
   runGUI
   ) where
 
-import qualified Graphics.UI.Gtk as Gtk
-import Graphics.UI.Gtk( AttrOp ((:=)) )
 import Majom.Control.Comm
+
+import Control.Monad.IO.Class
 import Data.IORef
 import qualified Data.Map as Map
-import Control.Monad.IO.Class
+import qualified Graphics.UI.Gtk as Gtk
+import Graphics.UI.Gtk( AttrOp ((:=)) )
+
+-- | Starts the GUI
 runGUI :: IO ()
 runGUI = do
   Gtk.initGUI
   window <- Gtk.windowNew
-  buttonBox <- Gtk.vButtonBoxNew
-  Gtk.set window [ Gtk.containerBorderWidth := 10, Gtk.containerChild := buttonBox ]
+  Gtk.set window [ Gtk.containerBorderWidth := 10 ]
   Gtk.onDestroy window Gtk.mainQuit
   
-  btnThrottleUp <- Gtk.buttonNew
-  btnThrottleDown <- Gtk.buttonNew
-  btnYawUp <- Gtk.buttonNew
-  btnYawDown <- Gtk.buttonNew
-  btnPitchUp <- Gtk.buttonNew
-  btnPitchDown <- Gtk.buttonNew
-  btnCorrectionUp <- Gtk.buttonNew
-  btnCorrectionDown <- Gtk.buttonNew
-
-  Gtk.set btnThrottleUp [ Gtk.buttonLabel := "Throttle +" ]
-  Gtk.set btnThrottleDown [ Gtk.buttonLabel := "Throttle -" ]
-  Gtk.set btnYawUp [ Gtk.buttonLabel := "Yaw +" ]
-  Gtk.set btnYawDown [ Gtk.buttonLabel := "Yaw -" ]
-  Gtk.set btnPitchUp [ Gtk.buttonLabel := "Pitch +" ]
-  Gtk.set btnPitchDown [ Gtk.buttonLabel := "Pitch -" ]
-  Gtk.set btnCorrectionUp [ Gtk.buttonLabel := "Correction +" ]
-  Gtk.set btnCorrectionDown [ Gtk.buttonLabel := "Correction -" ]
-
-  Gtk.set buttonBox [ Gtk.containerChild := button
-                    | button <-
-                      [btnThrottleUp, btnThrottleDown,
-                       btnYawUp,btnYawDown,
-                       btnPitchUp, btnPitchDown,
-                       btnCorrectionUp, btnCorrectionDown ]]
-                       
-  Gtk.set buttonBox [Gtk.buttonBoxLayoutStyle := Gtk.ButtonboxCenter]
-
-  ref <- newIORef 0
-  num <- newIORef 0
-
   vals <- fmap (Map.fromList . zip [Yaw, Pitch, Throttle, Correction])
         $ mapM newIORef [63, 63, 0, 63]
 
-  Gtk.onClicked btnThrottleUp $ do
-    val <- readIORef ref
-    set Throttle val
-    writeIORef ref (val + 10)
-
   Gtk.on window Gtk.keyPressEvent $ do
-    interpretKeyPress num vals
+    interpretKeyPress vals
   Gtk.widgetSetCanFocus window True
   Gtk.widgetShowAll window
   Gtk.mainGUI
 
-interpretKeyPress :: IORef Int -> Map.Map Option (IORef Int) -> Gtk.EventM Gtk.EKey Bool
-interpretKeyPress num valMap = do
+-- | Takes a key press and turns it into a helicopter command. Could use refactoring.
+interpretKeyPress :: Map.Map Option (IORef Int) -> Gtk.EventM Gtk.EKey Bool
+interpretKeyPress valMap = do
   keyName <- Gtk.eventKeyName
-  n <- liftIO $ readIORef num
-  liftIO $ putStrLn (show n)
-  liftIO $ writeIORef num (n+1)
   case keyName of
     "Up" -> do -- Pitch forwards
       liftIO $ putStrLn "Up"
