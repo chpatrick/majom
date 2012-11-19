@@ -14,8 +14,10 @@ Library
     Majom.Graphics.Draw,
     Majom.Vision.Simple,
     Majom.Simulation.SimplePhysics,
-    Majom.Control.Comm,
-    Majom.Control.GUI
+    Majom.Control.GUI,
+    Majom.Control.Flyable
+    Majom.Flyers.Helicopter,
+    Majom.Flyers.VirtualHelicopter
   
   Extensions:
   Ghc-options: -O 

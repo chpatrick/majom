@@ -1,21 +1,25 @@
--- | Module to perform the basic serial commands. Hides the actual serial port
--- dealings, and instead provides a basic command to set the parameters.
+-- | Defines the Flyable interface for the real helicopter, utilising
+-- serial data transmission.
 
-module Majom.Control.Comm (
+module Majom.Flyers.Helicopter (
   -- * Types
-  Option(..),
-  -- * Functions
-  set,
-  setMany
+  Helicopter(..),
   ) where
 
 import Data.ByteString(pack)
 import System.Hardware.Serialport
+import Majom.Control.Flyable
 
--- | Basic enumerated type for different orders. Corresponds to the 
--- order types on the Arduino side.
-data Option = Yaw | Pitch | Throttle | Correction
-  deriving (Eq, Ord, Show, Enum)
+-- | A real helicopter!
+data Helicopter = Helicopter
+
+instance Flyable Helicopter where
+  setFly _ o v = dropValM $ set o v
+  setFlyMany _ vs = dropValM $ setMany vs
+
+-- | Drops monadic values we don't care about.
+dropValM :: (Monad m) => m a -> m ()
+dropValM x = x >> (return ())
 
 -- | The default port for the arduino.
 port :: String

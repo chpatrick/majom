@@ -34,7 +34,7 @@ instance (Num a, Num b) => Num (a,b) where
 
 -- | Vector constructor
 vector :: Double -> Double -> Vector
-vector a b = (a, b)
+vector x y = (x, y)
 
 -- | Simple Vector, made from doubles.
 type Vector = (Double, Double)
@@ -54,13 +54,20 @@ type Force = Vector
 -- | Time for simulation.
 type Time = Double
 
+-- | Gravity force constant
+gravity :: Force
+gravity = vector 0 (-9.8)
+
+--foo :: [(Force, (Time,Time))] -> Object -> Object
+
 -- | Updates the position and velocity of an object given a time
--- frame and the force applied to it in that time frame.
-updatePosition :: Time -> Force -> Object -> Object
-updatePosition t f (Object m p v) = Object m (p + (newV |*| t)) newV
+-- frame and the forces applied to it in that time frame.
+updatePosition :: Time -> [Force] -> Object -> Object
+updatePosition t fs (Object m p v) =
+  Object m (p + (v |*| t) + (acc |*| (0.5 * (t^2) ) ) ) newV
   where
     newV = v + (acc |*| t) 
-    acc = f |*| (1/m)
+    acc = (sum fs) |*| (1/m)
 
 -- How do I want to use it?
 --updatePosition :: Object -> Force -> Time -> Object
