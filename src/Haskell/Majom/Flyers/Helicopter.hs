@@ -8,7 +8,7 @@ module Majom.Flyers.Helicopter (
 
 import Data.ByteString(pack)
 import System.Hardware.Serialport
-import Majom.Control.Flyable
+import Majom.Flyers.Flyable
 
 -- | A real helicopter!
 data Helicopter = Helicopter

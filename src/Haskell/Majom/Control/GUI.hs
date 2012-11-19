@@ -8,7 +8,7 @@ module Majom.Control.GUI (
   runGUI
   ) where
 
-import Majom.Control.Flyable
+import Majom.Flyers.Flyable
 
 import Control.Monad.IO.Class
 import Data.IORef

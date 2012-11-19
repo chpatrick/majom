@@ -11,14 +11,13 @@ Cabal-Version:  >=1.2
 
 Library
   Exposed-modules:
-    Majom.Graphics.Draw,
-    Majom.Vision.Simple,
-    Majom.Simulation.SimplePhysics,
     Majom.Control.GUI,
-    Majom.Control.Flyable
+    Majom.Control.Monkey,
+    Majom.Flyers.Flyable,
     Majom.Flyers.Helicopter,
-    Majom.Flyers.VirtualHelicopter
-  
+    Majom.Flyers.VirtualHelicopter,
+    Majom.Simulation.SimplePhysics
+ 
   Extensions:
   Ghc-options: -O 
 -- -prof -fprof-auto

@@ -42,9 +42,6 @@ void setup() {
 void setBitRange(int start, int fin, int val) {
   for(int i=fin-1; i>=start; i--) {
     pulseValues[i] = val & B1;
-    Serial.print(pulseValues[i]);
-    Serial.print(", ");
-    Serial.println(val);
     val = val >> 1;
 
   }
@@ -94,6 +91,9 @@ void loop() {
     if(Serial.available() > 0) {    
       // read the incoming value byte
       incomingValue = Serial.read();
+      Serial.print(incomingInstruction, DEC);
+      Serial.print(", ");
+      Serial.println(incomingValue, DEC);
 
       switch(incomingInstruction) {
       case YAW:
