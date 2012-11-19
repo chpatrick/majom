@@ -27,6 +27,6 @@ Set up steps
 - Download majom.ino (in src/Arduino/majom/) to arduino
 - Wire up arduino board as described above
 
-- Run "cabal configure ; cabal build" in src/Haskell\/
+- Run "cabal configure ; cabal build" in src/Haskell
 - Run "./run"
 - Success!
