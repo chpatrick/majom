@@ -7,10 +7,10 @@ Helicopter-flying-thinkerings
 Arduino Setup
 -------------
 
-1 x Arduino UNO board ( + USB to serial cable)
-4 x IR LEDs
-4 x 113 ohm resistors (brown brown orange black BROWN)
-5 x cables / wires
+1 x Arduino UNO board ( + USB to serial cable) 
+4 x IR LEDs 
+4 x 113 ohm resistors (brown brown orange black BROWN) 
+5 x cables / wires 
 
 Wiring
 ------
