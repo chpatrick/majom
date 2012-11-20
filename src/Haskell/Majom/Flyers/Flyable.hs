@@ -17,3 +17,4 @@ data Option = Yaw | Pitch | Throttle | Correction
 class Flyable a where
   setFly :: a -> Option -> Int -> IO ()
   setFlyMany :: a -> [(Option, Int)] -> IO ()
+  fly :: a -> IO ()

@@ -1,7 +1,7 @@
 module Main where
 import Majom.Control.GUI
-import Majom.Flyers.Helicopter
+import Majom.Flyers.VirtualHelicopter
 
 main = do
-  runGUI Helicopter
   putStrLn "Hello, majom!"
+  runGUI =<< spawnVirtualHelicopter

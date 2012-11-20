@@ -33,7 +33,8 @@ Executable majom
     serialport,
     gtk,
     transformers,
-    containers
+    containers,
+    stm
 
   Extensions:
   Ghc-options: -O 

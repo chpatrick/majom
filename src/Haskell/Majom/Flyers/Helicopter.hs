@@ -16,6 +16,7 @@ data Helicopter = Helicopter
 instance Flyable Helicopter where
   setFly _ o v = dropValM $ set o v
   setFlyMany _ vs = dropValM $ setMany vs
+  fly _ = return ()
 
 -- | Drops monadic values we don't care about.
 dropValM :: (Monad m) => m a -> m ()

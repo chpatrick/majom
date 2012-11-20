@@ -11,6 +11,7 @@ module Majom.Control.GUI (
 import Majom.Flyers.Flyable
 
 import Control.Monad.IO.Class
+import Control.Concurrent
 import Data.IORef
 import qualified Data.Map as Map
 import qualified Graphics.UI.Gtk as Gtk
@@ -31,7 +32,9 @@ runGUI flyer = do
     interpretKeyPress flyer vals
   Gtk.widgetSetCanFocus window True
   Gtk.widgetShowAll window
+  forkIO $ fly flyer
   Gtk.mainGUI
+
 
 -- | Takes a key press and turns it into a helicopter command. Could use refactoring.
 interpretKeyPress :: (Flyable a) => a -> Map.Map Option (IORef Int) -> Gtk.EventM Gtk.EKey Bool
