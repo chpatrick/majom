@@ -16,7 +16,7 @@ Library
     Majom.Flyers.Flyable,
     Majom.Flyers.Helicopter,
     Majom.Flyers.VirtualHelicopter,
-    Majom.Simulation.SimplePhysics
+    Majom.Simulation.SimpleSim
  
   Extensions:
   Ghc-options: -O -threaded

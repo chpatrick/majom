@@ -13,8 +13,8 @@ import Majom.Flyers.Flyable
 import Control.Monad
 import Control.Concurrent
 import Control.Concurrent.STM
-
-import Majom.Flyers.Helicopter
+import Control.Monad.IO.Class
+import Majom.Simulation.SimpleSim
 
 data VirtualHelicopter = VirtualHelicopter { getOrders :: TVar [(Option, Int)] }
 
@@ -31,6 +31,7 @@ instance Flyable VirtualHelicopter where
     atomically $ writeTVar orders . (vs ++) =<< readTVar orders
     return ()
   fly = run 
+  observe = undefined
 
 
 -- Need a seperate thread that ticks every n seconds, evaluating
@@ -39,14 +40,21 @@ instance Flyable VirtualHelicopter where
 
 -- Send messages -> Thread -> (FrontEnd that maps 1-127 to some continuous function that corresponds to force) -> Simulation
 
-run h = do
-  forever ( (putStrLn . show =<< (atomRead orders))
-            >> milliSleep 2000)
+run h = do 
+  shared <- startSimulation undefined -- + simulation params
+  forever $ do
+    atomically $ do
+      return . processOrders shared =<< readTVar orders
+      clearOrders orders
+    milliSleep 120
   where
     orders = getOrders h
-    clearOrders x = atomically $ writeTVar x []
-    addOrder v xs = atomically $ writeTVar xs . (v:) =<< readTVar xs
+    clearOrders x = writeTVar x []
     milliSleep = threadDelay . (*) 1000
-    appV fn x = atomically $ writeTVar x . fn =<< readTVar x
-    atomRead = atomically . readTVar
-    dispVar x = atomRead x >>= print
+
+-- | Takes a list of orders and applies them to the model.
+processOrders :: TVar [Force] -> [(Option, Int)] -> ()
+processOrders = undefined
+  where
+    convert :: (Option, Int) -> Force
+    convert = undefined
