@@ -41,8 +41,6 @@ instance Flyable VirtualHelicopter where
 
 run h = do
   forever ( (putStrLn . show =<< (atomRead orders))
-            -- >> (setFlyMany Helicopter =<< (atomRead orders))
-            >> clearOrders orders
             >> milliSleep 2000)
   where
     orders = getOrders h

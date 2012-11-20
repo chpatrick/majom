@@ -19,7 +19,7 @@ Library
     Majom.Simulation.SimplePhysics
  
   Extensions:
-  Ghc-options: -O 
+  Ghc-options: -O -threaded
 -- -prof -fprof-auto
 
 Executable majom
@@ -37,5 +37,5 @@ Executable majom
     stm
 
   Extensions:
-  Ghc-options: -O 
+  Ghc-options: -O -threaded
 -- -prof -fprof-auto
