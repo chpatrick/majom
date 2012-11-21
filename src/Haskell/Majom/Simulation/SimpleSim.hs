@@ -99,7 +99,7 @@ simulate forceVar object = do
     force <- atomically $ readTVar forceVar
     threadDelay (stepTime * 1000)
     simulate forceVar $ 
-      updatePosition (milliToSeconds stepTime) force object
+      updatePosition (milliToSeconds stepTime) (force + gravity) object
 
 displayObject :: Object -> IO ()
-displayObject = putStrLn . show
+displayObject o = putStrLn $ "Loc: " ++ (show $ objectLocation o) ++ ", Vel: " ++ (show $ objectVelocity o)

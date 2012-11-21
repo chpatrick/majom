@@ -11,6 +11,7 @@ module Majom.Flyers.VirtualHelicopter (
 
 import Majom.Flyers.Flyable
 import Majom.Simulation.SimpleSim
+import Control.Applicative
 import Control.Monad
 import Control.Concurrent
 import Control.Concurrent.STM
@@ -18,10 +19,11 @@ import Control.Monad.IO.Class
 import Data.IORef
 import qualified Data.Map as Map
 
-data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)] }
+data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)], getPosition :: TVar Position }
 
+-- | Spawns a virtual helicopter at (0,0)
 spawnVirtualHelicopter :: IO VirtualHelicopter
-spawnVirtualHelicopter = atomically $ fmap VirtualHelicopter (newTVar [])
+spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (vector 0 0))
 
 instance Flyable VirtualHelicopter where
   setFly h o v = do
@@ -35,13 +37,7 @@ instance Flyable VirtualHelicopter where
   fly = run 
   observe = undefined
 
-
--- Need a seperate thread that ticks every n seconds, evaluating
--- the change of force that I apply to the helicopter and updating
--- the simulation.
-
--- Send messages -> Thread -> (FrontEnd that maps 1-127 to some continuous function that corresponds to force) -> Simulation
-
+-- | Runs the flying simulation
 run h = do 
   forceVar <- startSimulation $ simpleObject $ vector 50 50
   oldOptionsVar <- newIORef $ Map.empty
