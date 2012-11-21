@@ -12,16 +12,22 @@ module Majom.Simulation.SimpleSim (
   Position,
   -- * Functions
   vector,
+  (|*|),
   updatePosition,
+  simpleObject,
   startSimulation
   ) where
 
 import Control.Concurrent.STM
+import Control.Concurrent
 
 -- | An object type, encompassing the necessary information
 -- that an object should have.
 data Object = Object { objectMass :: Double, objectLocation :: Position, objectVelocity :: Velocity }
   deriving (Eq, Show)
+
+simpleObject :: Position -> Object
+simpleObject p = Object 1 p 0
 
 instance (Num a, Num b) => Num (a,b) where
   (x1,x2) + (y1,y2) = (x1+y1,x2+y2)
@@ -54,7 +60,7 @@ type Acceleration = Vector
 -- | Force for objects.
 type Force = Vector
 
--- | Time for simulation.
+-- | Time for simulation (in seconds)
 type Time = Double
 
 -- | Gravity force constant
@@ -65,13 +71,35 @@ gravity = vector 0 (-9.8)
 
 -- | Updates the position and velocity of an object given a time
 -- frame and the forces applied to it in that time frame.
-updatePosition :: Time -> [Force] -> Object -> Object
+updatePosition :: Time -> Force -> Object -> Object
 updatePosition t fs (Object m p v) =
   Object m (p + (v |*| t) + (acc |*| (0.5 * (t^2) ) ) ) newV
   where
     newV = v + (acc |*| t) 
-    acc = (sum fs) |*| (1/m)
+    acc = fs |*| (1/m)
 
--- | Starts a simulation thread
-startSimulation :: Object -> IO (TVar [Force])
-startSimulation = undefined
+-- | Starts a simulation thread, showing the simulation on a GUI
+startSimulation :: Object -> IO (TVar Force)
+startSimulation object = do
+  forces <- atomically $ newTVar (vector 0 0)
+  forkIO $ simulate forces object
+  return forces
+
+-- | Iteration time in milliseconds
+stepTime :: Int
+stepTime = 1000
+
+-- | Converts milliseconds to seconds
+milliToSeconds :: Int -> Double
+milliToSeconds = (/1000) . fromIntegral
+
+simulate :: TVar Force -> Object -> IO ()
+simulate forceVar object = do
+    displayObject object
+    force <- atomically $ readTVar forceVar
+    threadDelay (stepTime * 1000)
+    simulate forceVar $ 
+      updatePosition (milliToSeconds stepTime) force object
+
+displayObject :: Object -> IO ()
+displayObject = putStrLn . show
