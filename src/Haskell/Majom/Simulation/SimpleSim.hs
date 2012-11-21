@@ -79,10 +79,10 @@ updatePosition t fs (Object m p v) =
     acc = fs |*| (1/m)
 
 -- | Starts a simulation thread, showing the simulation on a GUI
-startSimulation :: Object -> IO (TVar Force)
-startSimulation object = do
+startSimulation :: TVar Position -> Object -> IO (TVar Force)
+startSimulation position object = do
   forces <- atomically $ newTVar (vector 0 0)
-  forkIO $ simulate forces object
+  forkIO $ simulate forces position object
   return forces
 
 -- | Iteration time in milliseconds
@@ -93,12 +93,13 @@ stepTime = 1000
 milliToSeconds :: Int -> Double
 milliToSeconds = (/1000) . fromIntegral
 
-simulate :: TVar Force -> Object -> IO ()
-simulate forceVar object = do
+simulate :: TVar Force -> TVar Position -> Object -> IO ()
+simulate forceVar positionVar object = do
     displayObject object
     force <- atomically $ readTVar forceVar
+    atomically $ writeTVar positionVar $ objectLocation object
     threadDelay (stepTime * 1000)
-    simulate forceVar $ 
+    simulate forceVar positionVar $ 
       updatePosition (milliToSeconds stepTime) (force + gravity) object
 
 displayObject :: Object -> IO ()

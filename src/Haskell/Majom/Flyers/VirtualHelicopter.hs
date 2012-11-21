@@ -35,11 +35,17 @@ instance Flyable VirtualHelicopter where
     atomically $ writeTVar options . (vs ++) =<< readTVar options
     return ()
   fly = run 
-  observe = undefined
+  observe h = atomically $ readTVar $ getPosition h
+
+instance Location Double where
+  dimensions x = [x]
+
+instance (Location a, Location b) => Location (a, b) where
+  dimensions (x,y) = dimensions x ++ dimensions y
 
 -- | Runs the flying simulation
 run h = do 
-  forceVar <- startSimulation $ simpleObject $ vector 50 50
+  forceVar <- startSimulation (getPosition h) $ simpleObject $ vector 50 50
   oldOptionsVar <- newIORef $ Map.empty
   forever $ do
     options <- atomically $ do
