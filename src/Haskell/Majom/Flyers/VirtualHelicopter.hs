@@ -74,9 +74,14 @@ basicMap o v =
 processOptions :: IORef OptionMap -> TVar Force -> [(Option, Int)] -> IO ()
 processOptions oldOptionsVar forceVar options = do
   oldOptions <- readIORef oldOptionsVar
-  atomically $ 
-    writeTVar forceVar $ 
-      convertToForce basicMap $ foldl process oldOptions options
+  newOptions <-
+    atomically $ do 
+      let newOptions = foldl process oldOptions options
+      writeTVar forceVar $ 
+        convertToForce basicMap newOptions
+      return newOptions
+  writeIORef oldOptionsVar newOptions
+
   where
     process :: OptionMap -> (Option, Int) -> OptionMap
     process = flip $ uncurry Map.insert
