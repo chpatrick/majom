@@ -4,9 +4,9 @@
 module Majom.Flyers.Flyable (
   -- * Types
   Option(..),
+  Location(..),
   -- * Classes
   Flyable(..),
-  Location(..)
   -- * Functions
   ) where
 
@@ -14,12 +14,12 @@ module Majom.Flyers.Flyable (
 data Option = Yaw | Pitch | Throttle | Correction
   deriving (Eq, Ord, Show, Enum)
 
-class Location a where
-  dimensions :: a -> [Double]
+-- | Location type for the flyer, returned by the observer.
+data Location = Location { locationX :: Double, locationY :: Double, locationZ :: Double } deriving (Eq, Ord, Show)
 
 -- | Flyable class for flyable things that can fly.
 class Flyable a where
   setFly :: a -> Option -> Int -> IO ()
   setFlyMany :: a -> [(Option, Int)] -> IO ()
   fly :: a -> IO ()
-  observe :: a -> IO (Double, Double)
+  observe :: a -> IO Location

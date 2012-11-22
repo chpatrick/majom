@@ -97,6 +97,11 @@ interpretKeyPress flyer valMap = do
       liftIO $ writeIORef (valMap Map.! Correction) 63
       liftIO $ writeIORef (valMap Map.! Throttle) 0
       return True
+    "o" -> do -- Observe
+      liftIO $ putStrLn "o"
+      pos <- liftIO $ observe flyer
+      liftIO $ putStrLn $ show pos
+      return True
     "Escape" -> do -- Quit the program
       liftIO Gtk.mainQuit
       return True

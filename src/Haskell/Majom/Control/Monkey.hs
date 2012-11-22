@@ -6,3 +6,13 @@ module Majom.Control.Monkey (
 -- from the helicopter for the inputs, it just knows that the function is 
 -- monotonically increasing and continuous. It has to learn the function from
 -- observing the helicopter.
+
+-- What it has to work with:
+-- 1 - It can observe the helicopter at any time
+-- 2 - Power -> Force is monotonic increasing
+-- 3 - Power -> Force is continuous
+-- 4 - Simple case, environment forces are constant
+--   - Complex case, environment forces are not constant
+--
+-- Needs to be able to iteratively come to an approximation of the 
+-- Power -> Force function, changing as new input comes in (adaptive).

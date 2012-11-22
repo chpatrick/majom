@@ -19,6 +19,8 @@ import Control.Monad.IO.Class
 import Data.IORef
 import qualified Data.Map as Map
 
+-- | A data type containing base information about a helicopter, such as 
+-- the current options it holds and its current position
 data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)], getPosition :: TVar Position }
 
 -- | Spawns a virtual helicopter at (0,0)
@@ -35,13 +37,11 @@ instance Flyable VirtualHelicopter where
     atomically $ writeTVar options . (vs ++) =<< readTVar options
     return ()
   fly = run 
-  observe h = atomically $ readTVar $ getPosition h
+  observe h = fmap posToLoc $ atomically $ readTVar $ getPosition h
 
-instance Location Double where
-  dimensions x = [x]
-
-instance (Location a, Location b) => Location (a, b) where
-  dimensions (x,y) = dimensions x ++ dimensions y
+-- | Converts a 2D position to a 3D location.
+posToLoc :: Position -> Location
+posToLoc (x,y) = Location x y 0
 
 -- | Runs the flying simulation
 run h = do 
@@ -59,11 +59,16 @@ run h = do
     clearOptions x = writeTVar x []
     milliSleep = threadDelay . (*) 1000
 
+-- | A map mapping options to their values.
 type OptionMap = Map.Map Option Int
 
+-- | Using a mapping from options and their values to forces, and an option
+-- map, combines all of the resulting force into one. Essentially converts
+-- all of the orders into a final force on the helicopter. 
 convertToForce :: (Option -> Int -> Force) -> OptionMap -> Force
 convertToForce f m = Map.fold (+) (vector 0 0) $ Map.mapWithKey f m
 
+-- | A basic mapping of options to particular forces.
 basicMap :: Option -> Int -> Force
 basicMap o v = 
   case o of 
