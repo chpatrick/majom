@@ -9,8 +9,10 @@ module Majom.Flyers.VirtualHelicopter (
   spawnVirtualHelicopter
     ) where
 
+import Majom.Common
 import Majom.Flyers.Flyable
 import Majom.Simulation.SimpleSim
+
 import Control.Applicative
 import Control.Monad
 import Control.Concurrent
@@ -25,7 +27,7 @@ data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)],
 
 -- | Spawns a virtual helicopter at (0,0)
 spawnVirtualHelicopter :: IO VirtualHelicopter
-spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (vector 0 0))
+spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (vector2 0 0))
 
 instance Flyable VirtualHelicopter where
   setFly h o v = do
@@ -37,15 +39,11 @@ instance Flyable VirtualHelicopter where
     atomically $ writeTVar options . (vs ++) =<< readTVar options
     return ()
   fly = run 
-  observe h = fmap posToLoc $ atomically $ readTVar $ getPosition h
-
--- | Converts a 2D position to a 3D location.
-posToLoc :: Position -> Location
-posToLoc (x,y) = Location x y 0
+  observe h = atomically $ readTVar $ getPosition h
 
 -- | Runs the flying simulation
 run h = do 
-  forceVar <- startSimulation (getPosition h) $ simpleObject $ vector 50 50
+  forceVar <- startSimulation (getPosition h) $ simpleObject $ vector2 50 50
   oldOptionsVar <- newIORef $ Map.empty
   forever $ do
     options <- atomically $ do
@@ -66,16 +64,16 @@ type OptionMap = Map.Map Option Int
 -- map, combines all of the resulting force into one. Essentially converts
 -- all of the orders into a final force on the helicopter. 
 convertToForce :: (Option -> Int -> Force) -> OptionMap -> Force
-convertToForce f m = Map.fold (+) (vector 0 0) $ Map.mapWithKey f m
+convertToForce f m = Map.fold (+) (vector2 0 0) $ Map.mapWithKey f m
 
 -- | A basic mapping of options to particular forces.
 basicMap :: Option -> Int -> Force
 basicMap o v = 
   case o of 
-    Yaw -> vector 0 0
-    Pitch -> vector 0 0 
-    Throttle -> (vector 0 0.2) |*| (fromIntegral v)
-    Correction -> vector 0 0 
+    Yaw -> vector2 0 0
+    Pitch -> vector2 0 0 
+    Throttle -> (vector2 0 0.2) |*| (fromIntegral v)
+    Correction -> vector2 0 0 
 
 -- | Takes a list of options and applies them to the model.
 processOptions :: IORef OptionMap -> TVar Force -> [(Option, Int)] -> IO ()

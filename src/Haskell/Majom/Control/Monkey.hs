@@ -9,10 +9,31 @@ module Majom.Control.Monkey (
 
 -- What it has to work with:
 -- 1 - It can observe the helicopter at any time
--- 2 - Power -> Force is monotonic increasing
--- 3 - Power -> Force is continuous
+-- 2 - Power -> Acceleration is monotonic increasing
+-- 3 - Power -> Acceleration is continuous
 -- 4 - Simple case, environment forces are constant
 --   - Complex case, environment forces are not constant
 --
 -- Needs to be able to iteratively come to an approximation of the 
--- Power -> Force function, changing as new input comes in (adaptive).
+-- Power -> Acceleration function, changing as new input comes in (adaptive).
+
+import Majom.Analysis.Model
+import Majom.Common
+import Majom.Flyers.Flyable
+
+import Control.Monad
+
+data Intention = Intention -- To be defined properly
+
+-- | Starts the monkey
+runMonkey :: (Flyable a) => a -> IO ()
+runMonkey flyer = do
+  let model = createNewModel
+  forever $ do 
+    pos <- observe flyer
+    return ()
+    --monkeyDo undefined model pos
+
+-- | Handles observing the flyer, updating the model, and sending commands.
+--monkeyDo :: Monkey a -> Intention -> Model -> Position -> Monkey a
+--monkeyDo = undefined

@@ -11,6 +11,8 @@ Cabal-Version:  >=1.2
 
 Library
   Exposed-modules:
+    Majom.Analysis.Model,
+    Majom.Common,
     Majom.Control.GUI,
     Majom.Control.Monkey,
     Majom.Flyers.Flyable,
