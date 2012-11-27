@@ -1,3 +1,4 @@
+-- | Common functions and types for majom.
 module Majom.Common where
 
 instance (Num a, Num b) => Num (a,b) where

@@ -10,16 +10,16 @@ module Majom.Simulation.SimpleSim (
   startSimulation
   ) where
 
+import Majom.Common
 import Control.Concurrent.STM
 import Control.Concurrent
-
-import Majom.Common
 
 -- | An object type, encompassing the necessary information
 -- that an object should have.
 data Object = Object { objectMass :: Double, objectLocation :: Position, objectVelocity :: Velocity }
   deriving (Eq, Show)
 
+-- | Constructs a basic point mass at a given position.
 simpleObject :: Position -> Object
 simpleObject p = Object 1 p 0
 

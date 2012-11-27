@@ -15,6 +15,7 @@ import Majom.Common(Acceleration, Power)
 -- Start with an approximate map - say (0 -> -9.8), (70 -> 0), a straight line
 -- Iteratively improve
 
+-- | Default model functions.
 class Model a where
   getMap :: a -> (Power -> Acceleration)
   updateModel :: a -> (Power, Acceleration) -> a

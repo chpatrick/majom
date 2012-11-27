@@ -1,3 +1,6 @@
+-- | LeastSquares instantiation of the Model. Not really useful for
+-- step by step learning, better for observing the making a one 
+-- time judgement. Useful maybe for testing?
 module Majom.Analysis.LeastSquares (
   -- * Classes
   -- * Types
@@ -10,24 +13,25 @@ import Majom.Analysis.Model
 import Majom.Common(Power, Acceleration)
 import Numeric.LinearAlgebra
 
-data LeastSquares = LeastSquares { lsData :: [(Double, Double)], lsMap :: Double -> Double }
+-- | LeastSquares map type.
+data LeastSquares = LeastSquares { lsMap :: Double -> Double }
 
 instance Model LeastSquares where
-  createNewModel = (\x -> LeastSquares x (weightMap x)) [(0,0),(1,1)]
+  createNewModel = (\x -> LeastSquares (weightMap x)) [(0,0),(1,1)]
   getMap = undefined
-  updateModel (LeastSquares d m) (pwr,accel) = LeastSquares d' (weightMap d')
-    where 
-      -- Only want the y value for now
-      input = (fromIntegral pwr, snd accel)
-      d' = (input : d)
+  updateModel m _ = m
      
+-- | Sets the least squares map using a one time analysis of 
+-- a bunch of values.
 setLeastSquares :: [(Power,Acceleration)] -> LeastSquares
 setLeastSquares vals = 
-  LeastSquares d (weightMap d)
+  LeastSquares (weightMap d)
   where
     (pwrs,accels) = unzip vals
+    -- | Only want y value of accel
     d = zip (map fromIntegral pwrs) (map snd accels)
 
+-- | Constructs a weight map from inputs and observations.
 weightMap :: [(Double, Double)] -> Double -> Double
 weightMap d x = 
   head $ head $ toLists $ (prep x) <> (reshape 1 $ leastSquares d)
@@ -35,6 +39,7 @@ weightMap d x =
    prep :: Double -> Matrix Double
    prep x = fromColumns $ map ((fromList [x])^) [0..2]
 
+-- | Constructs a weight matrix from inputs and observations.
 leastSquares :: [(Double, Double)] -> Vector Double
 leastSquares d = (pinv $ (ctrans x) <> x) <> (ctrans x) <> y_in
   where 
