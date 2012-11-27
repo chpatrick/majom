@@ -12,6 +12,7 @@ Cabal-Version:  >=1.2
 Library
   Exposed-modules:
     Majom.Analysis.Model,
+    Majom.Analysis.LeastSquares,
     Majom.Common,
     Majom.Control.GUI,
     Majom.Control.Monkey,
@@ -36,7 +37,8 @@ Executable majom
     gtk,
     transformers,
     containers,
-    stm
+    stm,
+    hmatrix
 
   Extensions:
   Ghc-options: -O -threaded

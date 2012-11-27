@@ -34,6 +34,9 @@ type Force = Vector
 -- | Time for simulation (in seconds)
 type Time = Double
 
+-- | Power from the controller
+type Power = Int
+
 -- | Gravity force constant
 gravity :: Force
 gravity = vector2 0 (-9.8)

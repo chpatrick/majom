@@ -28,7 +28,7 @@ data Intention = Intention -- To be defined properly
 -- | Starts the monkey
 runMonkey :: (Flyable a) => a -> IO ()
 runMonkey flyer = do
-  let model = createNewModel
+  --let model = createNewModel
   forever $ do 
     pos <- observe flyer
     return ()
