@@ -5,7 +5,8 @@
 -- left/right - Yaw
 module Majom.Control.GUI (
   -- * Functions
-  runGUI
+  runGUI,
+  runGUIManualFly,
   ) where
 
 import Majom.Flyers.Flyable
@@ -21,6 +22,22 @@ import Graphics.UI.Gtk( AttrOp ((:=)) )
 runGUI :: (Flyable a) => a -> IO ()
 runGUI flyer = do
   Gtk.initGUI
+  guiSetup flyer
+  forkIO $ fly flyer
+  Gtk.mainGUI
+
+-- | Run the GUI assuming that fly is called manually.
+runGUIManualFly :: (Flyable a) => a -> IO ()
+runGUIManualFly flyer = do
+  Gtk.initGUI
+  guiSetup flyer
+  -- Forking the mainGUI allows it to be killed by an external
+  -- kill call to this thread. 
+  forkIO $ Gtk.mainGUI
+  return ()
+
+guiSetup :: (Flyable a) => a -> IO ()
+guiSetup flyer = do
   window <- Gtk.windowNew
   Gtk.set window [ Gtk.containerBorderWidth := 10 ]
   Gtk.onDestroy window Gtk.mainQuit
@@ -32,62 +49,35 @@ runGUI flyer = do
     interpretKeyPress flyer vals
   Gtk.widgetSetCanFocus window True
   Gtk.widgetShowAll window
-  forkIO $ fly flyer
-  Gtk.mainGUI
 
-
--- | Takes a key press and turns it into a helicopter command. Could use refactoring.
+-- | Takes a key press and turns it into a helicopter command.
 interpretKeyPress :: (Flyable a) => a -> Map.Map Option (IORef Int) -> Gtk.EventM Gtk.EKey Bool
 interpretKeyPress flyer valMap = do
   keyName <- Gtk.eventKeyName
   case keyName of
     "Up" -> do -- Pitch forwards
-      liftIO $ putStrLn "Up"
-      value <- liftIO $ readIORef $ valMap Map.! Pitch
-      liftIO $ setFly flyer Pitch (value - 10)
-      liftIO $ writeIORef (valMap Map.! Pitch) (value - 10)
+      liftIO $ chValue "Up" Pitch (-10)
       return True
     "Down" -> do -- Pitch backwards
-      liftIO $ putStrLn "Down"
-      value <- liftIO $ readIORef $ valMap Map.! Pitch
-      liftIO $ setFly flyer Pitch (value + 10)
-      liftIO $ writeIORef (valMap Map.! Pitch) (value + 10)
+      liftIO $ chValue "Down" Pitch (10)
       return True
     "Left" -> do -- Yaw left
-      liftIO $ putStrLn "Left"
-      value <- liftIO $ readIORef $ valMap Map.! Yaw
-      liftIO $ setFly flyer Yaw (value + 10)
-      liftIO $ writeIORef (valMap Map.! Yaw) (value + 10)
+      liftIO $ chValue "Left" Yaw (10)
       return True
     "Right" -> do -- Yaw right
-      liftIO $ putStrLn "Right"
-      value <- liftIO $ readIORef $ valMap Map.! Yaw
-      liftIO $ setFly flyer Yaw (value - 10)
-      liftIO $ writeIORef (valMap Map.! Yaw) (value - 10)
+      liftIO $ chValue "Right" Yaw (-10)
       return True
     "d" -> do -- Throttle down
-      liftIO $ putStrLn "d"
-      value <- liftIO $ readIORef $ valMap Map.! Throttle
-      liftIO $ setFly flyer Throttle (value - 10)
-      liftIO $ writeIORef (valMap Map.! Throttle) (value - 10)
+      liftIO $ chValue "d" Throttle (-10)
       return True
     "f" -> do -- Throttle up
-      liftIO $ putStrLn "f"
-      value <- liftIO $ readIORef $ valMap Map.! Throttle
-      liftIO $ setFly flyer Throttle (value + 10)
-      liftIO $ writeIORef (valMap Map.! Throttle) (value + 10)
+      liftIO $ chValue "f" Throttle (10)
       return True
     "a" -> do -- Correction left
-      liftIO $ putStrLn "a"
-      value <- liftIO $ readIORef $ valMap Map.! Correction
-      liftIO $ setFly flyer Correction (value - 10)
-      liftIO $ writeIORef (valMap Map.! Correction) (value - 10)
+      liftIO $ chValue "a" Correction (-10)
       return True
     "s" -> do -- Correction right
-      liftIO $ putStrLn "s"
-      value <- liftIO $ readIORef $ valMap Map.! Correction
-      liftIO $ setFly flyer Correction (value + 10)
-      liftIO $ writeIORef (valMap Map.! Correction) (value + 10)
+      liftIO $ chValue "s" Correction (10)
       return True
     "x" -> do -- Reset
       liftIO $ putStrLn "x"
@@ -100,9 +90,18 @@ interpretKeyPress flyer valMap = do
     "o" -> do -- Observe
       liftIO $ putStrLn "o"
       pos <- liftIO $ observe flyer
-      liftIO $ putStrLn $ show pos
+      pwr <- liftIO $ readIORef $ valMap Map.! Throttle
+      liftIO $ putStrLn $ show (pos, pwr)
       return True
     "Escape" -> do -- Quit the program
       liftIO Gtk.mainQuit
       return True
     otherwise -> return False
+    where
+      chValue :: String -> Option -> Int -> IO ()
+      chValue key o v = do
+        putStrLn key
+        value <- readIORef $ valMap Map.! o
+        setFly flyer o (value + v)
+        writeIORef (valMap Map.! o) (value + v)
+

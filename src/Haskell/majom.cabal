@@ -38,7 +38,8 @@ Executable majom
     transformers,
     containers,
     stm,
-    hmatrix
+    hmatrix,
+    mtl
 
   Extensions:
   Ghc-options: -O -threaded

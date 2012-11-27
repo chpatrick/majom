@@ -1,5 +1,9 @@
 -- | Bot to control the flyer.
 module Majom.Control.Monkey (
+  -- * Classes
+  -- * Types
+  -- * Functions
+  runMonkey,
   ) where
 
 -- The idea is that the controller has no idea exactly how much force is exerted
@@ -19,21 +23,41 @@ module Majom.Control.Monkey (
 
 import Majom.Analysis.Model
 import Majom.Common
+import Majom.Control.GUI
 import Majom.Flyers.Flyable
 
 import Control.Monad
+import Control.Monad.State
+import Control.Concurrent
+import Control.Monad.IO.Class
 
 data Intention = Intention -- To be defined properly
+
+-- TODO Modularise this so that I can plug it in and out as
+-- necessary. Need to get both Power and Position, then calculate
+-- the acceleration and apply the power to it.
 
 -- | Starts the monkey
 runMonkey :: (Flyable a) => a -> IO ()
 runMonkey flyer = do
-  --let model = createNewModel
-  forever $ do 
-    pos <- observe flyer
-    return ()
-    --monkeyDo undefined model pos
+  forkIO $ fly flyer
+  milliSleep 100
+  -- Watch the GUI
+  -- Need a way to retrieve power values...
+  -- guiID <- forkIO $ runGUIManualFly flyer
+  --(_,pos) <- runStateT (replicateM 20 (update flyer)) []
+  -- killThread guiID
+  --putStrLn $ show pos
 
--- | Handles observing the flyer, updating the model, and sending commands.
---monkeyDo :: Monkey a -> Intention -> Model -> Position -> Monkey a
---monkeyDo = undefined
+-- | I don't reallllly understand fully what is going on here.
+-- I know that it's cool though. 
+type PositionState = StateT [Position] IO
+update :: Flyable a => a -> PositionState ()
+update flyer = do
+  ps <- get
+  p <- liftIO $ observe flyer
+  liftIO $ milliSleep 100
+  put (p:ps)
+
+milliSleep :: Int -> IO ()
+milliSleep = threadDelay . (*) 1000
