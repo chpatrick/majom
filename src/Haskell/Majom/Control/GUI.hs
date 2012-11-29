@@ -79,7 +79,7 @@ interpretKeyPress flyer valMap = do
       return True
     "o" -> do -- Observe
       liftIO $ putStrLn "o"
-      pos <- liftIO $ observe flyer
+      (_,pos,_) <- liftIO $ observe flyer
       pwr <- liftIO $ readIORef $ valMap Map.! Throttle
       liftIO $ putStrLn $ show (pwr, pos)
       return True

@@ -21,7 +21,7 @@ data Object = Object { objectMass :: Double, objectLocation :: Position, objectV
 
 -- | Constructs a basic point mass at a given position.
 simpleObject :: Position -> Object
-simpleObject p = Object 1 p 0
+simpleObject p = Object 1 p (vector [0,0,0])
 
 -- | Updates the position and velocity of an object given a time
 -- frame and the forces applied to it in that time frame.
@@ -35,7 +35,7 @@ updatePosition t fs (Object m p v) =
 -- | Starts a simulation thread, showing the simulation on a GUI
 startSimulation :: TVar Position -> Object -> IO (TVar Force)
 startSimulation position object = do
-  forces <- atomically $ newTVar (vector2 0 0)
+  forces <- atomically $ newTVar (vector [0, 0, 0])
   forkIO $ simulate forces position object
   return forces
 

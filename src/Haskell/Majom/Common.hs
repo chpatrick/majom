@@ -17,7 +17,7 @@ instance (Num a) => Num (V.Vector a) where
   as - bs = V.zipWith (-) as bs
   as * bs = V.zipWith (*) as bs
   negate a = V.map negate a
-  fromInteger x = V.fromList (repeat 0)
+  fromInteger x = V.fromList $ replicate (fromInteger x) 0
   abs m = m
   signum _ = 1
 

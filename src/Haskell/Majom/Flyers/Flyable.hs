@@ -10,6 +10,7 @@ module Majom.Flyers.Flyable (
   ) where
 
 import Majom.Common
+import Data.Time.Clock 
 
 -- | Options for different commands, relevant to some flying thing.
 data Option = Yaw | Pitch | Throttle | Correction
@@ -20,4 +21,4 @@ class Flyable a where
   setFly :: a -> Option -> Int -> IO ()
   setFlyMany :: a -> [(Option, Int)] -> IO ()
   fly :: a -> IO ()
-  observe :: a -> IO Position --(Power, Position, UTCTime)
+  observe :: a -> IO (Power, Position, UTCTime)

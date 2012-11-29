@@ -56,7 +56,7 @@ type PositionState = StateT [Position] IO
 update :: Flyable a => a -> PositionState ()
 update flyer = do
   ps <- get
-  p <- liftIO $ observe flyer
+  (_,p,_) <- liftIO $ observe flyer
   liftIO $ milliSleep 100
   put (p:ps)
 
