@@ -23,13 +23,13 @@ module Majom.Control.Monkey (
 
 import Majom.Analysis.Model
 import Majom.Common
-import Majom.Control.GUI
 import Majom.Flyers.Flyable
 
 import Control.Monad
 import Control.Monad.State
 import Control.Concurrent
 import Control.Monad.IO.Class
+import Data.Time.Clock
 
 data Intention = Intention -- To be defined properly
 
@@ -49,6 +49,7 @@ runMonkey flyer = do
   -- killThread guiID
   --putStrLn $ show pos
 
+-- | Converts observed positions at times into perceived acceleration changes.
 -- | I don't reallllly understand fully what is going on here.
 -- I know that it's cool though. 
 type PositionState = StateT [Position] IO

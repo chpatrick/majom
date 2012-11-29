@@ -10,8 +10,8 @@ module Majom.Analysis.LeastSquares (
   ) where
 
 import Majom.Analysis.Model
-import Majom.Common(Power, Acceleration)
-import Numeric.LinearAlgebra
+import Majom.Common
+import qualified Numeric.LinearAlgebra as LA
 
 -- | LeastSquares map type.
 data LeastSquares = LeastSquares { lsMap :: Double -> Double }
@@ -29,21 +29,21 @@ setLeastSquares vals =
   where
     (pwrs,accels) = unzip vals
     -- | Only want y value of accel
-    d = zip (map fromIntegral pwrs) (map snd accels)
+    d = zip (map fromIntegral pwrs) (map vectorY accels)
 
 -- | Constructs a weight map from inputs and observations.
 weightMap :: [(Double, Double)] -> Double -> Double
 weightMap d x = 
-  head $ head $ toLists $ (prep x) <> (reshape 1 $ leastSquares d)
+  head $ head $ LA.toLists $ (prep x) LA.<> (LA.reshape 1 $ leastSquares d)
   where
-   prep :: Double -> Matrix Double
-   prep x = fromColumns $ map ((fromList [x])^) [0..2]
+   prep :: Double -> LA.Matrix Double
+   prep x = LA.fromColumns $ map ((LA.fromList [x])^) [0..2]
 
 -- | Constructs a weight matrix from inputs and observations.
-leastSquares :: [(Double, Double)] -> Vector Double
-leastSquares d = (pinv $ (ctrans x) <> x) <> (ctrans x) <> y_in
+leastSquares :: [(Double, Double)] -> LA.Vector Double
+leastSquares d = (LA.pinv $ (LA.ctrans x) LA.<> x) LA.<> (LA.ctrans x) LA.<> y_in
   where 
     (input, output) = unzip d
-    x = fromColumns $ map (x_in^) [0..2]
-    x_in = fromList input
-    y_in = fromList output
+    x = LA.fromColumns $ map (x_in^) [0..2]
+    x_in = LA.fromList input
+    y_in = LA.fromList output

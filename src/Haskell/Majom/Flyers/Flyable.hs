@@ -20,4 +20,4 @@ class Flyable a where
   setFly :: a -> Option -> Int -> IO ()
   setFlyMany :: a -> [(Option, Int)] -> IO ()
   fly :: a -> IO ()
-  observe :: a -> IO Position
+  observe :: a -> IO Position --(Power, Position, UTCTime)

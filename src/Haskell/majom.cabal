@@ -39,7 +39,9 @@ Executable majom
     containers,
     stm,
     hmatrix,
-    mtl
+    mtl,
+    vector,
+    time
 
   Extensions:
   Ghc-options: -O -threaded

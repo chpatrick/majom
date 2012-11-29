@@ -6,7 +6,6 @@
 module Majom.Control.GUI (
   -- * Functions
   runGUI,
-  runGUIObserve,
   ) where
 
 import Majom.Common
@@ -23,24 +22,12 @@ import Graphics.UI.Gtk( AttrOp ((:=)) )
 runGUI :: (Flyable a) => a -> IO ()
 runGUI flyer = do
   Gtk.initGUI
-  guiSetup flyer undefined
+  guiSetup flyer 
   forkIO $ fly flyer
   Gtk.mainGUI
 
--- | Run the GUI assuming that fly is called manually.
-runGUIObserve :: (Flyable a) => a -> IO [(Power, Position)]
-runGUIObserve flyer = do
-  Gtk.initGUI
-  observer <- newIORef []
-  guiSetup flyer observer
-  -- Forking the mainGUI allows it to be killed by an external
-  -- kill call to this thread. 
-  forkIO $ fly flyer
-  Gtk.mainGUI
-  readIORef observer
-
-guiSetup :: (Flyable a) => a -> IORef [(Power, Position)] -> IO ()
-guiSetup flyer observer = do
+guiSetup :: (Flyable a) => a -> IO ()
+guiSetup flyer = do
   window <- Gtk.windowNew
   Gtk.set window [ Gtk.containerBorderWidth := 10 ]
   Gtk.onDestroy window Gtk.mainQuit
@@ -49,13 +36,13 @@ guiSetup flyer observer = do
         $ mapM newIORef [63, 63, 0, 63]
 
   Gtk.on window Gtk.keyPressEvent $ do
-    interpretKeyPress flyer vals observer
+    interpretKeyPress flyer vals 
   Gtk.widgetSetCanFocus window True
   Gtk.widgetShowAll window
 
 -- | Takes a key press and turns it into a helicopter command.
-interpretKeyPress :: (Flyable a) => a -> Map.Map Option (IORef Int) -> IORef [(Power, Position)] -> Gtk.EventM Gtk.EKey Bool
-interpretKeyPress flyer valMap valObserve = do
+interpretKeyPress :: (Flyable a) => a -> Map.Map Option (IORef Int) -> Gtk.EventM Gtk.EKey Bool
+interpretKeyPress flyer valMap = do
   keyName <- Gtk.eventKeyName
   case keyName of
     "Up" -> do -- Pitch forwards
@@ -94,9 +81,7 @@ interpretKeyPress flyer valMap valObserve = do
       liftIO $ putStrLn "o"
       pos <- liftIO $ observe flyer
       pwr <- liftIO $ readIORef $ valMap Map.! Throttle
-      priorObs <- liftIO $ readIORef valObserve
       liftIO $ putStrLn $ show (pwr, pos)
-      liftIO $ writeIORef valObserve ((pwr, pos) : priorObs)
       return True
 
     "Escape" -> do -- Quit the program
