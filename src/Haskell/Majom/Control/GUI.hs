@@ -6,9 +6,10 @@
 module Majom.Control.GUI (
   -- * Functions
   runGUI,
-  runGUIManualFly,
+  runGUIObserve,
   ) where
 
+import Majom.Common
 import Majom.Flyers.Flyable
 
 import Control.Monad.IO.Class
@@ -22,22 +23,24 @@ import Graphics.UI.Gtk( AttrOp ((:=)) )
 runGUI :: (Flyable a) => a -> IO ()
 runGUI flyer = do
   Gtk.initGUI
-  guiSetup flyer
+  guiSetup flyer undefined
   forkIO $ fly flyer
   Gtk.mainGUI
 
 -- | Run the GUI assuming that fly is called manually.
-runGUIManualFly :: (Flyable a) => a -> IO ()
-runGUIManualFly flyer = do
+runGUIObserve :: (Flyable a) => a -> IO [(Power, Position)]
+runGUIObserve flyer = do
   Gtk.initGUI
-  guiSetup flyer
+  observer <- newIORef []
+  guiSetup flyer observer
   -- Forking the mainGUI allows it to be killed by an external
   -- kill call to this thread. 
-  forkIO $ Gtk.mainGUI
-  return ()
+  forkIO $ fly flyer
+  Gtk.mainGUI
+  readIORef observer
 
-guiSetup :: (Flyable a) => a -> IO ()
-guiSetup flyer = do
+guiSetup :: (Flyable a) => a -> IORef [(Power, Position)] -> IO ()
+guiSetup flyer observer = do
   window <- Gtk.windowNew
   Gtk.set window [ Gtk.containerBorderWidth := 10 ]
   Gtk.onDestroy window Gtk.mainQuit
@@ -46,13 +49,13 @@ guiSetup flyer = do
         $ mapM newIORef [63, 63, 0, 63]
 
   Gtk.on window Gtk.keyPressEvent $ do
-    interpretKeyPress flyer vals
+    interpretKeyPress flyer vals observer
   Gtk.widgetSetCanFocus window True
   Gtk.widgetShowAll window
 
 -- | Takes a key press and turns it into a helicopter command.
-interpretKeyPress :: (Flyable a) => a -> Map.Map Option (IORef Int) -> Gtk.EventM Gtk.EKey Bool
-interpretKeyPress flyer valMap = do
+interpretKeyPress :: (Flyable a) => a -> Map.Map Option (IORef Int) -> IORef [(Power, Position)] -> Gtk.EventM Gtk.EKey Bool
+interpretKeyPress flyer valMap valObserve = do
   keyName <- Gtk.eventKeyName
   case keyName of
     "Up" -> do -- Pitch forwards
@@ -91,8 +94,11 @@ interpretKeyPress flyer valMap = do
       liftIO $ putStrLn "o"
       pos <- liftIO $ observe flyer
       pwr <- liftIO $ readIORef $ valMap Map.! Throttle
-      liftIO $ putStrLn $ show (pos, pwr)
+      priorObs <- liftIO $ readIORef valObserve
+      liftIO $ putStrLn $ show (pwr, pos)
+      liftIO $ writeIORef valObserve ((pwr, pos) : priorObs)
       return True
+
     "Escape" -> do -- Quit the program
       liftIO Gtk.mainQuit
       return True
