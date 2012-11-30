@@ -17,7 +17,7 @@ instance (Num a) => Num (V.Vector a) where
   as - bs = V.zipWith (-) as bs
   as * bs = V.zipWith (*) as bs
   negate a = V.map negate a
-  fromInteger x = V.fromList $ replicate (fromInteger x) 0
+  fromInteger x = error "Cannot instantiate Vector from Integer :("
   abs m = m
   signum _ = 1
 

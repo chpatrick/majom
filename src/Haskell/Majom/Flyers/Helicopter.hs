@@ -4,20 +4,34 @@
 module Majom.Flyers.Helicopter (
   -- * Types
   Helicopter(..),
+  -- * Functions
+  startHelicopter
   ) where
 
+import Control.Applicative
 import Data.ByteString(pack)
+import Data.Time.Clock
+import Data.IORef
+import qualified Data.Map as Map
 import System.Hardware.Serialport
 import Majom.Flyers.Flyable
 
 -- | A real helicopter!
-data Helicopter = Helicopter
+data Helicopter = Helicopter { getCurrentOptions :: IORef OptionMap }
+
+startHelicopter :: IO Helicopter
+startHelicopter = Helicopter <$> (newIORef Map.empty)
 
 instance Flyable Helicopter where
-  setFly _ o v = dropValM $ set o v
-  setFlyMany _ vs = dropValM $ setMany vs
-  fly _ = return ()
-  observe = undefined
+  setFly h o v = dropValM $ set h o v
+  setFlyMany h vs = dropValM $ setMany h vs
+  fly h = return ()
+  observe h = do
+    let optVar = getCurrentOptions h
+    pwr <- fmap (Map.! Throttle) $ readIORef optVar
+    time <- getCurrentTime
+    pos <- undefined
+    return (pwr, pos, time)
 
 -- | Drops monadic values we don't care about.
 dropValM :: (Monad m) => m a -> m ()
@@ -35,13 +49,21 @@ s = openSerial port defaultSerialSettings {
 -- | Sets the option to the supplied value. Will fail if 
 -- the serial port could not be set, or other IO related stuff. 
 -- Returns the number of bytes sent.
-set :: Option -> Int -> IO Int
-set o v = foo `seq` foo
+set :: Helicopter -> Option -> Int -> IO Int
+set h o v = do
+  let optsVar = getCurrentOptions h
+  opts <- readIORef optsVar
+  writeIORef optsVar $ process opts (o, v)
+  foo `seq` foo
   where
     foo = flip send (pack [fromIntegral $ fromEnum o, fromIntegral v]) =<< s
+    process :: OptionMap -> (Option, Int) -> OptionMap
+    process = flip $ uncurry Map.insert
+
+type OptionMap = Map.Map Option Int
 
 -- | Sends many options at once, in list order (later commands in
 -- the list will be sent after (possibly overriding) previous commands).
 -- Returns the total number of bytes sent.
-setMany :: [(Option, Int)] -> IO Int
-setMany = fmap sum . sequence . map (uncurry set)
+setMany :: Helicopter -> [(Option, Int)] -> IO Int
+setMany h = fmap sum . sequence . map (uncurry $ set h)
