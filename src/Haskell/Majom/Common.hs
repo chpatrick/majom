@@ -84,6 +84,9 @@ calcObservedAccel obs = if length obs < 3 then [] else
         accel = (vel - vel') |/| (diffTime t' t)
     calc vs = []
 
+-- TODO Think of a nice way to find a new accel etc. from past
+-- eg. an incremental version of above, probably using state
+
 diffTime :: UTCTime -> UTCTime -> Double
 diffTime i i' = fromInteger $ diffTimeToInt $ diffUTCTime i i'
 

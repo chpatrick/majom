@@ -11,8 +11,9 @@ Cabal-Version:  >=1.2
 
 Library
   Exposed-modules:
-    Majom.Analysis.Model,
+    Majom.Analysis.Kalman,
     Majom.Analysis.LeastSquares,
+    Majom.Analysis.Model,
     Majom.Common,
     Majom.Control.GUI,
     Majom.Control.Monkey,
