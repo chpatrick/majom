@@ -34,8 +34,13 @@ data Brain = Brain { brainModel :: Kalman,
 -- | Starts the monkey
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
+  let intent = undefined
   forkIO $ fly flyer
-  let initBrain = undefined -- set up the model and stuff here
+  (_, pos, t) <- observe flyer
+  milliSleep waitTime
+  (_, pos', t') <- observe flyer
+  let vel = (pos - pos') |/| (diffTime t' t)
+  let initBrain = Brain createNewModel intent (pos', vel, t')
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- The last thing is the return value
