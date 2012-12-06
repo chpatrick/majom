@@ -17,6 +17,7 @@ Library
     Majom.Common,
     Majom.Control.GUI,
     Majom.Control.Monkey,
+    Majom.Control.Monkey.Intention,
     Majom.Flyers.Flyable,
     Majom.Flyers.Helicopter,
     Majom.Flyers.VirtualHelicopter,

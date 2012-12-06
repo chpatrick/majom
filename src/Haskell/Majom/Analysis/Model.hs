@@ -17,6 +17,6 @@ import Majom.Common(Acceleration, Power)
 
 -- | Default model functions.
 class Model a where
-  getMap :: a -> (Power -> Acceleration)
+  getMap :: a -> (Acceleration -> Power)
   updateModel :: a -> (Power, Acceleration) -> a
   createNewModel :: a

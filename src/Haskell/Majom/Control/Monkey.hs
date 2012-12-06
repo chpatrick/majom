@@ -10,17 +10,13 @@ import Majom.Analysis.Model
 import Majom.Analysis.Kalman
 import Majom.Common
 import Majom.Flyers.Flyable
+import Majom.Control.Monkey.Intention
 
 import Control.Applicative
 import Control.Monad
 import Control.Monad.State
 import Control.Concurrent
 import Data.Time.Clock
-
-data Intention = Intention -- To be defined properly
-
-getAccel :: Intention -> Velocity -> Position -> Power
-getAccel = undefined
 
 type MonkeyBrainT = StateT Brain IO ()
 
@@ -51,7 +47,7 @@ monkeyDo flyer = do
   let vel' = (pos - pos') |/| (diffTime t' t)
   let accel = (vel' - vel) |/| (diffTime t' t)
   let model' = updateModel model (pwr, accel)
-  let pwr' = getAccel intent vel' pos
+  let pwr' = (getMap model') $ getAccel intent vel' pos
   put $ Brain model' intent (pos', vel', t')
   lift $ setFly flyer Throttle pwr'
   lift $ milliSleep waitTime
