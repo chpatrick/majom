@@ -29,6 +29,14 @@ instance (Num a) => Num (V.Vector a) where
 (|/|) :: Vector -> Double -> Vector
 (|/|) v d = V.map (/d) v
 
+-- | Unit a vector
+vectorUnit :: Vector -> Vector
+vectorUnit v = v |/| (vectorSize v)
+
+-- | Size a vector
+vectorSize :: Vector -> Double
+vectorSize v = sqrt $ V.sum $ v * v
+
 -- | Vector constructor
 vector2 :: Double -> Double -> Vector
 vector2 x y = V.fromList [x, y]

@@ -10,7 +10,8 @@ import Majom.Analysis.Model
 import Majom.Analysis.Kalman
 import Majom.Common
 import Majom.Flyers.Flyable
-import Majom.Control.Monkey.Intention
+import Majom.Control.Monkey.Intent
+import Majom.Control.Monkey.HoverIntent
 
 import Control.Applicative
 import Control.Monad
@@ -24,13 +25,13 @@ execMonkeyBrainT :: MonkeyBrainT -> Brain -> IO Brain
 execMonkeyBrainT mk k = execStateT mk k
 
 data Brain = Brain { brainModel :: Kalman,
-                     brainIntent :: Intention,
+                     brainIntent :: HoverIntent,
                      brainLast :: (Position, Velocity, UTCTime) }
 
 -- | Starts the monkey
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
-  let intent = undefined
+  let intent = hoverAt (vector [0,0])
   forkIO $ fly flyer
   (_, pos, t) <- observe flyer
   milliSleep waitTime
