@@ -15,9 +15,7 @@ module Majom.Analysis.LeastSquares (
   -- * Types
   LeastSquares,
   -- * Functions
-  isSeeded,
   samples,
-  setLeastSquares,
   ) where
 
 import Majom.Analysis.Model
@@ -41,9 +39,6 @@ sampleLimit :: Int
 sampleLimit = 10
 
 samples = length . lsSamples
-
-isSeeded :: LeastSquares -> Bool
-isSeeded (LeastSquares _ vs) = length vs >= sampleLimit
 
 updateMap :: LeastSquares -> LeastSquares
 updateMap ls@(LeastSquares _ vs) 

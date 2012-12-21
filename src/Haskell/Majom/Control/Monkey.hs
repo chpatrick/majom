@@ -34,6 +34,7 @@ runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
   let intent = hoverAt (vector [50,100])
   forkIO $ fly flyer
+  milliSleep waitTime
   (_, pos, t) <- observe flyer
   milliSleep waitTime
   (_, pos', t') <- observe flyer
@@ -58,6 +59,7 @@ monkeyDo flyer = do
   lift $ putStrLn $ "New velocity: " ++ (show vel')
   lift $ putStrLn $ "New acceleration: " ++ (show accel)
   lift $ putStrLn $ "Setting fly to " ++ (show pwr') ++ " for accel " ++ (show $ getAccel intent vel' pos)
+  --lift $ putStrLn $ show $ lsSamples model'
   lift $ putStrLn ""
   put $ Brain model' intent (pos', vel', t')
   lift $ setFly flyer Throttle pwr'
