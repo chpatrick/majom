@@ -45,7 +45,14 @@ port = "/dev/ttyACM0"
 s :: IO SerialPort
 s = openSerial port defaultSerialSettings { 
       flowControl = Software }
-              
+             
+-- | Clamps the value to the feasible range
+clamp :: Int -> Int 
+clamp i 
+  | i > 127   = 127
+  | i < 0     = 0
+  | otherwise = i
+
 -- | Sets the option to the supplied value. Will fail if 
 -- the serial port could not be set, or other IO related stuff. 
 -- Returns the number of bytes sent.
@@ -53,7 +60,7 @@ set :: Helicopter -> Option -> Int -> IO Int
 set h o v = do
   let optsVar = getCurrentOptions h
   opts <- readIORef optsVar
-  writeIORef optsVar $ process opts (o, v)
+  writeIORef optsVar $ process opts (o, clamp v)
   foo `seq` foo
   where
     foo = flip send (pack [fromIntegral $ fromEnum o, fromIntegral v]) =<< s

@@ -6,6 +6,6 @@ import Majom.Flyers.Helicopter
 
 main = do
   putStrLn "Hello, majom!"
-  --runGUI Helicopter
+  runGUI =<< startHelicopter
   --runGUI =<< spawnVirtualHelicopter
-  runMonkey =<< spawnVirtualHelicopter
+  --runMonkey =<< spawnVirtualHelicopter
