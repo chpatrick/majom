@@ -2,7 +2,6 @@
 module Majom.Common where
 
 import qualified Data.Vector as V
-import Data.Time.Clock
 
 instance (Num a, Num b) => Num (a,b) where
   (x1,x2) + (y1,y2) = (x1+y1,x2+y2)
@@ -77,26 +76,17 @@ gravity :: Force
 gravity = vector2 0 (-9.8)
 
 -- There is an implicit ordering, with newest observations at the front.
-calcObservedAccel :: [(Power, Position, UTCTime)] -> [(Power, Acceleration)]
+calcObservedAccel :: [(Power, Position, Time)] -> [(Power, Acceleration)]
 calcObservedAccel obs = if length obs < 3 then [] else
   calc x
   where
     x = reverse obs
 
-    calc :: [(Power, Position, UTCTime)] -> [(Power, Acceleration)]
+    calc :: [(Power, Position, Time)] -> [(Power, Acceleration)]
     calc v@((_, pos'', t''):(_, pos', t'):(pwr, pos, t):vs) =
       (pwr, accel) : calc (tail v)
       where
-        vel' = (pos' - pos'') |/| (diffTime t'' t')
-        vel  = (pos - pos') |/| (diffTime t' t)
-        accel = (vel - vel') |/| (diffTime t' t)
+        vel' = (pos' - pos'') |/| (t'' - t')
+        vel  = (pos - pos') |/| (t' - t)
+        accel = (vel - vel') |/| (t' - t)
     calc vs = []
-
--- TODO Think of a nice way to find a new accel etc. from past
--- eg. an incremental version of above, probably using state
-
-diffTime :: UTCTime -> UTCTime -> Double
-diffTime i i' = fromInteger $ diffTimeToInt $ diffUTCTime i i'
-
-diffTimeToInt :: NominalDiffTime -> Integer
-diffTimeToInt = floor. toRational

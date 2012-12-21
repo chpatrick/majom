@@ -19,8 +19,8 @@ import Control.Concurrent
 import Control.Concurrent.STM
 import Control.Monad.IO.Class
 import Data.IORef
-import Data.Time.Clock
 import qualified Data.Map as Map
+import System.CPUTime
 
 -- | A data type containing base information about a helicopter, such as 
 -- the current options it holds and its current position
@@ -30,10 +30,16 @@ data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)],
 spawnVirtualHelicopter :: IO VirtualHelicopter
 spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (vector2 0 0)) <*> (newTVar Map.empty)
 
+clamp :: Int -> Int
+clamp i
+  | i > 127   = 127
+  | i < 0     = 0
+  | otherwise = i
+
 instance Flyable VirtualHelicopter where
   setFly h o v = do
     let options = getOptions h
-    atomically $ writeTVar options . ((o, v) :) =<< readTVar options
+    atomically $ writeTVar options . ((o, clamp v) :) =<< readTVar options
     return ()
   setFlyMany h vs = do 
     let options = getOptions h
@@ -41,12 +47,12 @@ instance Flyable VirtualHelicopter where
     return ()
   fly = run 
   observe h = do
-    time <- getCurrentTime
+    picoTime <- getCPUTime
     (pwr, pos) <- atomically $ do
       pos <- readTVar $ getPosition h
       pwr <- currentPower
       return (pwr, pos)
-    return (pwr, pos, time)
+    return (pwr, pos, (fromInteger picoTime) / (fromInteger cpuTimePrecision))
     where
       sequence3 :: Monad m => (m a, m b, m c) -> m (a, b, c)
       sequence3 (m1, m2, m3) = do

@@ -10,9 +10,9 @@ module Majom.Flyers.Helicopter (
 
 import Control.Applicative
 import Data.ByteString(pack)
-import Data.Time.Clock
 import Data.IORef
 import qualified Data.Map as Map
+import System.CPUTime
 import System.Hardware.Serialport
 import Majom.Flyers.Flyable
 
@@ -29,9 +29,9 @@ instance Flyable Helicopter where
   observe h = do
     let optVar = getCurrentOptions h
     pwr <- fmap (Map.! Throttle) $ readIORef optVar
-    time <- getCurrentTime
+    picoTime <- getCPUTime
     pos <- undefined
-    return (pwr, pos, time)
+    return (pwr, pos, (fromInteger picoTime) / (fromInteger cpuTimePrecision))
 
 -- | Drops monadic values we don't care about.
 dropValM :: (Monad m) => m a -> m ()

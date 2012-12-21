@@ -41,7 +41,7 @@ startSimulation position object = do
 
 -- | Iteration time in milliseconds
 stepTime :: Int
-stepTime = 1000
+stepTime = 50
 
 -- | Converts milliseconds to seconds
 milliToSeconds :: Int -> Double
@@ -49,7 +49,7 @@ milliToSeconds = (/1000) . fromIntegral
 
 simulate :: TVar Force -> TVar Position -> Object -> IO ()
 simulate forceVar positionVar object = do
-    displayObject object
+   -- displayObject object
     force <- atomically $ readTVar forceVar
     atomically $ writeTVar positionVar $ objectLocation object
     threadDelay (stepTime * 1000)

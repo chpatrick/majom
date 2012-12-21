@@ -7,7 +7,7 @@ module Majom.Control.Monkey (
   ) where
 
 import Majom.Analysis.Model
-import Majom.Analysis.Kalman
+import Majom.Analysis.LeastSquares
 import Majom.Common
 import Majom.Flyers.Flyable
 import Majom.Control.Monkey.Intent
@@ -17,44 +17,56 @@ import Control.Applicative
 import Control.Monad
 import Control.Monad.State
 import Control.Concurrent
-import Data.Time.Clock
+
+import System.CPUTime
 
 type MonkeyBrainT = StateT Brain IO ()
 
 execMonkeyBrainT :: MonkeyBrainT -> Brain -> IO Brain
 execMonkeyBrainT mk k = execStateT mk k
 
-data Brain = Brain { brainModel :: Kalman,
+data Brain = Brain { brainModel :: LeastSquares,
                      brainIntent :: HoverIntent,
-                     brainLast :: (Position, Velocity, UTCTime) }
+                     brainLast :: (Position, Velocity, Time) }
 
 -- | Starts the monkey
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
-  let intent = hoverAt (vector [0,0])
+  let intent = hoverAt (vector [50,100])
   forkIO $ fly flyer
   (_, pos, t) <- observe flyer
   milliSleep waitTime
   (_, pos', t') <- observe flyer
-  let vel = (pos - pos') |/| (diffTime t' t)
+  let vel = (pos - pos') |/| wt
   let initBrain = Brain createNewModel intent (pos', vel, t')
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- The last thing is the return value
 monkeyDo :: (Flyable a) => a -> MonkeyBrainT
 monkeyDo flyer = do
+  lift $ milliSleep waitTime
   (Brain model intent (pos, vel, t)) <- get
   obs@(pwr, pos', t') <- lift $ observe flyer
-  let vel' = (pos - pos') |/| (diffTime t' t)
-  let accel = (vel' - vel) |/| (diffTime t' t)
+  let vel' = (pos' - pos) |/| wt --(t' - t)
+  let accel = (vel' - vel) |/| wt --(t' - t)
   let model' = updateModel model (pwr, accel)
   let pwr' = (getMap model') $ getAccel intent vel' pos
+--  lift $ if isSeeded model' then putStrLn "Seeded!" else putStrLn "Not seeded :("
+  lift $ putStrLn $ (show $ samples model') ++ " samples."
+  lift $ putStrLn $ "Observed pwr: " ++ (show pwr)
+  lift $ putStrLn $ "New position: " ++ (show pos')
+  lift $ putStrLn $ "New velocity: " ++ (show vel')
+  lift $ putStrLn $ "New acceleration: " ++ (show accel)
+  lift $ putStrLn $ "Setting fly to " ++ (show pwr') ++ " for accel " ++ (show $ getAccel intent vel' pos)
+  lift $ putStrLn ""
   put $ Brain model' intent (pos', vel', t')
   lift $ setFly flyer Throttle pwr'
-  lift $ milliSleep waitTime
 
 waitTime :: Int
 waitTime = 100
+
+wt :: Double
+wt = (fromIntegral waitTime) / 1000.0
 
 milliSleep :: Int -> IO ()
 milliSleep = threadDelay . (*) 1000

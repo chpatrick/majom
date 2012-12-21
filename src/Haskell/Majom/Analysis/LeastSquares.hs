@@ -15,6 +15,8 @@ module Majom.Analysis.LeastSquares (
   -- * Types
   LeastSquares,
   -- * Functions
+  isSeeded,
+  samples,
   setLeastSquares,
   ) where
 
@@ -30,20 +32,22 @@ data LeastSquares =
     }
 
 instance Model LeastSquares where
-  createNewModel = (\x -> LeastSquares (constructMap x) x)
-    [(0, vector [0,0,0]),(1,vector [0,1,0])]
+  createNewModel = (\x -> LeastSquares (constructMap x) [])
+    [(50, vector [0,0]),(0,vector [0,-10])]
   getMap = lsMap
   updateModel (LeastSquares m vs) v = updateMap $ LeastSquares m (v:vs)
      
 sampleLimit :: Int
-sampleLimit = 1000
+sampleLimit = 10
+
+samples = length . lsSamples
 
 isSeeded :: LeastSquares -> Bool
 isSeeded (LeastSquares _ vs) = length vs >= sampleLimit
 
 updateMap :: LeastSquares -> LeastSquares
 updateMap ls@(LeastSquares _ vs) 
-  | length vs == sampleLimit = LeastSquares (constructMap vs) vs
+  | length vs >= sampleLimit = LeastSquares (constructMap vs) vs
   | otherwise = ls
 
 -- | Deconstructs the acceleration vector into three parts and performs
