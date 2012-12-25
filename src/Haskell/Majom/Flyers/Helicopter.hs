@@ -19,6 +19,7 @@ import Majom.Flyers.Flyable
 -- | A real helicopter!
 data Helicopter = Helicopter { getCurrentOptions :: IORef OptionMap }
 
+-- | Starts an instance of the helicopter communication protocol.
 startHelicopter :: IO Helicopter
 startHelicopter = Helicopter <$> (newIORef Map.empty)
 

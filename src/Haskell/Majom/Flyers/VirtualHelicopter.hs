@@ -96,7 +96,7 @@ basicMap o v =
   case o of 
     Yaw -> vector [0,0,0]
     Pitch -> vector [0,0,0]
-    Throttle -> vector [0,0.2,0] |*| (fromIntegral v)
+    Throttle -> vector [0,0.143,0] |*| (fromIntegral v)
     Correction -> vector [0,0,0] 
 
 -- | Takes a list of options and applies them to the model.

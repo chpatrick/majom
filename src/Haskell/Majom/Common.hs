@@ -40,13 +40,19 @@ vectorSize v = sqrt $ V.sum $ v * v
 vector2 :: Double -> Double -> Vector
 vector2 x y = V.fromList [x, y]
 
+-- | Creates a vector from a list.
 vector :: [Double] -> Vector
 vector = V.fromList
 
+-- | Gets the X value of a vector.
 vectorX :: Vector -> Double
 vectorX = (V.! 0)
+
+-- | Gets the Y value of a vector.
 vectorY :: Vector -> Double
 vectorY = (V.! 1)
+
+-- | Gets the Z value of a vector.
 vectorZ :: Vector -> Double
 vectorZ = (V.! 2)
 
@@ -75,6 +81,8 @@ type Power = Int
 gravity :: Force
 gravity = vector2 0 (-9.8)
 
+-- | Calcules the acceleration at a given observation time, given 
+-- a string of observed events.
 -- There is an implicit ordering, with newest observations at the front.
 calcObservedAccel :: [(Power, Position, Time)] -> [(Power, Acceleration)]
 calcObservedAccel obs = if length obs < 3 then [] else
