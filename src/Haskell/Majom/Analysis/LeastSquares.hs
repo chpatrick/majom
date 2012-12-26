@@ -32,14 +32,14 @@ data LeastSquares =
 
 instance Model LeastSquares where
   createNewModel = (\x -> LeastSquares (constructMap x) Map.empty)
-    [(70, vector [0,0]),(0,vector [0,-10])]
+    [(70, vector [0,0,0]),(0,vector [0,-10,0])]
   getMap = lsMap
   updateModel (LeastSquares m vs) (p,v) = updateMap $ LeastSquares m (Map.insert p v vs)
 
 -- | The number of samples to take on the initial assumption
 -- before beginning map updates
 sampleLimit :: Int
-sampleLimit = 10
+sampleLimit = 5
 
 -- | The number of samples of a model
 samples = Map.size . lsSamples

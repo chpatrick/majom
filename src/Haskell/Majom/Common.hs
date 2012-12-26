@@ -79,7 +79,7 @@ type Power = Int
 
 -- | Gravity force constant
 gravity :: Force
-gravity = vector2 0 (-9.8)
+gravity = vector [0, (-9.8), 0]
 
 -- | Calcules the acceleration at a given observation time, given 
 -- a string of observed events.

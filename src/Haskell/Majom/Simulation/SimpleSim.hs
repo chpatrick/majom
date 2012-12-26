@@ -7,6 +7,8 @@ module Majom.Simulation.SimpleSim (
   -- * Functions
   updatePosition,
   simpleObject,
+  defaultSettings,
+  setFloor,
   startSimulation
   ) where
 
@@ -32,11 +34,20 @@ updatePosition t fs (Object m p v) =
     newV = v + (acc |*| t) 
     acc = fs |*| (1/m)
 
+data SimulationSettings = Settings { simFloor :: Maybe Position } 
+  deriving Show
+
+defaultSettings :: SimulationSettings
+defaultSettings = Settings Nothing
+
+setFloor :: Maybe Position -> SimulationSettings -> SimulationSettings
+setFloor p s = s{simFloor = p}
+
 -- | Starts a simulation thread, showing the simulation on a GUI
-startSimulation :: TVar Position -> Object -> IO (TVar Force)
-startSimulation position object = do
+startSimulation :: SimulationSettings -> TVar Position -> Object -> IO (TVar Force)
+startSimulation settings position object = do
   forces <- atomically $ newTVar (vector [0, 0, 0])
-  forkIO $ simulate forces position object
+  forkIO $ simulate settings forces position object
   return forces
 
 -- | Iteration time in milliseconds
@@ -47,14 +58,29 @@ stepTime = 50
 milliToSeconds :: Int -> Double
 milliToSeconds = (/1000) . fromIntegral
 
-simulate :: TVar Force -> TVar Position -> Object -> IO ()
-simulate forceVar positionVar object = do
-   -- displayObject object
+simulate :: SimulationSettings -> TVar Force -> TVar Position -> Object -> IO ()
+simulate settings forceVar positionVar object = do
+    --displayObject object
     force <- atomically $ readTVar forceVar
     atomically $ writeTVar positionVar $ objectLocation object
     threadDelay (stepTime * 1000)
-    simulate forceVar positionVar $ 
-      updatePosition (milliToSeconds stepTime) (force + gravity) object
+    let obj' = updatePosition (milliToSeconds stepTime) (force + gravity) object
+    let pos' = objectLocation obj'
+    let vel' = objectVelocity obj'
+    simulate settings forceVar positionVar $ 
+      -- | Check case of floor - could be extracted
+      case simFloor settings of
+        Nothing -> obj'
+        Just f -> if objectLocation obj' `lowerThan` f
+          then
+            obj'{objectLocation = vector [vectorX pos', vectorY f, vectorZ pos'],objectVelocity = vector [vectorX vel', 0.0, vectorZ vel'] }
+          else
+            obj'
+
+-- | Returns true if the second var is lower (has a lesser Y vector)
+-- than the first var.
+lowerThan :: Position -> Position -> Bool
+lowerThan p1 p2 = vectorY p1 < vectorY p2
 
 displayObject :: Object -> IO ()
 displayObject o = putStrLn $ "Loc: " ++ (show $ objectLocation o) ++ ", Vel: " ++ (show $ objectVelocity o)

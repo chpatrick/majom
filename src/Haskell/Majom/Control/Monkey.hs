@@ -32,7 +32,7 @@ data Brain = Brain { brainModel :: LeastSquares,
 -- | Starts the monkey
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
-  let intent = hoverAt (vector [50,55])
+  let intent = hoverAt (vector [50,55,0])
   forkIO $ fly flyer
   milliSleep waitTime
   (_, pos, t) <- observe flyer
