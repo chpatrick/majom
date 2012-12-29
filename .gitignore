@@ -9,3 +9,4 @@ src/Arduino/tools
 *.swp
 *.swo
 *.pyo
+*.lyx~

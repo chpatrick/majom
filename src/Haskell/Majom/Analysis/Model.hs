@@ -20,3 +20,4 @@ class Model a where
   getMap :: a -> (Acceleration -> Power)
   updateModel :: a -> (Power, Acceleration) -> a
   createNewModel :: a
+  samples :: a -> [(Power, Acceleration)]

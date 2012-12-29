@@ -1,0 +1,200 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2cm
+\topmargin 3cm
+\rightmargin 2cm
+\bottommargin 3cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Interim Report
+\end_layout
+
+\begin_layout Author
+Luke Tomlin
+\end_layout
+
+\begin_layout Date
+29/12/2012
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+The projects main objectives can be summarised by one sentence - to mimic
+ how a person would learn to fly and operate a small remote control helicopter
+ in an indoor environment.
+ This objective is an interesting one, as it can be split into key areas
+ of focus, each providing an engineering challenge, and then they all need
+ to be combined to create the finished product.
+ The problem is best described by the limiting factors - we have a room
+ indoors, a small remote-controlled helicopter, a computer and a simple
+ camera source capable of estimating depth to some degree of accuracy.
+ With these boundaries, the final aim is to have the computer learn to fly
+ the helicopter, and given goals from a human, enact them correctly.
+ The difficulties are in the details - how exactly does one learn to fly
+ a helicopter? How will we reliably get positional information for the helicopte
+r in the room? These are just a few of the potential problems.
+\end_layout
+
+\begin_layout Paragraph
+Deconstruction
+\end_layout
+
+\begin_layout Standard
+The first step is to try and separate the individual programming problems
+ into a way that is easily reasoned about.
+ Once they have been divided, research can be done on the specific problems,
+ and tools can be created to start tackling the problems at hand.
+ For instance, the computer vision problem is entirely different from that
+ of the machine learning - the machine operates under the assumption that
+ the positional information is mostly accurate, and it is up to the computer
+ vision module to provide these mostly accurate readings.
+\end_layout
+
+\begin_layout Paragraph
+Mimicry
+\end_layout
+
+\begin_layout Standard
+I decided to tackle this problem by thinking about how a human would go
+ about it, reducing it to the key problems and then thinking about how a
+ machine could go about tackling them.
+ The final project will be split into modules, each providing a different
+ role.
+\end_layout
+
+\begin_layout Paragraph
+Complexity
+\end_layout
+
+\begin_layout Standard
+The easiest place to see the complexity in this project is by looking at
+ the computer vision aspect.
+ Initially I will try to deal with the simplest case - that of a purely
+ virtualised environment with completely controlled variables - no computer
+ vision required.
+ Then, for the first step, I will try to work in 1 dimension only, that
+ is up and down.
+ This restricts the vision to 1 dimension also, tracking the movement of
+ a blob up and down.
+ Expanding this to 2 dimensions should not be as much of a problem from
+ the computer vision perspective, but requires increased complexity of the
+ AI itself - it needs to know 
+\begin_inset Formula $how$
+\end_inset
+
+ a helicopter moves forward and backwards, using the main propellor for
+ upwards and forwards thrust.
+ Expanding to 3 dimensions provides even more challenges - from navigating
+ a 3 dimension environment (obtaining depth information and object awareness)
+ to reasoning about the movements of a helicopter in a 3D environment.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+How can it be solved?f
+\end_layout
+
+\begin_layout Paragraph
+Computer Vision
+\end_layout
+
+\begin_layout Paragraph
+Machine Learning
+\end_layout
+
+\begin_layout Paragraph
+Technology
+\end_layout
+
+\begin_layout Section
+Background
+\end_layout
+
+\begin_layout Section
+Project plan
+\end_layout
+
+\begin_layout Subsubsection*
+Milestones
+\end_layout
+
+\begin_layout Subsubsection*
+Extensions
+\end_layout
+
+\begin_layout Section
+Evaluation plan
+\end_layout
+
+\begin_layout Subsubsection*
+Required functionality
+\end_layout
+
+\begin_layout Subsubsection*
+Quality of functionality
+\end_layout
+
+\end_body
+\end_document

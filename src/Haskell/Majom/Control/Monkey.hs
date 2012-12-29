@@ -32,36 +32,53 @@ data Brain = Brain { brainModel :: LeastSquares,
 -- | Starts the monkey
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
-  let intent = hoverAt (vector [50,55,0])
+  let intent = hoverAt (vector [50,100,0])
   forkIO $ fly flyer
   milliSleep waitTime
-  (_, pos, t) <- observe flyer
+  (_, pos, _) <- observe flyer
   milliSleep waitTime
-  (_, pos', t') <- observe flyer
+  (_, pos', _) <- observe flyer
   let vel = (pos - pos') |/| wt
-  let initBrain = Brain createNewModel intent (pos', vel, t')
+  let initBrain = Brain createNewModel intent (pos', vel, undefined)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
+
+monkeySay :: (Model a) => 
+  (a, a, Power, Position, Velocity, Power, Acceleration) -> IO ()
+monkeySay (model, model', pwr, pos', vel', pwr', accel') = do
+  putStrLn $ (show $ length $ samples model') ++ " samples."
+  putStrLn $ "Observed pwr: " ++ (show pwr)
+  putStrLn $ "New position: " ++ (show pos')
+  putStrLn $ "New velocity: " ++ (show vel')
+  putStrLn $ "Setting fly to " ++ (show pwr') ++ " for accel " ++ (show accel')
+  putStrLn $ show $ samples model
+  putStrLn ""
+  
+monkeyThink :: (Intent a, Model b) => 
+  a -> b -> Power -> (Position, Position) -> Velocity 
+  -> (b, Position, Velocity, Power)
+monkeyThink intent model pwr (pos, pos') vel = do
+  (model', pos', vel', pwr')
+  where
+    vel' = (pos' - pos) |/| wt
+    accel = (vel' - vel) |/| wt
+    model' = updateModel model (pwr, accel)
+    pwr' = (getMap model') $ getAccel intent vel' pos
 
 -- The last thing is the return value
 monkeyDo :: (Flyable a) => a -> MonkeyBrainT
 monkeyDo flyer = do
   lift $ milliSleep waitTime
-  (Brain model intent (pos, vel, t)) <- get
-  obs@(pwr, pos', t') <- lift $ observe flyer
-  let vel' = (pos' - pos) |/| wt --(t' - t)
-  let accel = (vel' - vel) |/| wt --(t' - t)
-  let model' = updateModel model (pwr, accel)
-  let pwr' = (getMap model') $ getAccel intent vel' pos
-  lift $ putStrLn $ (show $ samples model') ++ " samples."
-  lift $ putStrLn $ "Observed pwr: " ++ (show pwr)
-  lift $ putStrLn $ "New position: " ++ (show pos')
-  lift $ putStrLn $ "New velocity: " ++ (show vel')
-  lift $ putStrLn $ "New acceleration: " ++ (show accel)
-  lift $ putStrLn $ "Setting fly to " ++ (show pwr') ++ " for accel " ++ (show $ getAccel intent vel' pos)
-  lift $ showSamples model
-  lift $ putStrLn ""
-  put $ Brain model' intent (pos', vel', t')
+
+  (Brain model intent (pos, vel, _)) <- get
+  obs@(pwr, pos', _) <- lift $ observe flyer
+  let (model', pos', vel', pwr') = monkeyThink intent model pwr (pos, pos') vel
+
+  -- For debugging
+  lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
+
+  put $ Brain model' intent (pos', vel', undefined)
   lift $ setFly flyer Throttle pwr'
+
 
 waitTime :: Int
 waitTime = 100

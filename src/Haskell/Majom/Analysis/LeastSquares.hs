@@ -2,20 +2,11 @@
 -- step by step learning, better for observing the making a one 
 -- time judgement. Useful maybe for testing?
 
--- Should try doing it in X segments - or take from a wide sampling
--- range? Keep sampling, removing if more 'varied' one appears or
--- if it gets too old - say after 10 seconds or so?
---
--- Hmmm... guess I'll do this tomorrow - maybe sketch it out and
--- see how it works. Store the structure and stuff in the data
--- type. 
 module Majom.Analysis.LeastSquares (
   -- * Classes
   -- * Types
   LeastSquares,
   -- * Functions
-  samples,
-  showSamples,
   ) where
 
 import Majom.Analysis.Model
@@ -35,25 +26,18 @@ instance Model LeastSquares where
     [(70, vector [0,0,0]),(0,vector [0,-10,0])]
   getMap = lsMap
   updateModel (LeastSquares m vs) (p,v) = updateMap $ LeastSquares m (Map.insert p v vs)
+  samples = Map.assocs . lsSamples
 
 -- | The number of samples to take on the initial assumption
 -- before beginning map updates
 sampleLimit :: Int
 sampleLimit = 5
 
--- | The number of samples of a model
-samples = Map.size . lsSamples
-
--- | Show the current samples
-showSamples = putStrLn . show . Map.assocs . lsSamples
-
 -- | Update the map from a given least squares model.
 updateMap :: LeastSquares -> LeastSquares
 updateMap ls@(LeastSquares _ vs) 
   | Map.size vs >= sampleLimit = LeastSquares (constructMap (Map.assocs vs)) vs
   | otherwise = ls
-
--- TODO Need a way of keeping 'unique' values and removing ones that exist
 
 -- | Deconstructs the acceleration vector into three parts and performs
 -- LS on each vector. 
