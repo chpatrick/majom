@@ -152,20 +152,62 @@ The easiest place to see the complexity in this project is by looking at
  
 \end_layout
 
-\begin_layout Subsubsection*
-How can it be solved?f
-\end_layout
-
 \begin_layout Paragraph
 Computer Vision
+\end_layout
+
+\begin_layout Standard
+As discussed above, there are a multitude of tasks that need to be performed
+ from a vision perspective before the overall aims can be realised.
+ I aim to start from as simplified as possible, simply tracking an object
+ on a 2D white background, and then from this gradually iterate the vision
+ module, adding extra functionality and dimensions.
+ Each iteration will present its own challenges, from getting depth information
+ to tracking orientation of the helicopter.
 \end_layout
 
 \begin_layout Paragraph
 Machine Learning
 \end_layout
 
+\begin_layout Standard
+The AI that flies the helicopter is wholly separate from the vision, and
+ instead is supposed to recreate the learning aspects of the abstract idea
+ of a helicopter.
+ Its key requirement is to know exactly how to fly the helicopter, given
+ information about the current whereabouts, and know how to act upon the
+ orders that it is given.
+ 
+\end_layout
+
 \begin_layout Paragraph
 Technology
+\end_layout
+
+\begin_layout Standard
+To aid the realisation of the aims, I plan to use some 
+\begin_inset Quotes eld
+\end_inset
+
+pre-made
+\begin_inset Quotes erd
+\end_inset
+
+ technology.
+ This will allow me to focus on the project as the whole.
+ 
+\end_layout
+
+\begin_layout Subparagraph*
+Kinect
+\end_layout
+
+\begin_layout Subparagraph*
+OpenCV
+\end_layout
+
+\begin_layout Subparagraph*
+Arduino
 \end_layout
 
 \begin_layout Section
@@ -174,6 +216,10 @@ Background
 
 \begin_layout Section
 Project plan
+\end_layout
+
+\begin_layout Standard
+There are 
 \end_layout
 
 \begin_layout Subsubsection*
