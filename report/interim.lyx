@@ -219,15 +219,129 @@ Project plan
 \end_layout
 
 \begin_layout Standard
-There are 
+The project as a whole can be split into multiple stages, and each of these
+ stages is composed of discrete parts.
+ 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Milestones
 \end_layout
 
+\begin_layout Standard
+These are the key things that need to be done - these milestones define
+ the project as a whole.
+\end_layout
+
 \begin_layout Subsubsection*
+Technology research and foundation implementations
+\end_layout
+
+\begin_layout Standard
+Before I begin doing any programming, I have to research the technologies
+ that I am going to use, and see how they will all fit together.
+ This includes finding documentation for the technologies, learning to use
+ them, and judging their usefulness.
+ Additionally, there are several parts of the project that are essential
+ and must be implemented as a 'foundation' before I can even begin any work
+ at all!
+\end_layout
+
+\begin_layout Paragraph*
+Back-engineering the RC protocol
+\end_layout
+
+\begin_layout Standard
+To control the remote control helicopter from a computer, it was essential
+ to be able to accurately replicate the signal that is sent from the normal
+ stock controller.
+ There were a variety of sources on the internet that had already done things
+ similar to this before, so I was able to get a rough idea of where to start
+ from there, and then performed my own experimentation to see what was best.
+ In addition to just figuring out how the protocol worked, I had to think
+ of a way to actually send the signal to the helicopter! I did some research
+ online, and decided to use an Arduino board.
+ After some fiddling around with the Arduino language, I was able to create
+ a simple circuit that could send pulses to the helicopter.
+ From here it was just playing around with different variations of the protocol
+ to see which one worked best.
+\end_layout
+
+\begin_layout Paragraph*
+Tool creation
+\end_layout
+
+\begin_layout Standard
+At this point I had to create the basic tools with which I would create
+ the finished product.
+ These included the interface from the AI to the Arduino, a GUI so I could
+ manually control the helicopter from the computer, and a simulation environment
+ so I could play around with the AI in a controlled environment before trying
+ it on the real thing.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Monkey
+\end_layout
+
+\begin_layout Standard
+I decided to name the AI a 'Monkey', as I figured that would fit in with
+ the mimicry motto 
+\begin_inset Quotes eld
+\end_inset
+
+monkey see, monkey do
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The monkey had to be able to replicate how a human would learn to fly a
+ helicopter.
+ At the simplest level, the monkey operates under the knowledge of the current
+ position of the helicopter in 3D space, and the time of that observation.
+ The monkey does not worry exactly how this position is found, it just works
+ on how to fly the helicopter from the information that it is receiving.
+\end_layout
+
+\begin_layout Subsubsection*
+Vision
+\end_layout
+
+\begin_layout Standard
+The vision part is responsible for obtaining a reliable and quick value
+ for the current position of the helicopter in 3D space, as well as (later
+ on) providing other spacial information that might be relevant.
+ I'll start simple, doing basic shape detection on a plain background in
+ 2D, and then later on try to expand this to 3D by getting depth information
+ and try to get orientation information about the helicopter.
+\end_layout
+
+\begin_layout Subsection*
+Timetable
+\end_layout
+
+\begin_layout Standard
+Here is a rough timetable for the project:
+\end_layout
+
+\begin_layout Description
+Pre-January Have all foundation tech done - simple simulations, controls
+ from computer, simple AI framework, GUI.
+ Interim report.
+\end_layout
+
+\begin_layout Description
+February Basic hover/landing working in simulation and on real-helicopter.
+ Start improving computer vision techniques.
+\end_layout
+
+\begin_layout Subsection*
 Extensions
+\end_layout
+
+\begin_layout Standard
+My provisional aim for this project is to 
 \end_layout
 
 \begin_layout Section
