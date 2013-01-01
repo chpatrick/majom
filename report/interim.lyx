@@ -202,16 +202,138 @@ pre-made
 Kinect
 \end_layout
 
+\begin_layout Standard
+For the computer vision, I will use a Kinect sensor device, created by Microsoft
+, which provides me with both an RGB camera and a method for calculating
+ depth of the image.
+ Additionally, there are several freely available open-source software kits
+ for interacting with the Kinect on any platform.
+ This should make the computer vision aspect simpler, as I will be able
+ to use the depth map that the kinect generates to augment any results I
+ get from the single camera source.
+\end_layout
+
 \begin_layout Subparagraph*
 OpenCV
+\end_layout
+
+\begin_layout Standard
+OpenCV (Open Source Computer Vision Library) is a library of programming
+ functions that will let me perform image analysis from the Kinect.
+ It is free to use, and has many different implementations in different
+ programming languages.
 \end_layout
 
 \begin_layout Subparagraph*
 Arduino
 \end_layout
 
+\begin_layout Standard
+Arduino is an open-source microcontroller, which lets the user work with
+ a simple programming language to control how the circuit works.
+ It also comes with a Processing-based IDE for programming in, that handles
+ a lot of the communications between the board and the computer.
+ Additionally, the board itself is reasonably cheap to purchase and highly
+ re-usable.
+\end_layout
+
 \begin_layout Section
 Background
+\end_layout
+
+\begin_layout Standard
+The whole basis from this project is from a suggestion by Google engineer
+ Johnny Chung Lee, from his blog post 
+\begin_inset Quotes eld
+\end_inset
+
+Computer Controlling a Syma Helicopter
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Syma"
+
+\end_inset
+
+.
+ In his post, he talks about possible methods for setting up the control
+ of a remote helicopter, as far as controlling it manually from a computer.
+ He then conjectures the possibility of using a camera or similar to control
+ the helicopter, and getting it to hover.
+ He leaves the detail of this up to the user, however!
+\end_layout
+
+\begin_layout Standard
+Armed with this inspiration for a starting point, I took to reading some
+ detail for how I would set the foundations of the project up.
+ This included browsing some other pages on using Arduino
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Arduino,Syma2"
+
+\end_inset
+
+, IR control of the helicopter
+\begin_inset CommandInset citation
+LatexCommand cite
+key "IR"
+
+\end_inset
+
+ and circuit plans
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Syma2"
+
+\end_inset
+
+.
+ There was a lot of trial and error involved with the building of the circuit,
+ as I had done any electrical engineering for many years! Initially I built
+ a simple LED circuit to get a feel for how the Arduino itself worked, and
+ then once I was confident with that I built the main IR circuit.
+ This proved to work well enough, however there were some teething problems
+ - the helicopter would jutter and work sporadically.
+ The problem because better and worse as I changed the timing values for
+ the IR signals, so it was evident that it was a problem with the signal.
+ After doing some further reading on precise timing using the Arduino
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Arduino port"
+
+\end_inset
+
+, and some trial and error, I found the value range that seemed to work
+ best, or at least well enough for me.
+ 
+\end_layout
+
+\begin_layout Standard
+I took a small amount of time to consider the feasibility of Arduino for
+ the task at hand - for instance, would it be possible to do the whole project
+ on a Raspberry Pi (http://www.raspberrypi.org/)? Or will the Arduino be too
+ restrictive for my requirements? I decided that as the main part of this
+ project was based upon the restrictions of input, and execution, not processing
+ power, it would be needlessly limiting to use a Raspberry Pi or other similar
+ device instead of a computer.
+ Additionally, a computer would have a much wider range of tools available
+ to it, making the project conceptually simpler.
+ The Arduino could be used as a simple intermediate device, that takes the
+ commands from the computer and sends them on to the helicopter, which does
+ not require much computational power.
+\end_layout
+
+\begin_layout Standard
+With my initial goals in mind, I started to build the foundation for the
+ project using the programming language Haskell.
+ I decided to use Haskell because I knew that it has an extensive programming
+ library available to it, has bindings to the OpenCV library, and I had
+ previously done a group project to create an AI framework in Haskell which
+ seemed appropriate given the topic of this project.
+ 
 \end_layout
 
 \begin_layout Section
@@ -341,7 +463,8 @@ Extensions
 \end_layout
 
 \begin_layout Standard
-My provisional aim for this project is to 
+My provisional aim for this project is to be able to fly the helicopter
+ in three dimensions, in a pre-planned trajectory.
 \end_layout
 
 \begin_layout Section
@@ -352,8 +475,82 @@ Evaluation plan
 Required functionality
 \end_layout
 
+\begin_layout Enumerate
+Automated flight with no input other than camera.
+\end_layout
+
+\begin_layout Enumerate
+Input of 'intentions', and automatic execution of them.
+\end_layout
+
+\begin_layout Enumerate
+Movement in one, two and three dimensions.
+\end_layout
+
 \begin_layout Subsubsection*
 Quality of functionality
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Syma"
+
+\end_inset
+
+Lee, J.
+ (2011) Procrastineering - Project blog for Johnny Chung Lee: Computer Controlli
+ng a Syma Helicopter.
+ [online] Available at: http://procrastineering.blogspot.co.uk/2011/11/computer-con
+trolling-syma-helicopter.html [Accessed: 1 Jan 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Syma2"
+
+\end_inset
+
+Avergottini.com (2011) Couch Sprout: Arduino helicopter infrared controller.
+ [online] Available at: http://www.avergottini.com/2011/05/arduino-helicopter-infr
+ared-controller.html [Accessed: 1 Jan 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Arduino"
+
+\end_inset
+
+Arduino.cc (n.d.) Arduino - Guide.
+ [online] Available at: http://arduino.cc/en/Guide/Guide [Accessed: 1 Jan
+ 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "IR"
+
+\end_inset
+
+Ladyada.net (2012) Sensor tutorials - IR remote receiver/decoder tutorial.
+ [online] Available at: http://www.ladyada.net/learn/sensors/ir.html [Accessed:
+ 1 Jan 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Arduino port"
+
+\end_inset
+
+Arduino.cc (n.d.) Arduino - PortManipulation.
+ [online] Available at: http://www.arduino.cc/en/Reference/PortManipulation
+ [Accessed: 1 Jan 2013].
 \end_layout
 
 \end_body
