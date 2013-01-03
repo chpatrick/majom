@@ -43,9 +43,9 @@
 \shortcut idx
 \color #008000
 \end_index
-\leftmargin 2cm
+\leftmargin 3cm
 \topmargin 3cm
-\rightmargin 2cm
+\rightmargin 3cm
 \bottommargin 3cm
 \secnumdepth 3
 \tocdepth 3
@@ -331,9 +331,57 @@ With my initial goals in mind, I started to build the foundation for the
  project using the programming language Haskell.
  I decided to use Haskell because I knew that it has an extensive programming
  library available to it, has bindings to the OpenCV library, and I had
- previously done a group project to create an AI framework in Haskell which
+ previously done a group project to create an AI framework in Haskell, which
  seemed appropriate given the topic of this project.
+ This foundation involved making the various interfaces for the different
+ parts of the project (modules, classes etc.), and deciding what responsibilities
+ would be where.
  
+\end_layout
+
+\begin_layout Subsubsection*
+Learning models
+\end_layout
+
+\begin_layout Standard
+A key consideration I had to make at this point was what method I would
+ use to 'learn' the correspondence between resultant acceleration and input
+ power to the helicopter.
+ The mapping between these two would be extremely important in flying the
+ helicopter later, as I would want the helicopter to be able to make judgements
+ on the appropriate input for a desired acceleration, and then to augment
+ this mapping with observations.
+ For the straight up/down case, where changing the input throttle results
+ in a flat increase in propellor speed, and hence change in upwards velocity
+ of the helicopter, I pulled out the key requirements:
+\end_layout
+
+\begin_layout Itemize
+It needs to be able to return a mapping between acceleration and power.
+ 
+\end_layout
+
+\begin_layout Itemize
+It needs to be able to update itself when receiving a new input power and
+ the observed output acceleration.
+\end_layout
+
+\begin_layout Itemize
+It needs to be able to create an initial model with very little input at
+ all, that can rapidly re-evaluate itself using the above two methods.
+\end_layout
+
+\begin_layout Standard
+Some initial considerations were using least squares and various similar
+ deriviations, temporal difference learning, or a kalman filter of sorts.
+ At first I implemented a basic least squares algorithm, as it appeared
+ to be the simplest of the three and would be easy to implement.
+ Additionally, by implementing it I might be able to see any problems that
+ could emerge if I were to do any other methods in the future.
+\end_layout
+
+\begin_layout Subsubsection*
+Vision
 \end_layout
 
 \begin_layout Section
@@ -489,6 +537,60 @@ Movement in one, two and three dimensions.
 
 \begin_layout Subsubsection*
 Quality of functionality
+\end_layout
+
+\begin_layout Standard
+It should prove to be quite simple to ascertain the quality of the functionality
+:
+\end_layout
+
+\begin_layout Description
+Observation It will be fairly evident from how the helicopter flies according
+ to the given instructions how well the project is performing.
+ For instance, a steady, certain flight path would be good whereas a juddering
+ path, or even crashing, would indicate bad performance!
+\end_layout
+
+\begin_layout Description
+Execution The ability to execute more and more complicated intentions.
+ Simply hovering in a given position should prove to be a (comparatively)
+ simple feat, whereas flying from one position to another is more demanding.
+ Extending this to customisable paths in three dimensional space would show
+ that the underlying mechanisms are of high quality and performance.
+\end_layout
+
+\begin_layout Description
+Extensibility If the system is set up well, it should be easy to extend
+ it with new abilities and features, using the existing functionality.
+\end_layout
+
+\begin_layout Standard
+These could be measured using the following demonstration, for example:
+\end_layout
+
+\begin_layout Enumerate
+Demonstrate the ability to fly the helicopter from the computer manually.
+ 
+\shape italic
+Demonstrates the foundations of the project.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Demonstrate the ability to hover the helicopter in place, even when displaced.
+ 
+\shape italic
+Demonstrates the static control of the helicopter from a single camera source
+ in multiple dimensions.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Demonstrate the ability to move in a predefined path.
+ 
+\shape italic
+Demonstrates advanced functionality.
+ 
 \end_layout
 
 \begin_layout Bibliography
