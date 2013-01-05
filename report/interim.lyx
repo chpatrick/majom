@@ -211,6 +211,10 @@ For the computer vision, I will use a Kinect sensor device, created by Microsoft
  This should make the computer vision aspect simpler, as I will be able
  to use the depth map that the kinect generates to augment any results I
  get from the single camera source.
+ It is also a very popular device for performing computer vision with -
+ this means that there will most likely be many other examples of it being
+ used for tasks similar to mine.
+ 
 \end_layout
 
 \begin_layout Subparagraph*
@@ -235,6 +239,29 @@ Arduino is an open-source microcontroller, which lets the user work with
  a lot of the communications between the board and the computer.
  Additionally, the board itself is reasonably cheap to purchase and highly
  re-usable.
+\end_layout
+
+\begin_layout Subparagraph*
+Syma Remote Control Helicopter
+\end_layout
+
+\begin_layout Standard
+The Syma Remote Control Helicopter is a small indoors helicopter, that is
+ controlled by an IR source sent from a remote control.
+ It is modelled to be easy to fly indoors, and to remain stable even in
+ in-experienced hands.
+ It does this my not having a traditional tail rotor - instead, it has an
+ internal gyroscope that keeps it level, and rotation is accomplished by
+ speeding up and slowing down the main rotor.
+ The tail rotor is instead positioned facing upwards, and provides a tilting
+ force to the tail, letting the helicopter fly forwards and backwards.
+ This makes the helicopter extremely stable, at the sacrifice of not being
+ able to tilt left or right.
+ Ultimately, this only serves to make it easier to fly.
+ The details on the communication protocols of the helicopter are not freely
+ available, but some third party sources have done their own analysis of
+ the signals (using oscilloscopes for example), and this should prove to
+ be sufficient.
 \end_layout
 
 \begin_layout Section
@@ -472,7 +499,7 @@ As has been mentioned earlier, I have decided to use a Kinect camera as
  Fortunately, after a little bit of looking around, I stumbled upon freenect
  (http://hackage.haskell.org/package/freenect), a Haskell interface to the
  Kinect device.
- However, he hackage version of freenect only has depth sensor support,
+ However, the hackage version of freenect only has depth sensor support,
  but fortunately a kind fellow named Kevin Conley extended the library to
  include this 
 \begin_inset CommandInset citation
@@ -484,6 +511,40 @@ key "freenect,freenect paper"
 .
  This meant that I could begin working on learning and using OpenCV directly
  without having to fuss with how I would incorporate the Kinect into Haskell.
+\end_layout
+
+\begin_layout Subsubsection*
+OpenCV
+\end_layout
+
+\begin_layout Standard
+For my initial research on OpenCV, I began reading some tutorials and online
+ documentation
+\begin_inset CommandInset citation
+LatexCommand cite
+key "OpenCV book"
+
+\end_inset
+
+, as well as looking at existing examples in the Haskell wrapper for OpenCV
+\begin_inset CommandInset citation
+LatexCommand cite
+key "OpenCV examples"
+
+\end_inset
+
+.
+ I aimed to follow the general learning flow from the book (implemented
+ in C++), but to do it myself in Haskell, thus hopefully learning both OpenCV
+ and the wrapper itself.
+ My first aim after doing some basic exercises was to get basic shape recognitio
+n working on a plain white background (eg.
+ my wall).
+ 
+\end_layout
+
+\begin_layout Standard
+[Results]
 \end_layout
 
 \begin_layout Section
@@ -514,6 +575,8 @@ Before I begin doing any programming, I have to research the technologies
  that I am going to use, and see how they will all fit together.
  This includes finding documentation for the technologies, learning to use
  them, and judging their usefulness.
+ I can accomplish these by performing small modular experiments with each
+ piece of technology.
  Additionally, there are several parts of the project that are essential
  and must be implemented as a 'foundation' before I can even begin any work
  at all!
@@ -549,8 +612,9 @@ At this point I had to create the basic tools with which I would create
  These included the interface from the AI to the Arduino, a GUI so I could
  manually control the helicopter from the computer, and a simulation environment
  so I could play around with the AI in a controlled environment before trying
- it on the real thing.
- 
+ it in the real thing.
+ These tools would also partially define the project structure, as I would
+ need to eventually get each of the tools working together.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -574,6 +638,9 @@ monkey see, monkey do
  position of the helicopter in 3D space, and the time of that observation.
  The monkey does not worry exactly how this position is found, it just works
  on how to fly the helicopter from the information that it is receiving.
+ This milestone is actually in several different parts - each one more complex
+ than the last.
+ 
 \end_layout
 
 \begin_layout Subsubsection*
@@ -587,6 +654,9 @@ The vision part is responsible for obtaining a reliable and quick value
  I'll start simple, doing basic shape detection on a plain background in
  2D, and then later on try to expand this to 3D by getting depth information
  and try to get orientation information about the helicopter.
+ It mostly goes hand in hand with the Monkey milestones, as each step in
+ complexity in the monkey requires equivalent jumps in complexity from the
+ vision system.
 \end_layout
 
 \begin_layout Subsection*
@@ -606,6 +676,32 @@ Pre-January Have all foundation tech done - simple simulations, controls
 \begin_layout Description
 February Basic hover/landing working in simulation and on real-helicopter.
  Start improving computer vision techniques.
+\end_layout
+
+\begin_layout Subsubsection*
+What I've done so far
+\end_layout
+
+\begin_layout Standard
+Up to the point of this report, I've so far managed to write most of the
+ tools, design the basic framework for the AI, and have started implementing
+ the simple foundation of the computer vision.
+ I can fly the helicopter manually using a computer, and I can also fly
+ the virtual helicopter manually.
+ Additionally, I have implemented some basic learning algorithms, and I
+ am still testing these to see which ones are best.
+ The main requirements for me to reach my first major milestone at this
+ stage are to get the basic computer vision working, tracking the helicopter
+ in one dimension, and then to give this data to the Monkey and see how
+ it works.
+ Hopefully at that point it should be a simple deal of tweaking some of
+ the behaviours of the monkey to get the helicopter hovering in one place.
+\end_layout
+
+\begin_layout Standard
+Once this milestone is reached, I will spend a small amount of time cleaning
+ up code and making sure that everything is stable for further progress,
+ and then begin working on getting the Monkey working in two dimensions.
 \end_layout
 
 \begin_layout Subsection*
@@ -817,6 +913,32 @@ key "Least squares wiki"
 En.wikipedia.org (2012) Least squares - Wikipedia, the free encyclopedia.
  [online] Available at: http://en.wikipedia.org/wiki/Least_squares [Accessed:
  4 Jan 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "OpenCV book"
+
+\end_inset
+
+BRADSKI, G.
+ R., & KAEHLER, A.
+ (2008).
+ Learning OpenCV: computer vision with the OpenCV library.
+ Sebastopol, CA, O'Reilly.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "OpenCV examples"
+
+\end_inset
+
+aleator (2012) CV.
+ [online] Available at: https://github.com/aleator/CV/tree/master/examples
+ [Accessed: 5 Jan 2013].
 \end_layout
 
 \end_body
