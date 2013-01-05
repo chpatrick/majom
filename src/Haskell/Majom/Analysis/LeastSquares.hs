@@ -43,7 +43,7 @@ updateMap ls@(LeastSquares _ vs)
 -- LS on each vector. 
 constructMap :: [(Power, Acceleration)] -> (Acceleration -> Power)
 constructMap vals =
-  round . (weightMap $ zip [1.0..] $ zip ys $ map fromIntegral pwrs) . vectorY
+  round . (weightMap $ zip [1.0,1.0..] $ zip ys $ map fromIntegral pwrs) . vectorY
   where
     (pwrs, accels) = unzip vals
     ys = map vectorY accels
@@ -61,6 +61,7 @@ setLeastSquares vals =
 -- Everything from here downwards deals with single dimension numbers
 
 -- | Constructs a weight map from inputs and observations.
+-- [(Weight, (input, output))]
 weightMap :: [(Double, (Double, Double))] -> Double -> Double
 weightMap d x = 
   head $ head $ LA.toLists $ (prep x) LA.<> (LA.reshape 1 $ leastSquares d)

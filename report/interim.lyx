@@ -44,9 +44,9 @@
 \color #008000
 \end_index
 \leftmargin 3cm
-\topmargin 3cm
+\topmargin 4cm
 \rightmargin 3cm
-\bottommargin 3cm
+\bottommargin 4cm
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -339,7 +339,7 @@ With my initial goals in mind, I started to build the foundation for the
  
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Learning models
 \end_layout
 
@@ -381,7 +381,109 @@ Some initial considerations were using least squares and various similar
 \end_layout
 
 \begin_layout Subsubsection*
+Least Squares 
+\end_layout
+
+\begin_layout Standard
+I performed some initial research on least squares algorithms, and how appropria
+te they would be to the problem at hand.
+ Initially, I was more interested in looking for an algorithm that would
+ be iterative, and not require recomputation on the entire data set every
+ time a new piece of data arrived.
+ This was because I was afraid that the computations would quickly become
+ slow as the measurements got larger and larger.
+ Some sources discussed recursive versions of least squares estimation 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Least squares + Recursive,Least squares wiki"
+
+\end_inset
+
+, but after spending some time looking at the algorithms and realising my
+ own lack of knowledge on the subject of regression analysis, I decided
+ to first implement the simple least squares algorithm and then possibly
+ look at the recursive version later.
+ Without too many problems I managed to implement the basic least squares
+ algorithm into my program using a couple of different sources for inspiration
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Least squares wiki"
+
+\end_inset
+
+.
+ To ensure that the calculations were as efficient as they could be, I made
+ use of the Numeric.LinearAlgebra haskell package (http://hackage.haskell.org/packa
+ges/archive/hmatrix/0.8.3.1/doc/html/Numeric-LinearAlgebra-Algorithms.html)
+ which provides a bunch of data structures and functions for performing
+ linear algebra.
+ Doing some initial tests in ghci, this proved to be quite efficient, with
+ satisfactory solve times for sample sets of sizes up to 1000, which, considerin
+g a seemingly suitable sample time of 100ms, results in a respectable 100
+ seconds of input data to base flying judgements on.
+ 
+\end_layout
+
+\begin_layout Standard
+In addition to the normal least squares implementation, I was able to do
+ some tests with a weighted least squares variant
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Least squares wiki"
+
+\end_inset
+
+.
+ This involves giving each input/output measurement a weight, and the resulting
+ map is skewed based on this weight.
+ The benefit of this would be potentially letting me add 'ages' to the inputs,
+ giving more recent and presumably thus more accurate depictions of the
+ current state of the helicopter higher priority.
+ 
+\end_layout
+
+\begin_layout Standard
+One of the other advantages of the least squares implementation was that
+ it would let me easily change the model from linear to quadratic, depending
+ on what the underlying system might represent.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Temporal difference learning
+\end_layout
+
+\begin_layout Subsection*
 Vision
+\end_layout
+
+\begin_layout Standard
+As has been mentioned earlier, I have decided to use a Kinect camera as
+ my vision input source.
+ The Kinect is not just an RGB camera - it is also a fairly accurate depth
+ sensor, and this extra dimension of input could potentially make many of
+ the problems that I am trying to solve easier.
+ Upon receiving the Kinect from my supervisor, I set about getting it up
+ and running with the Ubuntu operating system that I work on, searching
+ for libraries and tools for it.
+ In addition to this, it was important that I would be able to get the Kinect
+ working in Haskell without too much problem, otherwise I would have to
+ write a tool for this as well.
+ Fortunately, after a little bit of looking around, I stumbled upon freenect
+ (http://hackage.haskell.org/package/freenect), a Haskell interface to the
+ Kinect device.
+ However, he hackage version of freenect only has depth sensor support,
+ but fortunately a kind fellow named Kevin Conley extended the library to
+ include this 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "freenect,freenect paper"
+
+\end_inset
+
+.
+ This meant that I could begin working on learning and using OpenCV directly
+ without having to fuss with how I would incorporate the Kinect into Haskell.
 \end_layout
 
 \begin_layout Section
@@ -653,6 +755,68 @@ key "Arduino port"
 Arduino.cc (n.d.) Arduino - PortManipulation.
  [online] Available at: http://www.arduino.cc/en/Reference/PortManipulation
  [Accessed: 1 Jan 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "freenect paper"
+
+\end_inset
+
+Conley, K.
+ (2012) Adding Video Support to Christopher Done’s Haskell Kinect Library.
+ [e-book] http://static.kevintechnology.com/docs/cis194.pdf.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "freenect"
+
+\end_inset
+
+kevincon (2012) freenect.
+ [online] Available at: https://github.com/kevincon/freenect [Accessed: 4
+ Jan 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Least squares + Recursive"
+
+\end_inset
+
+Unknown.
+ (2010) Recursive Least Squares Estimation.
+ [e-book] Available through: http://www.cs.iastate.edu http://www.cs.iastate.edu/~cs57
+7/handouts/recursive-least-squares.pdf.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Recursive least squares"
+
+\end_inset
+
+Unknown.
+ (n.d.) Lecture 10: Recursive Least Squares Estimation.
+ [e-book] Available through: http://www.cs.tut.fi http://www.cs.tut.fi/~tabus/course/A
+SP/LectureNew10.pdf.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Least squares wiki"
+
+\end_inset
+
+En.wikipedia.org (2012) Least squares - Wikipedia, the free encyclopedia.
+ [online] Available at: http://en.wikipedia.org/wiki/Least_squares [Accessed:
+ 4 Jan 2013].
 \end_layout
 
 \end_body
