@@ -55,9 +55,9 @@ monkeySay (model, model', pwr, pos', vel', pwr', accel') = do
   
 monkeyThink :: (Intent a, Model b) => 
   a -> b -> Power -> (Position, Position) -> Velocity 
-  -> (b, Position, Velocity, Power)
+  -> (b, Velocity, Power)
 monkeyThink intent model pwr (pos, pos') vel = do
-  (model', pos', vel', pwr')
+  (model', vel', pwr')
   where
     vel' = (pos' - pos) |/| wt
     accel = (vel' - vel) |/| wt
@@ -71,7 +71,7 @@ monkeyDo flyer = do
 
   (Brain model intent (pos, vel, _)) <- get
   obs@(pwr, pos', _) <- lift $ observe flyer
-  let (model', pos', vel', pwr') = monkeyThink intent model pwr (pos, pos') vel
+  let (model', vel', pwr') = monkeyThink intent model pwr (pos, pos') vel
 
   -- For debugging
   lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)

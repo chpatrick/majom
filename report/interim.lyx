@@ -76,6 +76,15 @@ Luke Tomlin
 29/12/2012
 \end_layout
 
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Introduction
 \end_layout
@@ -366,7 +375,66 @@ With my initial goals in mind, I started to build the foundation for the
  
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
+Prior work
+\end_layout
+
+\begin_layout Standard
+Whilst researching methods and learning materials for the project, I came
+ across examples of similar work that other people have performed, namely
+ using quadcopters.
+ Quadcopters (also known as quadrocopters) are small flying machines that
+ have four individual propellers arranged in a square.
+ Navigation is accomplished by powering the propellers at different speeds,
+ causing the platform as a whole to tilt.
+ Quadcopters are reknown for their stability and simple design.
+\end_layout
+
+\begin_layout Subsubsection
+Quadrocopter experiments, Technical University Munich
+\end_layout
+
+\begin_layout Standard
+Three students at the Technical University Munich wrote a paper titled 
+\begin_inset Quotes eld
+\end_inset
+
+Camera-Based Navigation of a Low-Cost Quadrocopter
+\begin_inset Quotes erd
+\end_inset
+
+, detailing 
+\begin_inset Quotes eld
+\end_inset
+
+a system that enables a low-cost quadrocopter coupled with a ground-based
+ laptop to naviage autonomously in previously unknown and GPS-denied environment
+s
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This project shares many similar points with mine - it is done using a
+ low-cost flying device, without customised, high-precision location data
+ sources, uses (amongst other things) a monocular vision device, and works
+ indoors in previously unknown environments.
+ However, it is also different in many ways, not just in the fact that it
+ is using a quadcopter instead of a helicopter - it also has access to other
+ on-board camera sources and flight information (it also has a 3-axis gyroscope
+ and accelerometer and an ultrasound altimeter).
+ Despite these differences, I should still be able to get some useful informatio
+n from this project.
+\end_layout
+
+\begin_layout Paragraph*
+Monocular SLAM
+\end_layout
+
+\begin_layout Paragraph*
+Extended Kalman Filter
+\end_layout
+
+\begin_layout Subsection
 Learning models
 \end_layout
 
@@ -407,7 +475,7 @@ Some initial considerations were using least squares and various similar
  could emerge if I were to do any other methods in the future.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Least Squares 
 \end_layout
 
@@ -476,11 +544,11 @@ One of the other advantages of the least squares implementation was that
  
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Temporal difference learning
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Vision
 \end_layout
 
@@ -513,7 +581,7 @@ key "freenect,freenect paper"
  without having to fuss with how I would incorporate the Kinect into Haskell.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 OpenCV
 \end_layout
 
@@ -557,7 +625,7 @@ The project as a whole can be split into multiple stages, and each of these
  
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Milestones
 \end_layout
 
@@ -566,7 +634,7 @@ These are the key things that need to be done - these milestones define
  the project as a whole.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Technology research and foundation implementations
 \end_layout
 
@@ -617,7 +685,7 @@ At this point I had to create the basic tools with which I would create
  need to eventually get each of the tools working together.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Monkey
 \end_layout
 
@@ -643,7 +711,7 @@ monkey see, monkey do
  
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Vision
 \end_layout
 
@@ -659,7 +727,7 @@ The vision part is responsible for obtaining a reliable and quick value
  vision system.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Timetable
 \end_layout
 
@@ -678,7 +746,7 @@ February Basic hover/landing working in simulation and on real-helicopter.
  Start improving computer vision techniques.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 What I've done so far
 \end_layout
 
@@ -704,7 +772,7 @@ Once this milestone is reached, I will spend a small amount of time cleaning
  and then begin working on getting the Monkey working in two dimensions.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Extensions
 \end_layout
 
@@ -717,7 +785,7 @@ My provisional aim for this project is to be able to fly the helicopter
 Evaluation plan
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Required functionality
 \end_layout
 
@@ -733,7 +801,7 @@ Input of 'intentions', and automatic execution of them.
 Movement in one, two and three dimensions.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Quality of functionality
 \end_layout
 
