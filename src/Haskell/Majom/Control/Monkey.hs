@@ -19,6 +19,7 @@ import Control.Monad
 import Control.Monad.State
 import Control.Concurrent
 
+import Data.IORef
 
 import System.CPUTime
 
@@ -46,15 +47,28 @@ runMonkey flyer = do
   let intent = hoverAt (vector [50,60,0])
   forkIO $ fly flyer
 
-  -- For sake of experiment, let's assume that initially its landed.
-  loop $ do liftIO $ putStrLn "foo"
-            liftIO $ milliSleep 1000
-            
   milliSleep waitTime
   (_, pos, _) <- observe flyer
+
+  setFly flyer Throttle 0
+  posRef <- newIORef (pos, 0)
+
   milliSleep waitTime
-  (_, pos', _) <- observe flyer
-  let vel = (pos - pos') |/| wt
+
+  -- For sake of experiment, let's assume that initially its landed.
+  loop $ do (pos,throttle) <- lift $ readIORef posRef
+            (_,pos',_) <- lift $ observe flyer
+            let vel = (pos - pos')
+            lift $ writeIORef posRef (pos', throttle + 2)
+            while (vectorSize vel == 0.0)
+            lift $ setFly flyer Throttle (throttle + 2)
+            lift $ putStrLn $ "Taking off... new throttle = " ++ (show $ throttle + 2)
+            lift $ milliSleep waitTime
+            
+  (pos',_) <- readIORef posRef
+  milliSleep waitTime
+  (_, pos'', _) <- observe flyer
+  let vel = (pos'' - pos) |/| wt
   let initBrain = Brain createNewModel intent (pos', vel, undefined)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 

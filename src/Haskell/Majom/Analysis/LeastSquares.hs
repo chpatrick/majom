@@ -25,8 +25,14 @@ instance Model LeastSquares where
   createNewModel = (\x -> LeastSquares (constructMap x) Map.empty)
     [(70, vector [0,0,0]),(0,vector [0,-10,0])]
   getMap = lsMap
-  updateModel (LeastSquares m vs) (p,v) = updateMap $ LeastSquares m (Map.insert p v vs)
+  updateModel ls@(LeastSquares m vs) (p,v)
+    | sane (p,v) vs = updateMap $ LeastSquares m (Map.insert p v vs)
+    | otherwise     = ls
   samples = Map.assocs . lsSamples
+
+-- | TODO Perform sanity checks
+sane :: (Power, Acceleration) -> Map.Map Power Acceleration -> Bool
+sane = undefined
 
 -- | The number of samples to take on the initial assumption
 -- before beginning map updates
