@@ -22,6 +22,7 @@ Library
     Majom.Flyers.Flyable,
     Majom.Flyers.Helicopter,
     Majom.Flyers.VirtualHelicopter,
+    Majom.Lang.LoopWhile,
     Majom.Simulation.SimpleSim
  
   Extensions:
@@ -44,7 +45,8 @@ Executable majom
     hmatrix,
     mtl,
     vector,
-    time
+    time,
+    loop-while
 
   Extensions:
   Ghc-options: -O -threaded

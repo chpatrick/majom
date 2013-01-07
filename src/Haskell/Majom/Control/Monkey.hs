@@ -12,11 +12,13 @@ import Majom.Common
 import Majom.Flyers.Flyable
 import Majom.Control.Monkey.Intent
 import Majom.Control.Monkey.HoverIntent
+import Majom.Lang.LoopWhile
 
 import Control.Applicative
 import Control.Monad
 import Control.Monad.State
 import Control.Concurrent
+
 
 import System.CPUTime
 
@@ -27,13 +29,27 @@ execMonkeyBrainT mk k = execStateT mk k
 
 data Brain = Brain { brainModel :: LeastSquares,
                      brainIntent :: HoverIntent,
-                     brainLast :: (Position, Velocity, Time) }
+                     brainLast :: (Position, Velocity, FlyState) }
+
+data FlyState = Flying | Landed deriving (Show, Eq)
+
+
+foo :: IO ()
+foo = do
+  putStrLn "bar"
+  loop $ do liftIO $ putStrLn "gar"
+            liftIO $ milliSleep 1000
 
 -- | Starts the monkey
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
-  let intent = hoverAt (vector [50,100,0])
+  let intent = hoverAt (vector [50,60,0])
   forkIO $ fly flyer
+
+  -- For sake of experiment, let's assume that initially its landed.
+  loop $ do liftIO $ putStrLn "foo"
+            liftIO $ milliSleep 1000
+            
   milliSleep waitTime
   (_, pos, _) <- observe flyer
   milliSleep waitTime

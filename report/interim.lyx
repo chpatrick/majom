@@ -391,7 +391,14 @@ Whilst researching methods and learning materials for the project, I came
 \end_layout
 
 \begin_layout Subsubsection
-Quadrocopter experiments, Technical University Munich
+Quadrocopter experiments, Technical University Munich 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Camera based nav of low cost quadropter"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -430,8 +437,83 @@ n from this project.
 Monocular SLAM
 \end_layout
 
+\begin_layout Standard
+SLAM (simultaneous localization and mapping) is a computer vision technique
+ used to build up a map of an environment containing unknown factors, whilst
+ at the same time keeping track of current location.
+ Many different types of sensors can be used to solve SLAM-based problems,
+ such as laser range scanners, monocular or stereo cameras, or RGB-D sensors
+ (RGB camera plus a depth sensor eg.
+ Kinect).
+ It is used in the quadropter experiments to keep track of the quadropter
+ relative to the camera.
+\end_layout
+
 \begin_layout Paragraph*
 Extended Kalman Filter
+\end_layout
+
+\begin_layout Standard
+In the experiments, they use an Extended Kalman Filter (EKF) to combine
+ all of the available data.
+ In addition, the EKF is used to compensate for different time delays that
+ occur in the system (for example, from data transmission delays, or from
+ computationally expensive calculations).
+ The EKF differs from the standard Kalman Filter in the fact that is nonlinear.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+Results
+\end_layout
+
+\begin_layout Standard
+In the quadropter experiments, they successfully demonstrated that accurate
+ and robust visual navigation is feasible using a simple, low-cost hardware,
+ in a variety of environments.
+ Using a combination of machine learning and visual systems from a monocular
+ source, combined with onboard data, they managed to achieve an average
+ positioning accuracy of 4.9cm whilst flying indoors.
+ This is quite encouraging for my project - whilst I will not have access
+ to onboard flying information, my location information does not need to
+ be this accurate.
+ The methods that they describe for using an EKF to measure the quadropter
+ position at different observational times subject to control transmission
+ delay should prove to be very useful for when I am also doing visual tracking,
+ as I will be subject to many of the same problems that they faced.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Autonomous Camera-Based Navigation of a Quadrocopter
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Autonomous Camera based quadropter"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In his master's thesis, Jacob Engel discusses a system for enabling a quadrocopt
+er to 
+\begin_inset Quotes eld
+\end_inset
+
+localize and navigate autonomously in previously unknown and GPS-denied
+ environments...
+ using a monocular camera onboard the quadrocopter
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Much like the paper discussed above, he uses a SLAM system for positional
+ estimates, and combines this with an Extended Kalman Filter to fuse all
+ available data and to compensate for data delays.
+ He talks in detail about SLAM and the EKF, which is the key part of this
+ paper that interests me.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -1007,6 +1089,47 @@ key "OpenCV examples"
 aleator (2012) CV.
  [online] Available at: https://github.com/aleator/CV/tree/master/examples
  [Accessed: 5 Jan 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "SLAM"
+
+\end_inset
+
+En.wikipedia.org (2005) Simultaneous localization and mapping - Wikipedia,
+ the free encyclopedia.
+ [online] Available at: http://en.wikipedia.org/wiki/Simultaneous_localization_and
+_mapping [Accessed: 7 Jan 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Camera based nav of low cost quadropter"
+
+\end_inset
+
+J.
+ Engel, J.
+ Sturm, D.
+ Cremers (2012) Camera-Based Navigation of a Low-Cost Quadrocopter .
+ [e-book] Available through: http://vision.in.tum.de/research/quadcopter http://vis
+ion.in.tum.de/_media/spezial/bib/engel12iros.pdf.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Autonomous Camera based quadropter"
+
+\end_inset
+
+Engel, J.
+ (2011) Autonomous Camera-Based Navigation of a Quadrocopter .
+ Masters.
+ Der Technischen Universitat Munchen.
 \end_layout
 
 \end_body
