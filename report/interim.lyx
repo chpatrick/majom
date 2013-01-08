@@ -189,7 +189,7 @@ The AI that flies the helicopter is wholly separate from the vision, and
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsection
 Technology
 \end_layout
 
@@ -207,7 +207,7 @@ pre-made
  
 \end_layout
 
-\begin_layout Subparagraph*
+\begin_layout Subsubsection
 Kinect
 \end_layout
 
@@ -226,7 +226,7 @@ For the computer vision, I will use a Kinect sensor device, created by Microsoft
  
 \end_layout
 
-\begin_layout Subparagraph*
+\begin_layout Subsubsection
 OpenCV
 \end_layout
 
@@ -237,7 +237,7 @@ OpenCV (Open Source Computer Vision Library) is a library of programming
  programming languages.
 \end_layout
 
-\begin_layout Subparagraph*
+\begin_layout Subsubsection
 Arduino
 \end_layout
 
@@ -250,7 +250,7 @@ Arduino is an open-source microcontroller, which lets the user work with
  re-usable.
 \end_layout
 
-\begin_layout Subparagraph*
+\begin_layout Subsubsection
 Syma Remote Control Helicopter
 \end_layout
 
@@ -261,7 +261,7 @@ The Syma Remote Control Helicopter is a small indoors helicopter, that is
  in-experienced hands.
  It does this my not having a traditional tail rotor - instead, it has an
  internal gyroscope that keeps it level, and rotation is accomplished by
- speeding up and slowing down the main rotor.
+ speeding up and slowing down the main rotors.
  The tail rotor is instead positioned facing upwards, and provides a tilting
  force to the tail, letting the helicopter fly forwards and backwards.
  This makes the helicopter extremely stable, at the sacrifice of not being
@@ -271,6 +271,44 @@ The Syma Remote Control Helicopter is a small indoors helicopter, that is
  available, but some third party sources have done their own analysis of
  the signals (using oscilloscopes for example), and this should prove to
  be sufficient.
+\end_layout
+
+\begin_layout Paragraph
+Basic helicopter mechanics
+\end_layout
+
+\begin_layout Standard
+The helicopter itself consists of three different rotors (two on the main
+ rotor, and one on the tail), and a gyroscope.
+ The two sets of blades on the main rotor rotate in different directions,
+ the top blades rotating clockwise and the lower ones rotation counter-clockwise.
+ This has the effect of cancelling out their torque when they move at the
+ same speed, keeping the helicopter from rotating in one particular direction.
+ The ratio that these blades move to each other can be altered in small
+ amounts for fine tuning.
+ As discussed above, the rear rotor is positioned in an upright position,
+ just like the main rotors.
+\end_layout
+
+\begin_layout Itemize
+Vertical acceleration is gained by increasing the throttle to the two main
+ rotors in equal amounts.
+ 
+\end_layout
+
+\begin_layout Itemize
+Yaw rotation is gained by increasing one of the main rotors, and decreasing
+ the other an equivalent amount.
+ This will give an overall clockwise or counter-clockwise torque without
+ affecting the vertical acceleration produced.
+ 
+\end_layout
+
+\begin_layout Itemize
+Pitch movement is gained by spinning the tail rotor.
+ Reversing the spin of the tail rotor results in opposite pitch.
+ The gyroscope on top of the main helicopter rotor prevents the helicopter
+ from pitching forwards too much by providing a counter force.
 \end_layout
 
 \begin_layout Section
@@ -512,7 +550,216 @@ localize and navigate autonomously in previously unknown and GPS-denied
  estimates, and combines this with an Extended Kalman Filter to fuse all
  available data and to compensate for data delays.
  He talks in detail about SLAM and the EKF, which is the key part of this
- paper that interests me.
+ paper that interests me - absolute accuracy of movement are not a key aim
+ of this project, just as it is not when the human pilot wishes to fly the
+ remote control helicopter.
+ However, the paper still raises many interesting points regarding how positiona
+l information is gathered, and how flight paths are calculated.
+\end_layout
+
+\begin_layout Subsubsection
+Odometry from RGB-D Cameras for Autonomous Quadrocopters
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Odometry quadropter"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Again following on the themes of the previous two works, this paper focuses
+ on the details of flying a quadropter - however, unlike the previous two
+ pieces this one details quadropters where the camera source is an RGB-D
+ camera located on board the quadropter itself.
+ This is a less low-cost solution, but may still provide some insights towards
+ control of the quadropter and flight itself.
+\end_layout
+
+\begin_layout Paragraph*
+Rigid Body Motion
+\end_layout
+
+\begin_layout Paragraph
+Least Squares
+\end_layout
+
+\begin_layout Paragraph
+Conclusions
+\end_layout
+
+\begin_layout Paragraph
+Remarks
+\end_layout
+
+\begin_layout Subsubsection
+KinectFusion: Real-time 3D Reconstruction and Interaction Using a Moving
+ Depth Camera
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kinectfusion"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fundamentals of this paper are somewhat different than mine, however
+ I felt that it might provide some useful insight into some of the later
+ stages of the project.
+ The KinectFusion is a method for creating a 3D representation of a scene
+ by using a Kinect, that uses depth values from multiple angles to create
+ the model, in real-time.
+ It might be possible to utilize some of the techniques used to create a
+ partial construction of the environment by using a single location from
+ the Kinect.
+\end_layout
+
+\begin_layout Paragraph
+KinectFusion
+\end_layout
+
+\begin_layout Paragraph
+GPU Implementation
+\end_layout
+
+\begin_layout Paragraph*
+Conclusions
+\end_layout
+
+\begin_layout Paragraph
+Remarks
+\end_layout
+
+\begin_layout Subsubsection
+Computer Controlling a Syma Helicopter
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Syma"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This blog post was the original inspiration for this project, and lists
+ a potential implementation method for the manual control of the helicopter
+ from a computer.
+ Additionally, it lists some rough measurements for the IR protocol, and
+ it was from these measurements that I based my initial values on.
+\end_layout
+
+\begin_layout Paragraph
+IR Protocol
+\end_layout
+
+\begin_layout Itemize
+The signal is modulated at 38KHz
+\end_layout
+
+\begin_layout Itemize
+The packet header is 2ms on, the 2ms off.
+\end_layout
+
+\begin_layout Itemize
+The total packet payload is 4 bytes, in big-endian order.
+\end_layout
+
+\begin_layout Standard
+Then the individual command values are:
+\end_layout
+
+\begin_layout Itemize
+Yaw, which takes values 0 - 127, 0 being full reverse yaw and 127 being
+ full forward yaw.
+ 63 is no yaw at all.
+\end_layout
+
+\begin_layout Itemize
+Pitch, which takes values 0 - 127, 0 being full reverse pitch and 127 being
+ full forward pitch.
+ 63 is no pitch at all.
+\end_layout
+
+\begin_layout Itemize
+Throttle, which takes values 0 - 127, 0 being no throttle and 127 being
+ full throttle.
+\end_layout
+
+\begin_layout Itemize
+Yaw Correction, which takes values 0 - 127, 63 being no correction.
+\end_layout
+
+\begin_layout Standard
+The packet is completed with a stop bit ('1').
+ The individual bit values are formatted as '1' being 
+\begin_inset Formula $320\mu s$
+\end_inset
+
+ on, then 
+\begin_inset Formula $680\mu s$
+\end_inset
+
+ off, and '0' being 
+\begin_inset Formula $320\mu s$
+\end_inset
+
+ on, then 
+\begin_inset Formula $280\mu s$
+\end_inset
+
+ off.
+ These packets should be sent to the helicopter every 120ms.
+ 
+\end_layout
+
+\begin_layout Paragraph
+Personal findings
+\end_layout
+
+\begin_layout Standard
+I implemented the above protocol myself using the Arduino board, and found
+ that the helicopter did not respond as I would have liked.
+ The helicopter would operate as ordered for a few packets, and then stop
+ for a small amount of time, and then restart again.
+ This might have been due to small differences in the protocol between my
+ helicopter or his, or simply just a problem with his code.
+ I figured that this was a problem with the individual timings of packets,
+ so did some experiments and found that the following values worked best
+ for me:
+\end_layout
+
+\begin_layout Itemize
+Same values for '1' and '0' pulses, along with message length and the header.
+\end_layout
+
+\begin_layout Itemize
+Footer of length 
+\begin_inset Formula $300\mu s$
+\end_inset
+
+ .
+\end_layout
+
+\begin_layout Itemize
+A delay of 
+\begin_inset Formula $25\mu s$
+\end_inset
+
+ between each message sent.
+\end_layout
+
+\begin_layout Itemize
+Compensating time for the individual port switches (basically compensating
+ for communication time).
+\end_layout
+
+\begin_layout Standard
+This resulted in stable, non-stuttering flight that worked from a large
+ distance.
  
 \end_layout
 
@@ -1130,6 +1377,34 @@ Engel, J.
  (2011) Autonomous Camera-Based Navigation of a Quadrocopter .
  Masters.
  Der Technischen Universitat Munchen.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Kinectfusion"
+
+\end_inset
+
+Izadi, S.
+ et al.
+ (n.d.) KinectFusion: Real-time 3D Reconstruction and Interaction Using a
+ Moving Depth Camera*.
+ [e-book] Available through: http://research.microsoft.com/ http://research.microso
+ft.com/pubs/155416/kinectfusion-uist-comp.pdf.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Odometry quadropter"
+
+\end_inset
+
+Kerl, C.
+ (2012) Odometry from RGB-D Cameras for Autonomous Quadrocopters .
+ [e-book] Available through: http://vision.in.tum.de/research/quadcopter http://vis
+ion.in.tum.de/_media/spezial/bib/kerl2012msc.pdf.
 \end_layout
 
 \end_body
