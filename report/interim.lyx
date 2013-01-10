@@ -577,20 +577,33 @@ Again following on the themes of the previous two works, this paper focuses
  control of the quadropter and flight itself.
 \end_layout
 
-\begin_layout Paragraph*
-Rigid Body Motion
-\end_layout
-
 \begin_layout Paragraph
 Least Squares
 \end_layout
 
-\begin_layout Paragraph
-Conclusions
+\begin_layout Standard
+The paper discusses the technique of least squares, a technique that is
+ used to estimate parameter of a model that uses noisy observations.
+ It also discusses the derivation of this technique, as well as the technique
+ of weighted least squares, which is used to deal with outlier observations
+ that heavily affect the parameter estimates.
+ Unfortunately, outliers will most likely be something that will occur,
+ so making the motion estimates robust is extremely important.
+ These outliers are particularly bad in a standard least squares solution,
+ because of the large side-effects caused by the quadratic error term in
+ its formulation.
+ 
 \end_layout
 
 \begin_layout Paragraph
 Remarks
+\end_layout
+
+\begin_layout Standard
+The methods described for least squares, and dealing with outliers by using
+ variations of it should prove to be useful for the learning part of the
+ project.
+ 
 \end_layout
 
 \begin_layout Subsubsection
@@ -621,16 +634,43 @@ The fundamentals of this paper are somewhat different than mine, however
 KinectFusion
 \end_layout
 
+\begin_layout Standard
+The Kinect, whilst being a great tool for collecting depth data as well
+ as RGB data, is still subject to small errors in its depth calculations.
+ This means that when we want to recreate the environment as a point map
+ when using the depth data, we have to be aware that the resulting model
+ is not necessarily accurate.
+ The interactive reconstruction system that is KinectFusion aims to solve
+ these, by combining different viewpoints of the scene into on single 3D
+ representation.
+ The Kinect is moved around the scene as a handheld scanner, recreating
+ the model in realtime.
+ 
+\end_layout
+
 \begin_layout Paragraph
 GPU Implementation
 \end_layout
 
-\begin_layout Paragraph*
-Conclusions
+\begin_layout Standard
+The real-time camera tracking and reconstruction is performed using parallel
+ execution on a GPU.
+ If I wanted to use this technology directly, I may need to get specialised
+ hardware.
 \end_layout
 
 \begin_layout Paragraph
 Remarks
+\end_layout
+
+\begin_layout Standard
+The KinectFusion offers many interesting thinking points.
+ Partial scene reconstruction would certainly be useful for the later stages
+ of this project, where it is important to be aware of the surroundings
+ relative to the location of the helicopter.
+ Additionally, it may be of interest to see if this might aid object tracking
+ of the helicopter by building a 3D model of it prior to flight.
+ 
 \end_layout
 
 \begin_layout Subsubsection
@@ -893,21 +933,10 @@ As has been mentioned earlier, I have decided to use a Kinect camera as
  In addition to this, it was important that I would be able to get the Kinect
  working in Haskell without too much problem, otherwise I would have to
  write a tool for this as well.
- Fortunately, after a little bit of looking around, I stumbled upon freenect
- (http://hackage.haskell.org/package/freenect), a Haskell interface to the
- Kinect device.
- However, the hackage version of freenect only has depth sensor support,
- but fortunately a kind fellow named Kevin Conley extended the library to
- include this 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "freenect,freenect paper"
-
-\end_inset
-
-.
- This meant that I could begin working on learning and using OpenCV directly
- without having to fuss with how I would incorporate the Kinect into Haskell.
+ Additionally, there are several packages that support the Kinect for use
+ in Haskell.
+ However, most of these are incomplete, so I might not use them for my final
+ implementation of the vision package.
 \end_layout
 
 \begin_layout Subsubsection
@@ -941,7 +970,54 @@ n working on a plain white background (eg.
 \end_layout
 
 \begin_layout Standard
-[Results]
+Unfortunately, after spending some time trying to get the Haskell wrappers
+ to work, I came to the conclusion that the effort required to get the libraries
+ up and running in Haskell was not worth the gain.
+ Instead, I decided to use one of the better supported languages for OpenCV
+ - Python or C++.
+ Both of these have very thorough support for the OpenCV library, letting
+ me avoid the problem of language-wrestling entirely.
+ Python in particular is incredibly simple, not just in language terms but
+ in library support - I discovered the open source framework SimpleCV (http://si
+mplecv.org/), which is a large collection of libraries written in Python
+ with the aim of providing simplicity.
+ This should come in especially useful during the early prototyping phases.
+ For instance, getting the Kinect RGB image is as simple as:
+\begin_inset listings
+lstparams "breaklines=true,language=Python,numbers=left,showstringspaces=false,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import SimpleCV
+\end_layout
+
+\begin_layout Plain Layout
+
+cam = SimpleCV.Kinect()
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+while True:
+\end_layout
+
+\begin_layout Plain Layout
+
+	cam.getImage().show()
+\end_layout
+
+\end_inset
+
+Due to the modularity of the vision part of the project, it should be comparitiv
+ely simple to add a foreign function call to the Haskell code, and then
+ implement the whole vision package in a different language.
+ 
 \end_layout
 
 \begin_layout Section
@@ -1056,6 +1132,20 @@ The vision part is responsible for obtaining a reliable and quick value
  vision system.
 \end_layout
 
+\begin_layout Subsubsection
+Fallback points
+\end_layout
+
+\begin_layout Standard
+Once I reach the initial stage of flight (hovering the helicopter automatically
+ using the computer), I will be able to place 'fallback levels' at each
+ extra dimension of flight.
+ For instance, one dimensional flight will involve hovering at a particular
+ point and taking off and landing, which will be a subset of two dimensional
+ flight (which also includes moving in a two dimensional pattern, flight
+ paths etc.).
+\end_layout
+
 \begin_layout Subsection
 Timetable
 \end_layout
@@ -1071,8 +1161,39 @@ Pre-January Have all foundation tech done - simple simulations, controls
 \end_layout
 
 \begin_layout Description
+January Computer vision module up and running for basic computer vision
+ (location of helicopter to some degree of accuracy in a controlled environment
+ - minimal other objects).
+ Hover/landing working in simulation environment.
+ Engineer some sort of device to keep helicopter flying in only one dimension.
+\end_layout
+
+\begin_layout Description
 February Basic hover/landing working in simulation and on real-helicopter.
- Start improving computer vision techniques.
+ Start improving computer vision techniques to add complexity.
+ Start provisional layout of final report and think of content for each
+ section.
+ First fallback point.
+ Start work on two dimensional flight.
+ Start engineering two dimensional flight apparatus.
+ 
+\end_layout
+
+\begin_layout Description
+March 
+\end_layout
+
+\begin_layout Description
+April
+\end_layout
+
+\begin_layout Description
+May
+\end_layout
+
+\begin_layout Description
+June Final report finalize and clean up.
+ 
 \end_layout
 
 \begin_layout Subsubsection
@@ -1099,6 +1220,123 @@ Up to the point of this report, I've so far managed to write most of the
 Once this milestone is reached, I will spend a small amount of time cleaning
  up code and making sure that everything is stable for further progress,
  and then begin working on getting the Monkey working in two dimensions.
+\end_layout
+
+\begin_layout Paragraph
+Haskell
+\end_layout
+
+\begin_layout Standard
+I've found that using Haskell is a wonderful way to keep code concise and
+ editable.
+ The ability to prototype everything interactively in GHCi, whilst also
+ having a strong type system means that I can be fairly sure that my code
+ works just by compiling it and checking for type errors.
+ Additionally, it makes composing functions and using external modules a
+ lot simpler, as I can check the types of the functions interactively and
+ guess what they do based on their types.
+ For instance, the normal helicopter module, which relays orders through
+ serial to the Arduino board, to then be passed on to the helicopter is
+ wonderfully concise.
+ The code to send the order along the wire is simply:
+\begin_inset listings
+lstparams "language=Haskell,numbers=left,showstringspaces=false,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+-- | (o,v) is the order and value
+\end_layout
+
+\begin_layout Plain Layout
+
+-- | s is the serial port (defined locally in the file)
+\end_layout
+
+\begin_layout Plain Layout
+
+set :: Helicopter -> Option -> Value -> IO ()
+\end_layout
+
+\begin_layout Plain Layout
+
+set h o v = 
+\end_layout
+
+\begin_layout Plain Layout
+
+	send (pack [fromIntegral $ fromEnum o, fromIntegral     v]) =<< s
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+-- | Sends many orders at once, in order.
+\end_layout
+
+\begin_layout Plain Layout
+
+setMany :: Helicopter -> [(Option, Value)] -> IO ()
+\end_layout
+
+\begin_layout Plain Layout
+
+setMany h = sequence .
+ map (uncurry $ set h)
+\end_layout
+
+\end_inset
+
+The majority of the heavy lifting is done by 
+\begin_inset Formula $pack$
+\end_inset
+
+ and 
+\begin_inset Formula $send$
+\end_inset
+
+, which turn the data into byte packets and send it to the serial port,
+ respectively.
+ It's easy to see how powerful the functional aspect of it becomes once
+ you begin to utilise the tools like lists and higher order functions!
+\end_layout
+
+\begin_layout Paragraph
+Libraries
+\end_layout
+
+\begin_layout Standard
+Python, Haskell and C++ all provide a wide-range of libraries for dealing
+ with computer vision, communication and other such things that I require
+ for my project.
+ I plan to make extensive use of these (indeed I already have), to hopefully
+ realise the aims of my project that much faster.
+ 
+\end_layout
+
+\begin_layout Paragraph
+Apparatus
+\end_layout
+
+\begin_layout Standard
+I've begun at this point to design apparatus that will help me realise the
+ simplified forms of the project.
+ For instance, it is very difficult to have the helicopter operate in only
+ one specific dimension - it is very prone to moving around due to shifting
+ air currents (that it undoubtedly makes itself).
+ As a result of this, I require a method of holding the helicopter in one
+ particular dimension without affecting the ability of the vision system
+ to track it.
+ One possibly method involves two poles spaced equally distant from the
+ helicopter - with the ability to have string attached to them and the helicotpe
+r whilst preserving vertical freedom.
+ If the poles are placed at the maximal distance from the helicopter, it
+ should restrict the helicopters movement to exactly one dimension, whilst
+ retaining freedom in that dimension.
 \end_layout
 
 \begin_layout Subsection
