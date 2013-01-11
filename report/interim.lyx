@@ -94,16 +94,18 @@ The projects main objectives can be summarised by one sentence - to mimic
  how a person would learn to fly and operate a small remote control helicopter
  in an indoor environment.
  This objective is an interesting one, as it can be split into key areas
- of focus, each providing an engineering challenge, and then they all need
- to be combined to create the finished product.
+ of focus, each providing an engineering challenge, and they all need to
+ be combined to create the finished product.
  The problem is best described by the limiting factors - we have a room
  indoors, a small remote-controlled helicopter, a computer and a simple
  camera source capable of estimating depth to some degree of accuracy.
  With these boundaries, the final aim is to have the computer learn to fly
- the helicopter, and given goals from a human, enact them correctly.
+ the helicopter (with some previous understanding of the mechanics of helicopter
+ flying), and given goals from a human, enact them correctly.
  The difficulties are in the details - how exactly does one learn to fly
  a helicopter? How will we reliably get positional information for the helicopte
-r in the room? These are just a few of the potential problems.
+r in the room? What is the best way to act out intentions? These are just
+ a few of the potential problems.
 \end_layout
 
 \begin_layout Paragraph
@@ -913,8 +915,41 @@ One of the other advantages of the least squares implementation was that
  
 \end_layout
 
+\begin_layout Paragraph
+Potential problems
+\end_layout
+
+\begin_layout Standard
+In the experiments I encountered some flaws in the usage of least squares
+ - unfortunately, due to the nature of how least squares is formulated,
+ outliers and highly erroneous results heavily affect the final approximation.
+ This meant that when I would get an outlying result (possibly from bad
+ timing measurements on the computer, or from blips in the sensor data),
+ the whole approximation would be heavily skewed because of this.
+ I partially solved this by employing a sanity check on the results as they
+ came in, doing some analysis on already received 'okay' results and comparing
+ the what I know should happen with the result.
+ For instance, I know that the function between power and acceleration of
+ the helicopter should be monotonically increasing.
+\end_layout
+
+\begin_layout Paragraph
+Conclusions
+\end_layout
+
+\begin_layout Standard
+There are many different forms of least squares fitting - I will have to
+ do extra work and experimentation to find the one that is right for what
+ I need.
+ 
+\end_layout
+
 \begin_layout Subsubsection
 Temporal difference learning
+\end_layout
+
+\begin_layout Subsubsection
+Kalman Filters
 \end_layout
 
 \begin_layout Subsection
@@ -1174,21 +1209,16 @@ February Basic hover/landing working in simulation and on real-helicopter.
  Start provisional layout of final report and think of content for each
  section.
  First fallback point.
- Start work on two dimensional flight.
+ Start work on two dimensional flight in simulation.
  Start engineering two dimensional flight apparatus.
  
 \end_layout
 
 \begin_layout Description
-March 
-\end_layout
-
-\begin_layout Description
-April
-\end_layout
-
-\begin_layout Description
-May
+March/April/May Two dimensional flight finalised, virtual and real.
+ Start three dimensional vision and pathing.
+ Implement three dimensional simulation.
+ Plan final goal to try to achieve - be realistic! 
 \end_layout
 
 \begin_layout Description
@@ -1346,6 +1376,13 @@ Extensions
 \begin_layout Standard
 My provisional aim for this project is to be able to fly the helicopter
  in three dimensions, in a pre-planned trajectory.
+ Further extensions of this would be providing extra functionality for three
+ dimensional flight - perhaps specifying landing points in a scene, or flying
+ the helicopter by moving a cursor around a screen.
+ These would involve having a much more detailed idea of how the three dimension
+al scene is made, as well as having an accurate way of measuring the position
+ of the helicopter.
+ Much of the complexity of this is in the computer vision aspect.
 \end_layout
 
 \begin_layout Section
