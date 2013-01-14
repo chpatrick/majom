@@ -7,6 +7,10 @@ Author:         Luke Tomlin
 Maintainer:     luke.tomlin@gmail.com
 Build-Type:     Simple
 Cabal-Version:  >=1.2
+extra-source-files:
+    Majom/Vision/Vision_Client.hs
+    Majom/Vision/Vision.hs
+    Majom/Vision/Vision_Types.hs
 
 
 Library
@@ -24,6 +28,7 @@ Library
     Majom.Flyers.VirtualHelicopter,
     Majom.Lang.LoopWhile,
     Majom.Simulation.SimpleSim
+
  
   Extensions:
   Ghc-options: -O -threaded
@@ -43,10 +48,15 @@ Executable majom
     containers,
     stm,
     hmatrix,
-    mtl,
+    mtl, 
     vector,
     time,
-    loop-while
+    loop-while,
+    thrift,
+    text,
+    hashable,
+    network,
+    unordered-containers
 
   Extensions:
   Ghc-options: -O -threaded

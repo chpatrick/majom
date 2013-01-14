@@ -8,30 +8,51 @@ module Majom.Flyers.Helicopter (
   startHelicopter
   ) where
 
-import Control.Applicative
+import qualified Majom.Vision.Vision
+import qualified Majom.Vision.Vision_Client as Client
+import Majom.Vision.Vision_Types
+
+import Thrift
+import Thrift.Protocol.Binary
+import Thrift.Transport
+import Thrift.Transport.Handle
+import Thrift.Server
+
 import Data.ByteString(pack)
 import Data.IORef
 import qualified Data.Map as Map
+import Data.Maybe
+import Control.Applicative
+import Network
 import System.CPUTime
 import System.Hardware.Serialport
+
 import Majom.Flyers.Flyable
 
 -- | A real helicopter!
 data Helicopter = Helicopter { getCurrentOptions :: IORef OptionMap }
 
+client = do 
+  handle <- hOpen ("localhost", PortNumber 9090)
+  let binProto = BinaryProtocol handle
+  return (binProto, binProto)
+
 -- | Starts an instance of the helicopter communication protocol.
 startHelicopter :: IO Helicopter
-startHelicopter = Helicopter <$> (newIORef Map.empty)
+startHelicopter = 
+  Helicopter <$> (newIORef Map.empty)
 
 instance Flyable Helicopter where
   setFly h o v = dropValM $ set h o v
   setFlyMany h vs = dropValM $ setMany h vs
   fly h = return ()
   observe h = do
+    res <- Client.observe =<< client
+    putStrLn $ show res
     let optVar = getCurrentOptions h
     pwr <- fmap (Map.! Throttle) $ readIORef optVar
     picoTime <- getCPUTime
-    pos <- undefined
+    let pos = undefined --TODO Need to implement
     return (pwr, pos, (fromInteger picoTime) / (fromInteger cpuTimePrecision))
 
 -- | Drops monadic values we don't care about.

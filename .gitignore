@@ -1,5 +1,6 @@
 src/Haskell/dist
 src/Haskell/run
+src/Haskell/experiments
 src/Arduino/libraries
 src/Arduino/modes
 src/Arduino/tools
@@ -10,3 +11,4 @@ src/Arduino/tools
 *.swo
 *.pyo
 *.lyx~
+#*

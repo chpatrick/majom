@@ -44,7 +44,7 @@ foo = do
 -- | Starts the monkey
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
-  let intent = hoverAt (vector [50,60,0])
+  let intent = hoverAt (vector [50,51,0])
   forkIO $ fly flyer
 
   milliSleep waitTime
