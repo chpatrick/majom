@@ -26,6 +26,7 @@ Library
     Majom.Flyers.Flyable,
     Majom.Flyers.Helicopter,
     Majom.Flyers.VirtualHelicopter,
+    Majom.Flyers.Special.DuoCopter,
     Majom.Lang.LoopWhile,
     Majom.Simulation.SimpleSim
 

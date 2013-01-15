@@ -1345,28 +1345,70 @@ Python, Haskell and C++ all provide a wide-range of libraries for dealing
  for my project.
  I plan to make extensive use of these (indeed I already have), to hopefully
  realise the aims of my project that much faster.
- 
 \end_layout
 
-\begin_layout Paragraph
-Apparatus
+\begin_layout Subparagraph
+Apache Thrift
 \end_layout
 
 \begin_layout Standard
-I've begun at this point to design apparatus that will help me realise the
- simplified forms of the project.
+As I will be using a multitude of different tools in this project, I want
+ to be able to remain as flexible as possible with regard to language choices
+ and implementations.
+ Unfortunately, different languages do not always interoperate well with
+ one another, if at all.
+ To remedy this, I have implemented a basic cross-language communication
+ system using Apache Thrift (http://thrift.apache.org/).
+ Thrift is 
+\begin_inset Quotes eld
+\end_inset
+
+a software framework that enables scalable, cross-language services development..
+ that works efficiently and seamlessly between C++..
+ Python..
+ Haskell..
+ and other languages
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For my initial implementation, I specified a return value that will connect
+ the vision package (which is provisionally written in Python) with my control
+ package (in Haskell).
+ This requires a simple Python server which hosts the implementation in
+ Python and provides the appropriate responses when the Haskell client asks
+ for results.
+\end_layout
+
+\begin_layout Paragraph
+Apparatus and tools
+\end_layout
+
+\begin_layout Standard
+I've begun at this point to design apparatus and tools that will help me
+ realise the simplified forms of the project.
  For instance, it is very difficult to have the helicopter operate in only
  one specific dimension - it is very prone to moving around due to shifting
  air currents (that it undoubtedly makes itself).
- As a result of this, I require a method of holding the helicopter in one
- particular dimension without affecting the ability of the vision system
- to track it.
- One possibly method involves two poles spaced equally distant from the
- helicopter - with the ability to have string attached to them and the helicotpe
-r whilst preserving vertical freedom.
- If the poles are placed at the maximal distance from the helicopter, it
- should restrict the helicopters movement to exactly one dimension, whilst
- retaining freedom in that dimension.
+ This results in the helicopter moving around the scene, which will make
+ it problematic to track using the camera (especially if it floats out of
+ the scene!).
+ To remedy this, I implemented a 'shared control' scheme in Haskell, which
+ lets me specify multiple control methods with the corresponding traits
+ that I want them to control (for instance, I might want the Monkey to control
+ Throttle, but I wish to control the Pitch, Yaw and Correction, so I can
+ keep the helicopter stable in flight), and then the scheme automatically
+ filters the traits according to the control type.
+ Adding these little corrective tools helps me keep the experimentation
+ going, and keeps it simpler to reason about.
+\end_layout
+
+\begin_layout Paragraph
+Code progress
+\end_layout
+
+\begin_layout Standard
+All code progress can be checked out at https://github.com/tetigi/majom.
 \end_layout
 
 \begin_layout Subsection

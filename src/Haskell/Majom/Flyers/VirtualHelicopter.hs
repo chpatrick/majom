@@ -97,7 +97,7 @@ basicMap :: Option -> Int -> Force
 basicMap o v = 
   case o of 
     Yaw -> vector [0,0,0]
-    Pitch -> vector [0,0,0]
+    Pitch -> vector [0.1/63,0,0] |*| (fromIntegral $ v - 63)
     Throttle -> vector [0,0.143,0] |*| (fromIntegral v)
     Correction -> vector [0,0,0] 
 

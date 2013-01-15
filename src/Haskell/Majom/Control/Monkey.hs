@@ -4,15 +4,18 @@ module Majom.Control.Monkey (
   -- * Types
   -- * Functions
   runMonkey,
+  runMonkeyWithHuman
   ) where
 
 import Majom.Analysis.Model
 import Majom.Analysis.LeastSquares
 import Majom.Common
 import Majom.Flyers.Flyable
+import Majom.Control.GUI
 import Majom.Control.Monkey.Intent
 import Majom.Control.Monkey.HoverIntent
 import Majom.Lang.LoopWhile
+import Majom.Flyers.Special.DuoCopter
 
 import Control.Applicative
 import Control.Monad
@@ -34,18 +37,16 @@ data Brain = Brain { brainModel :: LeastSquares,
 
 data FlyState = Flying | Landed deriving (Show, Eq)
 
-
-foo :: IO ()
-foo = do
-  putStrLn "bar"
-  loop $ do liftIO $ putStrLn "gar"
-            liftIO $ milliSleep 1000
-
 -- | Starts the monkey
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
-  let intent = hoverAt (vector [50,51,0])
   forkIO $ fly flyer
+
+  runMonkey' flyer
+
+runMonkey' :: (Flyable a) => a -> IO Brain
+runMonkey' flyer = do
+  let intent = hoverAt (vector [50,51,0])
 
   milliSleep waitTime
   (_, pos, _) <- observe flyer
@@ -71,6 +72,14 @@ runMonkey flyer = do
   let vel = (pos'' - pos) |/| wt
   let initBrain = Brain createNewModel intent (pos', vel, undefined)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
+
+-- | Lets the human fly the flyer with the monkey, controlling a specific
+-- set of options.
+runMonkeyWithHuman :: (Flyable a) => [Option] -> a -> IO Brain
+runMonkeyWithHuman humanControl flyer = do
+  let (human, monkey) = startDuoCopter flyer humanControl
+  forkIO $ runGUI human
+  runMonkey' monkey
 
 monkeySay :: (Model a) => 
   (a, a, Power, Position, Velocity, Power, Acceleration) -> IO ()
