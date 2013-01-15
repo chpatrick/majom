@@ -205,8 +205,8 @@ pre-made
 \end_inset
 
  technology.
- This will allow me to focus on the project as the whole.
- 
+ This will allow me to focus on the project as the whole, rather than the
+ minute details.
 \end_layout
 
 \begin_layout Subsubsection
@@ -311,6 +311,24 @@ Pitch movement is gained by spinning the tail rotor.
  Reversing the spin of the tail rotor results in opposite pitch.
  The gyroscope on top of the main helicopter rotor prevents the helicopter
  from pitching forwards too much by providing a counter force.
+\end_layout
+
+\begin_layout Subsubsection
+Bullet Physics and simulation
+\end_layout
+
+\begin_layout Standard
+It is an attractive idea to have a simulation environment in which I can
+ model the helicopter with very specific restraints so that I can do extensive
+ tests on the Monkey AI.
+ One potential idea that I am looking into is somehow connecting the Open
+ Source physics library Bullet (http://www.bulletphysics.com/) to my project,
+ letting me simulate the helicopter in a very realistic fashion before actually
+ trying real world implementation.
+ This lets me skip the whole vision part and focus instead on only the AI
+ mechanics.
+ The library itself is built in C++, and lets the user simulate collision
+ detection, rigid body dynamics and soft body dynamics, amongst other things.
 \end_layout
 
 \begin_layout Section
@@ -1424,7 +1442,10 @@ My provisional aim for this project is to be able to fly the helicopter
  These would involve having a much more detailed idea of how the three dimension
 al scene is made, as well as having an accurate way of measuring the position
  of the helicopter.
- Much of the complexity of this is in the computer vision aspect.
+ Much of the complexity of this is in the computer vision aspect, as once
+ the three dimensional representation of the helicopter is retrieved (co-ordinat
+es, orientation etc.) it is fairly simple to simulate an abstraction of it.
+ 
 \end_layout
 
 \begin_layout Section

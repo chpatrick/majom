@@ -34,12 +34,15 @@ updatePosition t fs (Object m p v) =
     newV = v + (acc |*| t) 
     acc = fs |*| (1/m)
 
+-- | Simulation specific settings that can be defined by the user.
 data SimulationSettings = Settings { simFloor :: Maybe Position } 
   deriving Show
 
+-- | The default settings that will be used if none are specified.
 defaultSettings :: SimulationSettings
 defaultSettings = Settings Nothing
 
+-- | Sets the floor of the simulation to Just position or Nothing.
 setFloor :: Maybe Position -> SimulationSettings -> SimulationSettings
 setFloor p s = s{simFloor = p}
 
@@ -68,7 +71,7 @@ simulate settings forceVar positionVar object = do
     let pos' = objectLocation obj'
     let vel' = objectVelocity obj'
     simulate settings forceVar positionVar $ 
-      -- | Check case of floor - could be extracted
+      -- Check case of floor - could be extracted
       case simFloor settings of
         Nothing -> obj'
         Just f -> if objectLocation obj' `lowerThan` f

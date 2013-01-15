@@ -26,24 +26,29 @@ import Data.IORef
 
 import System.CPUTime
 
+-- | State transformer for MonkeyBrain
 type MonkeyBrainT = StateT Brain IO ()
 
+-- | State executor for a monkey brain
 execMonkeyBrainT :: MonkeyBrainT -> Brain -> IO Brain
 execMonkeyBrainT mk k = execStateT mk k
 
+-- | Brain that holds all the relevant data for the monkey brain.
 data Brain = Brain { brainModel :: LeastSquares,
                      brainIntent :: HoverIntent,
                      brainLast :: (Position, Velocity, FlyState) }
 
+-- | The current state of the flyer - either flying, or landed.
 data FlyState = Flying | Landed deriving (Show, Eq)
 
--- | Starts the monkey
+-- | Starts the monkey (starts the flyer too)
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
   forkIO $ fly flyer
 
   runMonkey' flyer
 
+-- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
   let intent = hoverAt (vector [50,51,0])
@@ -81,6 +86,7 @@ runMonkeyWithHuman humanControl flyer = do
   forkIO $ runGUI human
   runMonkey' monkey
 
+-- | Gives information on what the monkey is currently thinking to stdout.
 monkeySay :: (Model a) => 
   (a, a, Power, Position, Velocity, Power, Acceleration) -> IO ()
 monkeySay (model, model', pwr, pos', vel', pwr', accel') = do
@@ -92,6 +98,7 @@ monkeySay (model, model', pwr, pos', vel', pwr', accel') = do
   putStrLn $ show $ samples model
   putStrLn ""
   
+-- | Computes the next step of the monkey process.
 monkeyThink :: (Intent a, Model b) => 
   a -> b -> Power -> (Position, Position) -> Velocity 
   -> (b, Velocity, Power)
@@ -104,6 +111,7 @@ monkeyThink intent model pwr (pos, pos') vel = do
     pwr' = (getMap model') $ getAccel intent vel' pos
 
 -- The last thing is the return value
+-- | The iterative loop of the monkey.
 monkeyDo :: (Flyable a) => a -> MonkeyBrainT
 monkeyDo flyer = do
   lift $ milliSleep waitTime
@@ -118,12 +126,14 @@ monkeyDo flyer = do
   put $ Brain model' intent (pos', vel', undefined)
   lift $ setFly flyer Throttle pwr'
 
-
+-- | The iteration time of the monkey (milliseconds)
 waitTime :: Int
 waitTime = 100
 
+-- | Wait time in seconds.
 wt :: Double
 wt = (fromIntegral waitTime) / 1000.0
 
+-- | Sleeps the monkey for given milliseconds.
 milliSleep :: Int -> IO ()
 milliSleep = threadDelay . (*) 1000

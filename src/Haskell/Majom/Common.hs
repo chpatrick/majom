@@ -98,3 +98,11 @@ calcObservedAccel obs = if length obs < 3 then [] else
         vel  = (pos - pos') |/| (t' - t)
         accel = (vel - vel') |/| (t' - t)
     calc vs = []
+
+-- | Tolerance for use with approximations.
+tolerance :: Double
+tolerance = 1e-5
+
+-- | Approximately equals.
+(~=) :: Double -> Double -> Bool
+(~=) a b = abs (a - b) < tolerance
