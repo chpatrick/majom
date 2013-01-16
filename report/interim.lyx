@@ -24,7 +24,7 @@
 \output_sync 0
 \bibtex_command default
 \index_command default
-\paperfontsize default
+\paperfontsize 11
 \spacing single
 \use_hyperref false
 \papersize default
@@ -963,11 +963,150 @@ There are many different forms of least squares fitting - I will have to
 \end_layout
 
 \begin_layout Subsubsection
-Temporal difference learning
+Kalman Filters
+\end_layout
+
+\begin_layout Standard
+Kalman Filters were mentioned in many of the previous papers that I read,
+ and were used to combine different (potentially noisy) data sources into
+ a single result.
+ This will most likely apply to my project as well, particularly in the
+ vision aspect.
+ Raw vision data from the camera will be noisy, and prone to small shifts
+ in direction that may not be accurate.
+\end_layout
+
+\begin_layout Paragraph
+Definition
+\end_layout
+
+\begin_layout Standard
+The Kalman filter is designed to address the problem of dealing with measurement
+s that contains small inaccuracies, producing results that are often more
+ accurate than simply using the raw measurements themselves.
+ Additionally, it operates recurisvely and as such is efficient to use in
+ space and time.
+ It is described as working in a two-step process
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kalman wiki"
+
+\end_inset
+
+ - first the filter produces an estimate of the currest state, along with
+ uncertainty values.
+ Then, given a measurement of the state (which may contain errors), the
+ estimate is updated based upon the certainty.
+\end_layout
+
+\begin_layout Standard
+More formally, the true state is described as (for some state 
+\begin_inset Formula $x$
+\end_inset
+
+)
+\begin_inset Formula 
+\[
+x_{k}=Ax_{k-1}+Bu_{k-1}+w_{k-1}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ is the 
+\begin_inset Formula $i^{th}$
+\end_inset
+
+ true state, 
+\begin_inset Formula $A$
+\end_inset
+
+ is the state transition model from 
+\begin_inset Formula $x_{i-1}$
+\end_inset
+
+, 
+\begin_inset Formula $B$
+\end_inset
+
+ is the control-input model applied to control input 
+\begin_inset Formula $u_{i}$
+\end_inset
+
+ , and 
+\begin_inset Formula $w_{k-1}$
+\end_inset
+
+ is the process noise.
+ The 
+\begin_inset Formula $k^{th}$
+\end_inset
+
+observation is made of the true state 
+\begin_inset Formula $x_{k}$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+z_{k}=Hx_{k}+v_{k}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $H$
+\end_inset
+
+ is an observation model mapping true state to an observation, and 
+\begin_inset Formula $v_{k}$
+\end_inset
+
+is the observation noise.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kalman wiki,kalman tutorial"
+
+\end_inset
+
+ Assumptions are made about the properties of the errors.
+\end_layout
+
+\begin_layout Paragraph
+Suitability
+\end_layout
+
+\begin_layout Standard
+As the Kalman filter is a recursive estimator (it only requires information
+ from the previous time step, and the current state measurement, to get
+ the next estimate), it can be used easily in real-time, which means that
+ it should fit well into the vision module of the project.
+ At the very least, it is worth trying to implement on a basic level to
+ see if it improves the quality of the vision tracking.
 \end_layout
 
 \begin_layout Subsubsection
-Kalman Filters
+Next steps
+\end_layout
+
+\begin_layout Standard
+A large portion of the learning implementation in this project will be down
+ to trial and error.
+ I think it will be difficult for me to decide exactly what learning model
+ I should use straight away, and instead I should iterate learning model
+ designs, testing them against the current one and seeing if there are any
+ improvements.
+ It may be that I need to use some combination of learning models to achieve
+ the desired outcome.
+ The main requirement for me to execute this will be to ensure I have a
+ solid set of interfaces seperating the learning model implementation from
+ exactly what it needs to accomplish - this should let me swap in and out
+ learning models with ease, without affecting the rest of the project.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -1468,6 +1607,15 @@ Input of 'intentions', and automatic execution of them.
 Movement in one, two and three dimensions.
 \end_layout
 
+\begin_layout Standard
+I believe that these three points establish the 'baseline' of the functionality
+ I should achieve.
+ Successful execution of these should demonstrate complexity in computer
+ vision, AI and general design, and should be sufficiently challenging to
+ perform.
+ 
+\end_layout
+
 \begin_layout Subsubsection
 Quality of functionality
 \end_layout
@@ -1743,6 +1891,30 @@ Kerl, C.
  (2012) Odometry from RGB-D Cameras for Autonomous Quadrocopters .
  [e-book] Available through: http://vision.in.tum.de/research/quadcopter http://vis
 ion.in.tum.de/_media/spezial/bib/kerl2012msc.pdf.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Kalman wiki"
+
+\end_inset
+
+En.wikipedia.org (1960) Kalman filter - Wikipedia, the free encyclopedia.
+ [online] Available at: http://en.wikipedia.org/wiki/Kalman_filter [Accessed:
+ 16 Jan 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "kalman tutorial"
+
+\end_inset
+
+Cs.unc.edu (2012) The Kalman Filter.
+ [online] Available at: http://www.cs.unc.edu/~welch/kalman/ [Accessed: 16
+ Jan 2013].
 \end_layout
 
 \end_body
