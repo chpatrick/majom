@@ -73,7 +73,7 @@ Luke Tomlin
 \end_layout
 
 \begin_layout Date
-29/12/2012
+16/01/2012
 \end_layout
 
 \begin_layout Standard
@@ -93,22 +93,23 @@ Introduction
 The projects main objectives can be summarised by one sentence - to mimic
  how a person would learn to fly and operate a small remote control helicopter
  in an indoor environment.
- This objective is an interesting one, as it can be split into key areas
+ This objective is an interesting one, that can be split into key areas
  of focus, each providing an engineering challenge, and they all need to
  be combined to create the finished product.
  The problem is best described by the limiting factors - we have a room
  indoors, a small remote-controlled helicopter, a computer and a simple
- camera source capable of estimating depth to some degree of accuracy.
+ camera source capable of estimating depth to some degree of accuracy (also
+ known as an RGB-D camera).
  With these boundaries, the final aim is to have the computer learn to fly
- the helicopter (with some previous understanding of the mechanics of helicopter
- flying), and given goals from a human, enact them correctly.
+ the helicopter (with some pre-instilled understanding of the mechanics
+ of helicopter flying), and given goals from a human, enact them correctly.
  The difficulties are in the details - how exactly does one learn to fly
  a helicopter? How will we reliably get positional information for the helicopte
 r in the room? What is the best way to act out intentions? These are just
  a few of the potential problems.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Deconstruction
 \end_layout
 
@@ -117,7 +118,7 @@ The first step is to try and separate the individual programming problems
  into a way that is easily reasoned about.
  Once they have been divided, research can be done on the specific problems,
  and tools can be created to start tackling the problems at hand.
- For instance, the computer vision problem is entirely different from that
+ For instance, the computer vision problem is entirely separate from that
  of the machine learning - the machine operates under the assumption that
  the positional information is mostly accurate, and it is up to the computer
  vision module to provide these mostly accurate readings.
@@ -133,6 +134,34 @@ I decided to tackle this problem by thinking about how a human would go
  machine could go about tackling them.
  The final project will be split into modules, each providing a different
  role.
+\end_layout
+
+\begin_layout Paragraph
+Computer Vision
+\end_layout
+
+\begin_layout Standard
+There are a multitude of tasks that need to be performed from a vision perspecti
+ve before the overall aims can be realised.
+ I aim to start from as simplified as possible, simply tracking an object
+ on a 2D white background, and then from this gradually iterate the vision
+ module, adding extra functionality, accuracy, and dimensions.
+ Each iteration will present its own challenges, from getting depth information
+ to tracking orientation of the helicopter.
+\end_layout
+
+\begin_layout Paragraph
+Machine Learning
+\end_layout
+
+\begin_layout Standard
+The AI that flies the helicopter is wholly separate from the vision, and
+ instead is supposed to recreate the learning aspects of the abstract idea
+ of a helicopter.
+ Its key requirement is to know exactly how to fly the helicopter, given
+ information about the current whereabouts, and know how to act upon the
+ orders that it is given.
+ 
 \end_layout
 
 \begin_layout Paragraph
@@ -163,34 +192,6 @@ The easiest place to see the complexity in this project is by looking at
  
 \end_layout
 
-\begin_layout Paragraph
-Computer Vision
-\end_layout
-
-\begin_layout Standard
-As discussed above, there are a multitude of tasks that need to be performed
- from a vision perspective before the overall aims can be realised.
- I aim to start from as simplified as possible, simply tracking an object
- on a 2D white background, and then from this gradually iterate the vision
- module, adding extra functionality and dimensions.
- Each iteration will present its own challenges, from getting depth information
- to tracking orientation of the helicopter.
-\end_layout
-
-\begin_layout Paragraph
-Machine Learning
-\end_layout
-
-\begin_layout Standard
-The AI that flies the helicopter is wholly separate from the vision, and
- instead is supposed to recreate the learning aspects of the abstract idea
- of a helicopter.
- Its key requirement is to know exactly how to fly the helicopter, given
- information about the current whereabouts, and know how to act upon the
- orders that it is given.
- 
-\end_layout
-
 \begin_layout Subsection
 Technology
 \end_layout
@@ -205,12 +206,24 @@ pre-made
 \end_inset
 
  technology.
- This will allow me to focus on the project as the whole, rather than the
- minute details.
+ This will allow me to focus on the project as the whole, rather than in
+ the minute details.
 \end_layout
 
 \begin_layout Subsubsection
 Kinect
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename kinect.png
+	display false
+	width 5cm
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -224,8 +237,8 @@ For the computer vision, I will use a Kinect sensor device, created by Microsoft
  get from the single camera source.
  It is also a very popular device for performing computer vision with -
  this means that there will most likely be many other examples of it being
- used for tasks similar to mine.
- 
+ used for tasks similar to mine, as well as many ways to incorporate it
+ with tools that I might use.
 \end_layout
 
 \begin_layout Subsubsection
@@ -237,6 +250,7 @@ OpenCV (Open Source Computer Vision Library) is a library of programming
  functions that will let me perform image analysis from the Kinect.
  It is free to use, and has many different implementations in different
  programming languages.
+ I will talk about this in more detail later on.
 \end_layout
 
 \begin_layout Subsubsection
@@ -244,12 +258,26 @@ Arduino
 \end_layout
 
 \begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename arduino.png
+	display false
+	width 5cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 Arduino is an open-source microcontroller, which lets the user work with
- a simple programming language to control how the circuit works.
+ a simple programming language (C-like) to control how the circuit works.
  It also comes with a Processing-based IDE for programming in, that handles
  a lot of the communications between the board and the computer.
  Additionally, the board itself is reasonably cheap to purchase and highly
  re-usable.
+ This fits very well with the theme of the project as a whole, using off-the-she
+lf, affordable products.
 \end_layout
 
 \begin_layout Subsubsection
@@ -257,11 +285,23 @@ Syma Remote Control Helicopter
 \end_layout
 
 \begin_layout Standard
-The Syma Remote Control Helicopter is a small indoors helicopter, that is
- controlled by an IR source sent from a remote control.
+\align center
+\begin_inset Graphics
+	filename syma.png
+	display false
+	width 5cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Syma Remote Control Helicopter is a small indoors-flying helicopter,
+ that is controlled by an IR signal sent from a remote control.
  It is modelled to be easy to fly indoors, and to remain stable even in
  in-experienced hands.
- It does this my not having a traditional tail rotor - instead, it has an
+ It does this by not having a traditional tail rotor - instead, it has an
  internal gyroscope that keeps it level, and rotation is accomplished by
  speeding up and slowing down the main rotors.
  The tail rotor is instead positioned facing upwards, and provides a tilting
@@ -273,6 +313,7 @@ The Syma Remote Control Helicopter is a small indoors helicopter, that is
  available, but some third party sources have done their own analysis of
  the signals (using oscilloscopes for example), and this should prove to
  be sufficient.
+ These are discussed later.
 \end_layout
 
 \begin_layout Paragraph
@@ -355,14 +396,14 @@ key "Syma"
 .
  In his post, he talks about possible methods for setting up the control
  of a remote helicopter, as far as controlling it manually from a computer.
- He then conjectures the possibility of using a camera or similar to control
- the helicopter, and getting it to hover.
+ He then conjectures the possibility of using a camera or similar device
+ to control the helicopter, and getting it to hover.
  He leaves the detail of this up to the user, however!
 \end_layout
 
 \begin_layout Standard
 Armed with this inspiration for a starting point, I took to reading some
- detail for how I would set the foundations of the project up.
+ detail for how I would set up the foundations of the project.
  This included browsing some other pages on using Arduino
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -386,13 +427,16 @@ key "Syma2"
 
 .
  There was a lot of trial and error involved with the building of the circuit,
- as I had done any electrical engineering for many years! Initially I built
- a simple LED circuit to get a feel for how the Arduino itself worked, and
- then once I was confident with that I built the main IR circuit.
- This proved to work well enough, however there were some teething problems
- - the helicopter would jutter and work sporadically.
- The problem because better and worse as I changed the timing values for
- the IR signals, so it was evident that it was a problem with the signal.
+ as I had done any electrical engineering for quite some time.
+ Initially I built a simple LED circuit to get a feel for how the Arduino
+ itself worked, and then once I was confident with that I built the main
+ IR circuit.
+ This proved to work well enough, however, there were some teething problems
+ - the helicopter would jutter and work sporadically, as if it were not
+ always receiving signal.
+ The problem became better and worse as I changed the timing values for
+ the IR signals, so it was evident that it was a problem with the signal
+ timing.
  After doing some further reading on precise timing using the Arduino
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -408,13 +452,13 @@ key "Arduino port"
 \begin_layout Standard
 I took a small amount of time to consider the feasibility of Arduino for
  the task at hand - for instance, would it be possible to do the whole project
- on a Raspberry Pi (http://www.raspberrypi.org/)? Or will the Arduino be too
- restrictive for my requirements? I decided that as the main part of this
- project was based upon the restrictions of input, and execution, not processing
- power, it would be needlessly limiting to use a Raspberry Pi or other similar
- device instead of a computer.
+ on a Raspberry Pi (http://www.raspberrypi.org/)? Or would the Arduino be
+ too restrictive for my requirements? I decided that as the main part of
+ this project was based upon the restrictions of scenario, and execution,
+ not processing power, it would be needlessly limiting to use a Raspberry
+ Pi or other similar device instead of a computer.
  Additionally, a computer would have a much wider range of tools available
- to it, making the project conceptually simpler.
+ to it, making the project simpler to execute.
  The Arduino could be used as a simple intermediate device, that takes the
  commands from the computer and sends them on to the helicopter, which does
  not require much computational power.
@@ -424,12 +468,13 @@ I took a small amount of time to consider the feasibility of Arduino for
 With my initial goals in mind, I started to build the foundation for the
  project using the programming language Haskell.
  I decided to use Haskell because I knew that it has an extensive programming
- library available to it, has bindings to the OpenCV library, and I had
- previously done a group project to create an AI framework in Haskell, which
- seemed appropriate given the topic of this project.
+ library available to it, has bindings to the OpenCV library (which I may
+ or may not use), and I had previously done a group project to create an
+ AI framework in Haskell, which seemed appropriate given the topic of this
+ project.
  This foundation involved making the various interfaces for the different
  parts of the project (modules, classes etc.), and deciding what responsibilities
- would be where.
+ would lie where.
  
 \end_layout
 
@@ -473,14 +518,14 @@ Camera-Based Navigation of a Low-Cost Quadrocopter
 \end_inset
 
 a system that enables a low-cost quadrocopter coupled with a ground-based
- laptop to naviage autonomously in previously unknown and GPS-denied environment
-s
+ laptop to navigate autonomously in previously unknown and GPS-denied environmen
+ts
 \begin_inset Quotes erd
 \end_inset
 
 .
  This project shares many similar points with mine - it is done using a
- low-cost flying device, without customised, high-precision location data
+ low-cost flying device, without customised, high-precision location-data
  sources, uses (amongst other things) a monocular vision device, and works
  indoors in previously unknown environments.
  However, it is also different in many ways, not just in the fact that it
@@ -513,7 +558,7 @@ Extended Kalman Filter
 
 \begin_layout Standard
 In the experiments, they use an Extended Kalman Filter (EKF) to combine
- all of the available data.
+ all of the available data into a single, reliable data point.
  In addition, the EKF is used to compensate for different time delays that
  occur in the system (for example, from data transmission delays, or from
  computationally expensive calculations).
@@ -539,7 +584,8 @@ In the quadropter experiments, they successfully demonstrated that accurate
  position at different observational times subject to control transmission
  delay should prove to be very useful for when I am also doing visual tracking,
  as I will be subject to many of the same problems that they faced.
- 
+ When I get to this point in my project, it will be worth doing extra research
+ on the methods that they used, and how I can implement it.
 \end_layout
 
 \begin_layout Subsubsection
@@ -574,7 +620,8 @@ localize and navigate autonomously in previously unknown and GPS-denied
  of this project, just as it is not when the human pilot wishes to fly the
  remote control helicopter.
  However, the paper still raises many interesting points regarding how positiona
-l information is gathered, and how flight paths are calculated.
+l information is gathered, and how flight paths are calculated, which will
+ come in useful when I reach the midpoint of my project.
 \end_layout
 
 \begin_layout Subsubsection
@@ -593,8 +640,8 @@ Again following on the themes of the previous two works, this paper focuses
  on the details of flying a quadropter - however, unlike the previous two
  pieces this one details quadropters where the camera source is an RGB-D
  camera located on board the quadropter itself.
- This is a less low-cost solution, but may still provide some insights towards
- control of the quadropter and flight itself.
+ This is a more high-cost solution, but may still provide some insights
+ towards control of the quadropter and flight itself.
 \end_layout
 
 \begin_layout Paragraph
@@ -602,13 +649,13 @@ Least Squares
 \end_layout
 
 \begin_layout Standard
-The paper discusses the technique of least squares, a technique that is
- used to estimate parameter of a model that uses noisy observations.
+The paper discusses the technique of least squares, that is used to estimate
+ the parameter of a model that uses noisy observations.
  It also discusses the derivation of this technique, as well as the technique
- of weighted least squares, which is used to deal with outlier observations
+ of weighted least squares, which is used to deal with outlier observations,
  that heavily affect the parameter estimates.
- Unfortunately, outliers will most likely be something that will occur,
- so making the motion estimates robust is extremely important.
+ Outliers will most likely be something that will occur when I take measurements
+ in my project, so making the motion estimates robust is extremely important.
  These outliers are particularly bad in a standard least squares solution,
  because of the large side-effects caused by the quadratic error term in
  its formulation.
@@ -621,7 +668,7 @@ Remarks
 
 \begin_layout Standard
 The methods described for least squares, and dealing with outliers by using
- variations of it should prove to be useful for the learning part of the
+ variations thereof should prove to be useful for the learning part of the
  project.
  
 \end_layout
@@ -639,7 +686,7 @@ key "Kinectfusion"
 \end_layout
 
 \begin_layout Standard
-The fundamentals of this paper are somewhat different than mine, however
+The fundamental topics of this paper are somewhat different than mine, however
  I felt that it might provide some useful insight into some of the later
  stages of the project.
  The KinectFusion is a method for creating a 3D representation of a scene
@@ -677,6 +724,8 @@ The real-time camera tracking and reconstruction is performed using parallel
  execution on a GPU.
  If I wanted to use this technology directly, I may need to get specialised
  hardware.
+ Alternatively, I may be able to implement a less-functional version using
+ my current hardware.
 \end_layout
 
 \begin_layout Paragraph
@@ -828,13 +877,13 @@ Learning models
 \end_layout
 
 \begin_layout Standard
-A key consideration I had to make at this point was what method I would
- use to 'learn' the correspondence between resultant acceleration and input
- power to the helicopter.
+A key consideration I had to make was what method I would use to 'learn'
+ the correspondence between resultant acceleration and input power to the
+ helicopter.
  The mapping between these two would be extremely important in flying the
  helicopter later, as I would want the helicopter to be able to make judgements
- on the appropriate input for a desired acceleration, and then to augment
- this mapping with observations.
+ on the appropriate input for a desired acceleration, whilst also being
+ able to augment this mapping with new observations.
  For the straight up/down case, where changing the input throttle results
  in a flat increase in propellor speed, and hence change in upwards velocity
  of the helicopter, I pulled out the key requirements:
@@ -875,7 +924,7 @@ te they would be to the problem at hand.
  be iterative, and not require recomputation on the entire data set every
  time a new piece of data arrived.
  This was because I was afraid that the computations would quickly become
- slow as the measurements got larger and larger.
+ slow as the array of measurements became larger and larger.
  Some sources discussed recursive versions of least squares estimation 
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -885,7 +934,7 @@ key "Least squares + Recursive,Least squares wiki"
 
 , but after spending some time looking at the algorithms and realising my
  own lack of knowledge on the subject of regression analysis, I decided
- to first implement the simple least squares algorithm and then possibly
+ to first implement the simple least squares algorithm, and then possibly
  look at the recursive version later.
  Without too many problems I managed to implement the basic least squares
  algorithm into my program using a couple of different sources for inspiration
@@ -1212,6 +1261,24 @@ ely simple to add a foreign function call to the Haskell code, and then
  
 \end_layout
 
+\begin_layout Standard
+To make things even simpler, SimpleCV is also documented very well, with
+ all of the documentation available online and inside an interpreter.
+ Having access to an interpreter makes experimentation very easy, especially
+ considering the fact that Python has first-class functions, letting me
+ manipulate images and test out new image processing techniques into existing
+ code very easily.
+ In addition to the code documentation, I also have started reading the
+ book Practical Computer Vision with SimpleCV 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SimpleCV book"
+
+\end_inset
+
+, which lists many different examples and techniques to get me started.
+\end_layout
+
 \begin_layout Section
 Project plan
 \end_layout
@@ -1357,7 +1424,8 @@ January Computer vision module up and running for basic computer vision
  (location of helicopter to some degree of accuracy in a controlled environment
  - minimal other objects).
  Hover/landing working in simulation environment.
- Engineer some sort of device to keep helicopter flying in only one dimension.
+ Engineer some sort of device or method to keep helicopter flying in only
+ one dimension.
 \end_layout
 
 \begin_layout Description
@@ -1367,7 +1435,7 @@ February Basic hover/landing working in simulation and on real-helicopter.
  section.
  First fallback point.
  Start work on two dimensional flight in simulation.
- Start engineering two dimensional flight apparatus.
+ Start engineering two dimensional flight apparatus/methods.
  
 \end_layout
 
@@ -1915,6 +1983,19 @@ key "kalman tutorial"
 Cs.unc.edu (2012) The Kalman Filter.
  [online] Available at: http://www.cs.unc.edu/~welch/kalman/ [Accessed: 16
  Jan 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "SimpleCV book"
+
+\end_inset
+
+DEMAAGD, K., OLIVER, A., & OOSTENDORP, N.
+ (2012).
+ Practical computer vision with SimpleCV.
+ Beijing, O'Reilly.
 \end_layout
 
 \end_body
