@@ -1,0 +1,5 @@
+- Show two versions of vision (human and robot)
+- Set up 'work area'
+- Think of test environment methods
+- Auto calibration
+- Flight override?
