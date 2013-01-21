@@ -1,5 +1,5 @@
-- Show two versions of vision (human and robot)
-- Set up 'work area'
-- Think of test environment methods
+- Show two versions of vision (human and robot) [X]
+- Set up 'work area' [X]
+- Think of test environment methods [X]
 - Auto calibration
 - Flight override?
