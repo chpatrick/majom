@@ -1,18 +1,24 @@
 from SimpleCV import *
+import time
+
 cam = Kinect()
 
 def basic(img):
-    dist = img.colorDistance(Color.WHITE).dilate(2)
-    segmented = dist.stretch(150,255)
-    return segmented
+    dist = img.colorDistance(Color.WHITE).dilate(4)
+    segmented = dist.stretch(180,255)
+    return segmented.binarize()
 
 def move(img, (x,y)):
   points= ((x, y), (img.width+x, y), (img.width+x, img.height+y), (x, img.height+y))
   return img.shear(points)
 
-def depthDetect():
+def getDepth():
   # Get depth image
   img = cam.getDepth()
+  return img
+
+def depthDetect():
+  img = getDepth()
   # Restrict to foreground. Cut out everything else
   field = img.stretch(0,200)
   # Change stuff we can see to white and everything else to black
@@ -21,51 +27,119 @@ def depthDetect():
 
 def depthFilter(img):
   filt = depthDetect().dilate(6)
-  return img.applyBinaryMask(move(filt, (-20, 20)),Color.WHITE)
+  return img.applyBinaryMask(move(filt, (-20,20)),Color.WHITE)
 #  return img.applyBinaryMask(filt)
 
 normalCrop = (90, 0, 420, 480)
 
 def detect(foo, human=True, filt=None, crop=None):
-  while True:
+  # Get starting time
+  oldTime = time.time()
+
+  # Crop image if necessary
+  if crop:
+    disp = cam.getImage().crop(crop).show()
+  else:
+    disp = cam.getImage().show()
+
+  # Start running the detector
+  while disp.isNotDone():
+    stats = []
+    img = cam.getImage()
+    if filt: # Prefilter?
+      img = filt(img)
     if crop:
-      disp = cam.getImage().crop(crop).show()
-    else:
-      disp = cam.getImage().show()
-    while disp.isNotDone():
-      img = cam.getImage()
-      if filt:
-        img = filt(img)
-      if crop:
-        img = img.crop(crop)
-      if human:
-        img.show()
-      else:
-        img = foo(img)
-        blobs = img.findBlobs()
-        map(lambda x: x.drawOutline(width=3),blobs)
-        img.show()
+      img = img.crop(crop)
+    if not human: # Show the machine-version
+      img = foo(img).invert()
+      blobs = img.findBlobs()
+      img = img.invert()
+      if blobs:
+        map(lambda x: x.draw(),blobs)
+        stats.append(str(len(blobs)) + " blobs found")
+
+        ds = assocBlobs(blobs, getDepth())
+        pBlobs = partitionBlobs(zip(blobs, ds))
+        for b in pBlobs:
+          (x1,y1,x2,y2) = trackBlobs(b, None)
+          img.drawRectangle(x1,y1,x2-x1,y2-y1)
+
+        for i in range(len(pBlobs)):
+          (x,y) = pBlobs[i][0].centroid()
+          img.drawText(str(round(ds[i],2)), x, y)
+
+    # Calculate fps
+    newTime = time.time()
+    seconds = newTime - oldTime
       
-      if disp.leftButtonDownPosition() is not None: # left mouse button
-        human = not human
-        # Switch displays
-      elif disp.rightButtonDownPosition() is not None:
-        disp.quit()
-        # stop running
+    stats.append(str(round(1/seconds, 1)) + " fps")
+    writeStats(img, stats)
+    img.show()
+    
+    oldTime = newTime
 
-  #if blobs:
-  #  circles = blobs.filter([b.isCircle(0.2) for b in blobs])
-  #  if circles:
-  #    img.drawCircle((circles[-1].x, circles[-1].y),circles[-1].radius(),Color.BLUE,3)
-  #img.show()
-
-def foo():
-  disp = cam.getImage().show()
-  while(disp.isNotDone()):
+    # Get user input
     if disp.leftButtonDownPosition() is not None: # left mouse button
-      disp.writeFrame(cam.getImage())
+      human = not human
       # Switch displays
     elif disp.rightButtonDownPosition() is not None:
       disp.quit()
+      # stop running
 
+def writeStats(img, stats):
+  y = 10
+  for s in stats:
+    img.drawText(s, 10, y, Color.BLACK)
+    y += 10
 
+tolerance = 0.5
+def partitionBlobs(blobs):
+  bs = sorted(blobs,key=lambda x: x[1]) 
+  ret = []
+  curD = 0.0
+  cur = []
+  for (b,d) in bs:
+    if d > curD + tolerance: # new block
+      if cur:
+        ret.append(cur)
+      cur = [b]
+    else:
+      cur.append(b)
+    curD = d
+
+  if cur:
+    ret.append(cur)
+  return ret
+
+def assocBlobs(blobs, values):
+  ret = []
+  for b in blobs:
+    mask = b.blobMask().embiggen(values.size())
+    depthVals = move(values, (-20,20)).applyBinaryMask(mask)
+    meanDepth = depthVals.meanColor()[0]
+    ret.append(meanDepth)
+  return ret
+
+def trackBlobs(blobs, prev):
+  if not blobs:
+    return None
+  # create largest bounding box of blobs, return
+  blobs = map(lambda x: x.minRect(), blobs)
+  xs = map(lambda y: map(lambda x: x[0], y),blobs)
+  xs = [x for y in xs for x in y]
+  ys = map(lambda y: map(lambda x: x[1], y),blobs)
+  ys = [y for x in ys for y in x]
+
+  x1 = min(xs)
+  x2 = max(xs)
+
+  y1 = min(ys)
+  y2 = max(ys)
+
+  if not prev:
+    return (x1,y1,x2,y2)
+  
+  # otherwise, make new bounding box of blobs.
+  # compare to last box. Is it the same size? Has it moved?
+  # Has the relative positions of it's composite blobs changed?
+  # Exclude blobs based on judgements
