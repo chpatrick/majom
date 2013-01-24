@@ -1,7 +1,14 @@
 from SimpleCV import *
+import cv2
 import time
 
 cam = Kinect()
+
+def diffDetect(base, img):
+  t1 = cv2.cvtColor(base.getNumpy(), cv2.COLOR_RGB2GRAY)
+  t2 = cv2.cvtColor(img.getNumpy(), cv2.COLOR_RGB2GRAY)
+
+  return Image(cv2.absdiff(t2,t1)).smooth().dilate(2)
 
 def basic(img):
     dist = img.colorDistance(Color.WHITE).dilate(4)
@@ -114,9 +121,28 @@ def partitionBlobs(blobs):
 def assocBlobs(blobs, values):
   ret = []
   for b in blobs:
-    mask = b.blobMask().embiggen(values.size())
-    depthVals = move(values, (-20,20)).applyBinaryMask(mask)
-    meanDepth = depthVals.meanColor()[0]
+    rect = b.minRect()
+    x1 = max(0,min(rect, key=lambda x: x[0])[0])
+    y1 = max(0,min(rect, key=lambda x: x[1])[1])
+    x2 = max(0,max(rect, key=lambda x: x[0])[0])
+    y2 = max(0,max(rect, key=lambda x: x[1])[1])
+
+    raw_input("Hi!")
+
+    b.show()
+    raw_input("The image looks like this (x and y are " + str(x1) + "," + str(y1) + ")")
+    mask = b.blobMask()
+    mask.show()
+    raw_input("Embiggening...")
+    mask = mask.embiggen(size=values.size(),pos=(int(x1),int(y1)))
+    mask.show()
+    raw_input("The mask is this")
+    depthVals = values.applyBinaryMask(mask)
+    depthVals.show()
+    raw_input("The new depth vals are")
+    meanDepth = depthVals.crop(x1,y1,x2-x1,y2-y1).meanColor()[0]
+    print(meanDepth)
+    raw_input()
     ret.append(meanDepth)
   return ret
 
