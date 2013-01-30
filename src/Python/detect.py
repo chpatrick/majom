@@ -1,3 +1,19 @@
+# Can combine the outputs from
+#   a) change from the original scene
+#   b) shape detection from near objects
+
+# POA:
+#   Make calibration board
+#   Calibrate camera with depth sensor too
+#   Get 3D position of simple object (ball)
+#   Get 3D position using multiple methods for helicopter
+#   Try out some orientation coding
+#     Machine learning?
+#     Scan left to right - med -> small -> big = facing left etc.
+#   Connect to bot
+#   Add ability for both to fly in two dimensions
+
+
 from SimpleCV import *
 import cv2
 import time
@@ -8,7 +24,7 @@ def diffDetect(base, img):
   t1 = cv2.cvtColor(base.getNumpy(), cv2.COLOR_RGB2GRAY)
   t2 = cv2.cvtColor(img.getNumpy(), cv2.COLOR_RGB2GRAY)
 
-  return Image(cv2.absdiff(t2,t1)).smooth().dilate(2)
+  return Image(cv2.absdiff(t2,t1))#.smooth().dilate(2)
 
 def basic(img):
     dist = img.colorDistance(Color.WHITE).dilate(4)
@@ -17,7 +33,7 @@ def basic(img):
 
 def move(img, (x,y)):
   points= ((x, y), (img.width+x, y), (img.width+x, img.height+y), (x, img.height+y))
-  return img.shear(points)
+  return img#.shear(points)
 
 def getDepth():
   # Get depth image
@@ -33,9 +49,9 @@ def depthDetect():
   return visible
 
 def depthFilter(img):
-  filt = depthDetect().dilate(6)
+  filt = depthDetect()#.dilate(6)
   return img.applyBinaryMask(move(filt, (-20,20)),Color.WHITE)
-#  return img.applyBinaryMask(filt)
+  #return img.applyBinaryMask(filt, Color.WHITE)
 
 normalCrop = (90, 0, 420, 480)
 
@@ -52,7 +68,8 @@ def detect(foo, human=True, filt=None, crop=None):
   # Start running the detector
   while disp.isNotDone():
     stats = []
-    img = cam.getImage()
+    cam.loadCalibration("cam")
+    img = cam.getImageUndistort()
     if filt: # Prefilter?
       img = filt(img)
     if crop:
@@ -127,22 +144,10 @@ def assocBlobs(blobs, values):
     x2 = max(0,max(rect, key=lambda x: x[0])[0])
     y2 = max(0,max(rect, key=lambda x: x[1])[1])
 
-    raw_input("Hi!")
-
-    b.show()
-    raw_input("The image looks like this (x and y are " + str(x1) + "," + str(y1) + ")")
     mask = b.blobMask()
-    mask.show()
-    raw_input("Embiggening...")
     mask = mask.embiggen(size=values.size(),pos=(int(x1),int(y1)))
-    mask.show()
-    raw_input("The mask is this")
     depthVals = values.applyBinaryMask(mask)
-    depthVals.show()
-    raw_input("The new depth vals are")
     meanDepth = depthVals.crop(x1,y1,x2-x1,y2-y1).meanColor()[0]
-    print(meanDepth)
-    raw_input()
     ret.append(meanDepth)
   return ret
 
@@ -169,3 +174,56 @@ def trackBlobs(blobs, prev):
   # compare to last box. Is it the same size? Has it moved?
   # Has the relative positions of it's composite blobs changed?
   # Exclude blobs based on judgements
+
+# ---------------
+# Borrowed from http://graphics.stanford.edu/~mdfisher/Kinect.html
+
+def rawToMeters(raw):
+  if raw < 2047:
+    return (1.0 / (raw * -0.0030711016 + 3.3309495161));
+
+  return 0.0;
+
+def depthToWorld(x, y, d):
+  fx_d = 1.0 / 5.9421434211923247e+02
+  fy_d = 1.0 / 5.9104053696870778e+02
+  cx_d = 3.3930780975300314e+02
+  cy_d = 2.4273913761751615e+02
+
+  depth = rawToMeters(d)
+  return (((x - cx_d) * depth * fx_d),((y - cy_d) * depth * fy_d),depth)
+
+from numpy import *
+
+def zipWith(f, xs, ys):
+  zs = zip(xs,ys)
+  return map(f, zs)
+
+def addCol(m, v):
+  return zipWith(lambda (x,y): x+y, m, v)
+
+def addRow(m, v):
+  return m + [v]
+
+def worldToRGB((x,y,z)):
+  rot = [[ 0.99984629, -0.00147791,  0.01747042],
+         [ 0.00126354,  0.99992386,  0.01227534],
+         [-0.01748723, -0.01225138,  0.99977202]]
+  trans = [[-0.01998524],
+           [0.00074424],
+           [0.01091674]]
+
+  finalMatrix = matrix(addRow(addCol(rot, trans),[0,0,0,1]))
+
+  fx_rgb = 5.2921508098293293e+02
+  fy_rgb = 5.2556393630057437e+02
+  cx_rgb = 3.2894272028759258e+02
+  cy_rgb = 2.6748068171871557e+02
+
+  inp = matrix([x,y,z,1]).transpose()
+  res = finalMatrix *  inp
+  [rx],[ry],[rz],_ = res.tolist()
+  invZ = 1.0 / rz
+  return (int(rx*fx_rgb*invZ + cx_rgb),
+          int(ry*fy_rgb*invZ + cy_rgb))
+  
