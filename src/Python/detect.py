@@ -33,7 +33,11 @@ def basic(img):
 
 def move(img, (x,y)):
   points= ((x, y), (img.width+x, y), (img.width+x, img.height+y), (x, img.height+y))
-  return img#.shear(points)
+  return img.shear(points)
+
+def scale(img, (fx, fy)):
+  (x, y) = img.size()
+  return img.resize(int(fx*x), int(fy*y))
 
 def getDepth():
   # Get depth image
@@ -50,7 +54,10 @@ def depthDetect():
 
 def depthFilter(img):
   filt = depthDetect()#.dilate(6)
-  return img.applyBinaryMask(move(filt, (-20,20)),Color.WHITE)
+  #return img.applyBinaryMask(move(filt, (-20,20)),Color.WHITE)
+  mask = foo(filt)#.embiggen(img.size())
+  return img.sideBySide(filt)
+  #return img.applyBinaryMask(mask,Color.WHITE)
   #return img.applyBinaryMask(filt, Color.WHITE)
 
 normalCrop = (90, 0, 420, 480)
@@ -183,13 +190,16 @@ def rawToMeters(raw):
     return (1.0 / (raw * -0.0030711016 + 3.3309495161));
 
   return 0.0;
+  
+def foo(img):
+  return move(scale(move(img, (-cx_d,-cy_d)), (fx_rgb*fx_d, fy_rgb*fy_d)), (cx_rgb,cy_rgb))
+
+fx_d = 1.0 / 5.9421434211923247e+02
+fy_d = 1.0 / 5.9104053696870778e+02
+cx_d = 3.3930780975300314e+02
+cy_d = 2.4273913761751615e+02
 
 def depthToWorld(x, y, d):
-  fx_d = 1.0 / 5.9421434211923247e+02
-  fy_d = 1.0 / 5.9104053696870778e+02
-  cx_d = 3.3930780975300314e+02
-  cy_d = 2.4273913761751615e+02
-
   depth = rawToMeters(d)
   return (((x - cx_d) * depth * fx_d),((y - cy_d) * depth * fy_d),depth)
 
@@ -205,25 +215,33 @@ def addCol(m, v):
 def addRow(m, v):
   return m + [v]
 
+rot = [[ 0.99984629, -0.00147791,  0.01747042],
+       [ 0.00126354,  0.99992386,  0.01227534],
+       [-0.01748723, -0.01225138,  0.99977202]]
+trans = [[-0.01998524],
+         [0.00074424],
+         [0.01091674]]
+finalMatrix = matrix(addRow(addCol(rot, trans),[0,0,0,1]))
+
+fx_rgb = 5.2921508098293293e+02
+fy_rgb = 5.2556393630057437e+02
+cx_rgb = 3.2894272028759258e+02
+cy_rgb = 2.6748068171871557e+02
+
 def worldToRGB((x,y,z)):
-  rot = [[ 0.99984629, -0.00147791,  0.01747042],
-         [ 0.00126354,  0.99992386,  0.01227534],
-         [-0.01748723, -0.01225138,  0.99977202]]
-  trans = [[-0.01998524],
-           [0.00074424],
-           [0.01091674]]
-
-  finalMatrix = matrix(addRow(addCol(rot, trans),[0,0,0,1]))
-
-  fx_rgb = 5.2921508098293293e+02
-  fy_rgb = 5.2556393630057437e+02
-  cx_rgb = 3.2894272028759258e+02
-  cy_rgb = 2.6748068171871557e+02
-
   inp = matrix([x,y,z,1]).transpose()
   res = finalMatrix *  inp
-  [rx],[ry],[rz],_ = res.tolist()
+  [rx],[ry],[rz],[rf] = res.tolist()
   invZ = 1.0 / rz
   return (int(rx*fx_rgb*invZ + cx_rgb),
           int(ry*fy_rgb*invZ + cy_rgb))
   
+def RGBToVector((x,y)):
+  rx = (x - cx_rgb)/fx_rgb
+  ry = (y - cy_rgb)/fy_rgb
+
+  inp = matrix([rx,ry,1,1]).transpose()
+  res = finalMatrix.I * inp
+  [retx],[rety],[retz],[f] = res.tolist()
+  return (retx, rety, retz,)
+
