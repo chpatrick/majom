@@ -20,15 +20,27 @@ import time
 
 cam = Kinect()
 
-def diffDetect(base, img):
-  t1 = cv2.cvtColor(base.getNumpy(), cv2.COLOR_RGB2GRAY)
-  t2 = cv2.cvtColor(img.getNumpy(), cv2.COLOR_RGB2GRAY)
+def differizer(base):
+  while True:
+    i = cam.getImage()
+    n1 = i.getNumpy()
+    n2 = base.getNumpy()
 
-  return Image(cv2.absdiff(t2,t1))#.smooth().dilate(2)
+    d = cv2.absdiff(n1,n2)
+    Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().show()
+
+
+def diffDetect(base, img):
+  n1 = base.getNumpy()
+  n2 = img.getNumpy()
+  n1 = n1 * 1
+  n2 = n2 * 1
+
+  return Image(cv2.absdiff(n1,n2))#.smooth().dilate(2)
 
 def basic(img):
     dist = img.colorDistance(Color.WHITE).dilate(4)
-    segmented = dist.stretch(180,255)
+    segmented = dist.stretch(150,255)
     return segmented.binarize()
 
 def move(img, (x,y)):
@@ -53,7 +65,7 @@ def depthDetect():
   return visible
 
 def depthFilter(img):
-  filt = depthDetect()#.dilate(6)
+  filt = depthDetect().dilate(5)
   return img.applyBinaryMask(move(filt, (-20,20)),Color.WHITE)
   #return img.applyBinaryMask(filt, Color.WHITE)
 
@@ -238,3 +250,15 @@ def RGBToVector((x,y)):
   res = finalMatrix.I * inp
   [retx],[rety],[retz],[f] = res.tolist()
   return (retx, rety, retz,)
+
+def depthTest():
+  d = cam.getDepth()
+  m = cam.getDepthMatrix().T
+  
+  (sx, sy) = d.size()
+  while True:
+    d.drawCircle((sx/2,sy/2),10, Color.GREEN)
+    writeStats(d, ["Center is " + str(rawToMeters(m[sx/2,sy/2])) + "m away"])
+    d.show()
+    d = cam.getDepth()
+    m = cam.getDepthMatrix().T
