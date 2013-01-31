@@ -54,10 +54,7 @@ def depthDetect():
 
 def depthFilter(img):
   filt = depthDetect()#.dilate(6)
-  #return img.applyBinaryMask(move(filt, (-20,20)),Color.WHITE)
-  mask = foo(filt)#.embiggen(img.size())
-  return img.sideBySide(filt)
-  #return img.applyBinaryMask(mask,Color.WHITE)
+  return img.applyBinaryMask(move(filt, (-20,20)),Color.WHITE)
   #return img.applyBinaryMask(filt, Color.WHITE)
 
 normalCrop = (90, 0, 420, 480)
@@ -75,8 +72,7 @@ def detect(foo, human=True, filt=None, crop=None):
   # Start running the detector
   while disp.isNotDone():
     stats = []
-    cam.loadCalibration("cam")
-    img = cam.getImageUndistort()
+    img = cam.getImage()
     if filt: # Prefilter?
       img = filt(img)
     if crop:
@@ -191,9 +187,6 @@ def rawToMeters(raw):
 
   return 0.0;
   
-def foo(img):
-  return move(scale(move(img, (-cx_d,-cy_d)), (fx_rgb*fx_d, fy_rgb*fy_d)), (cx_rgb,cy_rgb))
-
 fx_d = 1.0 / 5.9421434211923247e+02
 fy_d = 1.0 / 5.9104053696870778e+02
 cx_d = 3.3930780975300314e+02
@@ -221,6 +214,7 @@ rot = [[ 0.99984629, -0.00147791,  0.01747042],
 trans = [[-0.01998524],
          [0.00074424],
          [0.01091674]]
+
 finalMatrix = matrix(addRow(addCol(rot, trans),[0,0,0,1]))
 
 fx_rgb = 5.2921508098293293e+02
@@ -244,4 +238,3 @@ def RGBToVector((x,y)):
   res = finalMatrix.I * inp
   [retx],[rety],[retz],[f] = res.tolist()
   return (retx, rety, retz,)
-
