@@ -27,15 +27,23 @@ def cal(i, d, (t1, t2), (s1, s2)):
 def differizer(base):
   while True:
     i = cam.getImage()
+    depths = cam.getDepthMatrix().T
     n1 = i.getNumpy()
     n2 = base.getNumpy()
 
     d = cv2.absdiff(n1,n2)
     loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().erode().dilate(4)
 
-    depth = cam.getDepth()#correctDepth(cam.getDepth())
-    depth.applyBinaryMask(correctRGB(loc), Color.WHITE).show()
-
+    #depth = cam.getDepth()#correctDepth(cam.getDepth())
+    #depth.applyBinaryMask(correctRGB(loc), Color.WHITE).show()
+    #return correctRGB(loc)
+    loc = correctRGB(loc)
+    loc.show()
+    m = loc.getGrayNumpy()
+    mdepth = np.ma.MaskedArray(depths, mask=(m!=255))
+    cleanDepth = np.ma.masked_values (mdepth, 2047)
+    print rawToMeters(cleanDepth.min()) #closest value!
+    
     #rawToMeters()
     continue
     bs = loc.findBlobs()
