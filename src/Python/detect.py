@@ -3,8 +3,7 @@
 #   b) shape detection from near objects
 
 # POA:
-#   Make calibration board
-#   Calibrate camera with depth sensor too
+#   Get reasonably accurate translation for cameras.
 #   Get 3D position of simple object (ball)
 #   Get 3D position using multiple methods for helicopter
 #   Try out some orientation coding
@@ -20,6 +19,10 @@ import time
 
 cam = Kinect()
 
+def cal(i, d, (t1, t2), (s1, s2)):
+  # move depth by t1,t2, squish it by s1,s2
+  pass
+
 def differizer(base):
   while True:
     i = cam.getImage()
@@ -27,8 +30,13 @@ def differizer(base):
     n2 = base.getNumpy()
 
     d = cv2.absdiff(n1,n2)
-    Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().show()
+    loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().erode()
 
+    bs = loc.findBlobs()
+    if bs:
+      (x1,y1,x2,y2) = trackBlobs(bs)
+      loc.drawRectangle(x1,y1,x2-x1,y2-y1)
+    loc.show()
 
 def diffDetect(base, img):
   n1 = base.getNumpy()
@@ -49,7 +57,7 @@ def move(img, (x,y)):
 
 def scale(img, (fx, fy)):
   (x, y) = img.size()
-  return img.resize(int(fx*x), int(fy*y))
+  return move(img.resize(int(fx*x), int(fy*y)), ((1-fx)*(x/2),(1-fy)*(y/2)))
 
 def getDepth():
   # Get depth image
@@ -166,7 +174,7 @@ def assocBlobs(blobs, values):
     ret.append(meanDepth)
   return ret
 
-def trackBlobs(blobs, prev):
+def trackBlobs(blobs, prev=None):
   if not blobs:
     return None
   # create largest bounding box of blobs, return
