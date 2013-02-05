@@ -3,7 +3,8 @@
 #   b) shape detection from near objects
 
 # POA:
-#   Get reasonably accurate translation for cameras.
+#   Add adaption to base image for differizer to 'absorb' areas of
+#     image that don't move
 #   Get 3D position of simple object (ball)
 #   Get 3D position using multiple methods for helicopter
 #   Try out some orientation coding
@@ -30,8 +31,13 @@ def differizer(base):
     n2 = base.getNumpy()
 
     d = cv2.absdiff(n1,n2)
-    loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().erode()
+    loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().erode().dilate(4)
 
+    depth = cam.getDepth()#correctDepth(cam.getDepth())
+    depth.applyBinaryMask(correctRGB(loc), Color.WHITE).show()
+
+    #rawToMeters()
+    continue
     bs = loc.findBlobs()
     if bs:
       (x1,y1,x2,y2) = trackBlobs(bs)
@@ -57,7 +63,17 @@ def move(img, (x,y)):
 
 def scale(img, (fx, fy)):
   (x, y) = img.size()
-  return move(img.resize(int(fx*x), int(fy*y)), ((1-fx)*(x/2),(1-fy)*(y/2)))
+  img = img.resize(int(fx*x), int(fy*y))
+  if fx <= 1:
+    img = img.embiggen((x, int(fy*y)))
+  else:
+    img = img.crop(fx*x/2, fy*y/2, x, fy*y, True)
+  (x,_) = img.size()
+  if fy <= 1:
+    img = img.embiggen((x, y))
+  else:
+    img = img.crop(x/2, fy*y/2, x, y, True)
+  return img
 
 def getDepth():
   # Get depth image
@@ -72,9 +88,15 @@ def depthDetect():
   visible = field.binarize()
   return visible
 
+def correctDepth(img):
+  return scale(move(img, (-20,20)), (0.9,0.9))
+
+def correctRGB(img):
+  return move(scale(img, (1.0/0.9,1.0/0.9)), (20,-20))
+
 def depthFilter(img):
   filt = depthDetect().dilate(5)
-  return img.applyBinaryMask(move(filt, (-20,20)),Color.WHITE)
+  return img.applyBinaryMask(correctDepth(filt),Color.WHITE)
   #return img.applyBinaryMask(filt, Color.WHITE)
 
 normalCrop = (90, 0, 420, 480)
