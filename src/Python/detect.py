@@ -20,10 +20,6 @@ import time
 
 cam = Kinect()
 
-def cal(i, d, (t1, t2), (s1, s2)):
-  # move depth by t1,t2, squish it by s1,s2
-  pass
-
 def differizer(base):
   while True:
     i = cam.getImage()
@@ -34,15 +30,26 @@ def differizer(base):
     d = cv2.absdiff(n1,n2)
     loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().erode().dilate(4)
 
-    #depth = cam.getDepth()#correctDepth(cam.getDepth())
-    #depth.applyBinaryMask(correctRGB(loc), Color.WHITE).show()
-    #return correctRGB(loc)
     loc = correctRGB(loc)
-    loc.show()
+    blobs = loc.findBlobs()
+    i = correctRGB(i)
+    if blobs:
+      #ds = assocBlobs(blobs, Image(depths))
+      #pBlobs = partitionBlobs(zip(blobs, ds))
+      centers = map(Blob.centroid, blobs)
+      (cx, cy) = average(centers, 0)
+      i.drawCircle((cx,cy), 10, color=Color.RED)
+      (a,b,c) = depthToWorld(cx, cy, cleanDepth.min()) #closest value!
+      print (round(a, 2),round(b,2),round(c,2))
+      #for b in pBlobs:
+      #  (x1,y1,x2,y2) = trackBlobs(b, None)
+      #  i.drawRectangle(x1,y1,x2-x1,y2-y1)
+      #  (x,y) = ((x2 - x1)/2 + x1, (y2 - y1)/2 + y1)
+      #  i.drawCircle((x,y), 10)
+    i.show()
     m = loc.getGrayNumpy()
     mdepth = np.ma.MaskedArray(depths, mask=(m!=255))
     cleanDepth = np.ma.masked_values (mdepth, 2047)
-    print rawToMeters(cleanDepth.min()) #closest value!
     
     #rawToMeters()
     continue
@@ -51,6 +58,14 @@ def differizer(base):
       (x1,y1,x2,y2) = trackBlobs(bs)
       loc.drawRectangle(x1,y1,x2-x1,y2-y1)
     loc.show()
+
+def unzip(xs):
+  x = []
+  y = []
+  for (a,b) in xs:
+    x.append(a)
+    y.append(b)
+  return (x,y)
 
 def diffDetect(base, img):
   n1 = base.getNumpy()
@@ -169,7 +184,7 @@ def writeStats(img, stats):
     img.drawText(s, 10, y, Color.BLACK)
     y += 10
 
-tolerance = 0.5
+tolerance = 50
 def partitionBlobs(blobs):
   bs = sorted(blobs,key=lambda x: x[1]) 
   ret = []
