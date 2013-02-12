@@ -53,10 +53,11 @@ Executable majom
     vector,
     time,
     loop-while,
-    thrift,
     text,
     hashable,
     network,
+--    regex-posix,
+    HTTP,
     unordered-containers
 
   Extensions:

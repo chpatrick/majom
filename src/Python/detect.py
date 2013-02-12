@@ -21,43 +21,37 @@ import time
 cam = Kinect()
 
 def differizer(base):
-  while True:
-    i = cam.getImage()
-    depths = cam.getDepthMatrix().T
-    n1 = i.getNumpy()
-    n2 = base.getNumpy()
+  i = cam.getImage()
+  depths = cam.getDepthMatrix().T
+  n1 = i.getNumpy()
+  n2 = base.getNumpy()
 
-    d = cv2.absdiff(n1,n2)
-    loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().erode().dilate(4)
+  d = cv2.absdiff(n1,n2)
+  loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().erode().dilate(4)
 
-    loc = correctRGB(loc)
-    blobs = loc.findBlobs()
-    i = correctRGB(i)
-    if blobs:
-      #ds = assocBlobs(blobs, Image(depths))
-      #pBlobs = partitionBlobs(zip(blobs, ds))
-      centers = map(Blob.centroid, blobs)
-      (cx, cy) = average(centers, 0)
-      i.drawCircle((cx,cy), 10, color=Color.RED)
-      (a,b,c) = depthToWorld(cx, cy, cleanDepth.min()) #closest value!
-      print (round(a, 2),round(b,2),round(c,2))
-      #for b in pBlobs:
-      #  (x1,y1,x2,y2) = trackBlobs(b, None)
-      #  i.drawRectangle(x1,y1,x2-x1,y2-y1)
-      #  (x,y) = ((x2 - x1)/2 + x1, (y2 - y1)/2 + y1)
-      #  i.drawCircle((x,y), 10)
-    i.show()
+  loc = correctRGB(loc)
+  blobs = loc.findBlobs()
+  i = correctRGB(i)
+  if blobs:
+    #ds = assocBlobs(blobs, Image(depths))
+    #pBlobs = partitionBlobs(zip(blobs, ds))
     m = loc.getGrayNumpy()
     mdepth = np.ma.MaskedArray(depths, mask=(m!=255))
     cleanDepth = np.ma.masked_values (mdepth, 2047)
-    
-    #rawToMeters()
-    continue
-    bs = loc.findBlobs()
-    if bs:
-      (x1,y1,x2,y2) = trackBlobs(bs)
-      loc.drawRectangle(x1,y1,x2-x1,y2-y1)
-    loc.show()
+    centers = map(Blob.centroid, blobs)
+    (cx, cy) = average(centers, 0)
+    i.drawCircle((cx,cy), 10, color=Color.RED)
+    (a,b,c) = depthToWorld(cx, cy, cleanDepth.min()) #closest value!
+    i.show()
+    return (round(a, 2),round(b,2),round(c,2))
+    #for b in pBlobs:
+    #  (x1,y1,x2,y2) = trackBlobs(b, None)
+    #  i.drawRectangle(x1,y1,x2-x1,y2-y1)
+    #  (x,y) = ((x2 - x1)/2 + x1, (y2 - y1)/2 + y1)
+    #  i.drawCircle((x,y), 10)
+  i.show()
+
+  return None
 
 def unzip(xs):
   x = []

@@ -8,16 +8,6 @@ module Majom.Flyers.Helicopter (
   startHelicopter
   ) where
 
-import qualified Majom.Vision.Vision
-import qualified Majom.Vision.Vision_Client as Client
-import Majom.Vision.Vision_Types
-
-import Thrift
-import Thrift.Protocol.Binary
-import Thrift.Transport
-import Thrift.Transport.Handle
-import Thrift.Server
-
 import Data.ByteString(pack)
 import Data.IORef
 import qualified Data.Map as Map
@@ -27,15 +17,28 @@ import Network
 import System.CPUTime
 import System.Hardware.Serialport
 
+import Majom.Common
 import Majom.Flyers.Flyable
 
+import qualified Network.HTTP as HTTP
+--import Text.Regex.Posix
+
+getPosition :: String -> (Double, Double, Double)
+getPosition s
+  | length m > 0 = read $ head m
+  | otherwise = (0,0,0)
+  where
+    m = undefined --getAllTextMatches $ s =~ "[(].*[)]" :: [String]
+
+getResponse :: IO String
+getResponse = do
+  r <- HTTP.simpleHTTP (HTTP.getRequest "http://localhost:8080/")
+  return $ show r
+
+get :: IO (Double, Double, Double)
+get = getPosition `fmap` getResponse
 -- | A real helicopter!
 data Helicopter = Helicopter { getCurrentOptions :: IORef OptionMap }
-
-client = do 
-  handle <- hOpen ("localhost", PortNumber 9090)
-  let binProto = BinaryProtocol handle
-  return (binProto, binProto)
 
 -- | Starts an instance of the helicopter communication protocol.
 startHelicopter :: IO Helicopter
@@ -43,16 +46,16 @@ startHelicopter =
   Helicopter <$> (newIORef Map.empty)
 
 instance Flyable Helicopter where
-  setFly h o v = dropValM $ set h o v
-  setFlyMany h vs = dropValM $ setMany h vs
+  setFly h o v = return ()--dropValM $ set h o v
+  setFlyMany h vs = return ()--dropValM $ setMany h vs
   fly h = return ()
   observe h = do
-    res <- Client.observe =<< client
-    putStrLn $ show res
+    (x,y,z) <- get
     let optVar = getCurrentOptions h
     pwr <- fmap (Map.! Throttle) $ readIORef optVar
     picoTime <- getCPUTime
-    let pos = undefined --TODO Need to implement
+    let pos = vector [x,y,z]
+    putStrLn $ show pos
     return (pwr, pos, (fromInteger picoTime) / (fromInteger cpuTimePrecision))
 
 -- | Drops monadic values we don't care about.

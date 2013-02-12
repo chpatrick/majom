@@ -10,4 +10,5 @@ main = do
   --runGUI =<< startHelicopter
   --runGUI =<< spawnVirtualHelicopter
   --runMonkey =<< spawnVirtualHelicopter
-  runMonkeyWithHuman [Pitch] =<< spawnVirtualHelicopter
+  --runMonkeyWithHuman [Pitch] =<< spawnVirtualHelicopter
+  runMonkeyWithHuman [Pitch] =<< startHelicopter

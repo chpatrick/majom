@@ -45,13 +45,14 @@ data FlyState = Flying | Landed deriving (Show, Eq)
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
   forkIO $ fly flyer
+  putStrLn "I am a monkey"
 
   runMonkey' flyer
 
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  let intent = hoverAt (vector [50,51,0])
+  let intent = hoverAt (vector [0,0.15,0])
 
   milliSleep waitTime
   (_, pos, _) <- observe flyer
@@ -65,9 +66,9 @@ runMonkey' flyer = do
   loop $ do (pos,throttle) <- lift $ readIORef posRef
             (_,pos',_) <- lift $ observe flyer
             let vel = (pos - pos')
-            lift $ writeIORef posRef (pos', throttle + 2)
+            lift $ writeIORef posRef (pos', throttle + 5)
             while (vectorSize vel == 0.0)
-            lift $ setFly flyer Throttle (throttle + 2)
+            lift $ setFly flyer Throttle (throttle + 5)
             lift $ putStrLn $ "Taking off... new throttle = " ++ (show $ throttle + 2)
             lift $ milliSleep waitTime
             
@@ -84,6 +85,7 @@ runMonkeyWithHuman :: (Flyable a) => [Option] -> a -> IO Brain
 runMonkeyWithHuman humanControl flyer = do
   let (human, monkey) = startDuoCopter flyer humanControl
   forkIO $ runGUI human
+  putStrLn "I am a monkey"
   runMonkey' monkey
 
 -- | Gives information on what the monkey is currently thinking to stdout.
@@ -114,7 +116,7 @@ monkeyThink intent model pwr (pos, pos') vel = do
 -- | The iterative loop of the monkey.
 monkeyDo :: (Flyable a) => a -> MonkeyBrainT
 monkeyDo flyer = do
-  lift $ milliSleep waitTime
+  --lift $ milliSleep waitTime
 
   (Brain model intent (pos, vel, _)) <- get
   obs@(pwr, pos', _) <- lift $ observe flyer
@@ -128,7 +130,7 @@ monkeyDo flyer = do
 
 -- | The iteration time of the monkey (milliseconds)
 waitTime :: Int
-waitTime = 100
+waitTime = 10
 
 -- | Wait time in seconds.
 wt :: Double
