@@ -12,7 +12,7 @@ from thrift.transport.TSocket import *
 class VisionHandler:
   def observe(self):
     ret = Position()
-    ret.x,ret.y,ret.z = (1,2,3)
+    ret.x,ret.y,ret.z = (1.0,2.0,3.0)
     return ret
 
 class MyServer(TSocketBase, TServerTransportBase):

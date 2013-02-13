@@ -41,6 +41,9 @@ def differizer(base):
     centers = map(Blob.centroid, blobs)
     (cx, cy) = average(centers, 0)
     i.drawCircle((cx,cy), 10, color=Color.RED)
+    (mx,my) = worldToRGB((0,-0.2,1))
+    i.drawCircle((mx,my), 10, color=Color.GREEN)
+    #i = loc.sideBySide(i)
     (a,b,c) = depthToWorld(cx, cy, cleanDepth.min()) #closest value!
     i.show()
     return (round(a, 2),round(b,2),round(c,2))

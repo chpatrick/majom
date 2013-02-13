@@ -56,7 +56,7 @@ Executable majom
     text,
     hashable,
     network,
---    regex-posix,
+    regex-posix,
     HTTP,
     unordered-containers
 

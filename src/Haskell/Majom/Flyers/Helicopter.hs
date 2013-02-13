@@ -21,14 +21,14 @@ import Majom.Common
 import Majom.Flyers.Flyable
 
 import qualified Network.HTTP as HTTP
---import Text.Regex.Posix
+import Text.Regex.Posix
 
 getPosition :: String -> (Double, Double, Double)
 getPosition s
   | length m > 0 = read $ head m
   | otherwise = (0,0,0)
   where
-    m = undefined --getAllTextMatches $ s =~ "[(].*[)]" :: [String]
+    m = getAllTextMatches $ s =~ "[(].*[)]" :: [String]
 
 getResponse :: IO String
 getResponse = do
@@ -46,8 +46,8 @@ startHelicopter =
   Helicopter <$> (newIORef Map.empty)
 
 instance Flyable Helicopter where
-  setFly h o v = return ()--dropValM $ set h o v
-  setFlyMany h vs = return ()--dropValM $ setMany h vs
+  setFly h o v = dropValM $ set h o v
+  setFlyMany h vs = dropValM $ setMany h vs
   fly h = return ()
   observe h = do
     (x,y,z) <- get

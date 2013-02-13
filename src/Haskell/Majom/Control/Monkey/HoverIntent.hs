@@ -19,13 +19,13 @@ instance Intent HoverIntent where
     where
       dir = q - pos
       dist = vectorSize dir
-      stop = 1.0
+      stop = 0.05
       q = hoverPosition intent
       s = speedMax * (if dist > stop then 1.0 else (dist/stop))
 
 -- | The maximum speed.
 speedMax :: Double
-speedMax = 1
+speedMax = 0.5
 
 -- | Makes a hover intent.
 hoverAt :: Position -> HoverIntent

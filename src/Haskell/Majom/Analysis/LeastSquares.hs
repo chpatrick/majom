@@ -24,10 +24,10 @@ data LeastSquares =
 instance Model LeastSquares where
   createNewModel = (\x -> LeastSquares (constructMap x) $ Map.fromList x)
     [(80, vector [0,0,0]),(0,vector [0,-10,0])]
-  getMap = lsMap
+  getMap h = (\a -> if (vectorY a) < 0 then 60 else 90) --lsMap
   updateModel ls@(LeastSquares m vs) (p,v) = ls
---    | sane (p,v) $ Map.toList vs = updateMap $ LeastSquares m (Map.insert p v vs)
---    | otherwise     = ls
+    -- | sane (p,v) $ Map.toList vs = updateMap $ LeastSquares m (Map.insert p v vs)
+    -- | otherwise     = ls
   samples = Map.assocs . lsSamples
 
 -- | TODO Perform sanity checks - Just gravity check for now
