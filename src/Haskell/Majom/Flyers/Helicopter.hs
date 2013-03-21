@@ -13,6 +13,9 @@ import Data.IORef
 import qualified Data.Map as Map
 import Data.Maybe
 import Control.Applicative
+import Control.Concurrent
+import Control.Concurrent.STM
+import Control.Monad
 import Network
 import System.CPUTime
 import System.Hardware.Serialport
@@ -38,12 +41,33 @@ getResponse = do
 get :: IO (Double, Double, Double)
 get = getPosition `fmap` getResponse
 -- | A real helicopter!
-data Helicopter = Helicopter { getCurrentOptions :: IORef OptionMap }
+data Helicopter = Helicopter { getCurrentOptions :: TVar OptionMap }
 
 -- | Starts an instance of the helicopter communication protocol.
 startHelicopter :: IO Helicopter
-startHelicopter = 
-  Helicopter <$> (newIORef Map.empty)
+startHelicopter = do
+  var <- (atomically $ newTVar Map.empty)
+  forkIO $ forever $ heliThread var
+  return $ Helicopter var
+
+-- | Message passing time in milliseconds
+stepTime :: Int
+stepTime = 1000
+
+heliThread :: TVar OptionMap -> IO ()
+heliThread var = do
+  putStrLn "ROFL"
+  threadDelay (stepTime * 1000)
+
+{-TODO-- | Monitors a stack of helicopter instructions, then merges and sends 
+ --- them at predefined intervals. 
+ --- heliThread :: TVar [(Option, Int)] -> IO ()
+ --- heliThread s = do
+ --    -- check if s has elems
+ --    --   merge and send s
+ --    -- wait X ms
+ --    -- repeat
+-} 
 
 instance Flyable Helicopter where
   setFly h o v = dropValM $ set h o v
@@ -52,7 +76,7 @@ instance Flyable Helicopter where
   observe h = do
     (x,y,z) <- get
     let optVar = getCurrentOptions h
-    pwr <- fmap (Map.! Throttle) $ readIORef optVar
+    pwr <- fmap (Map.! Throttle) $ atomically $ readTVar optVar
     picoTime <- getCPUTime
     let pos = vector [x,y,z]
     putStrLn $ show pos
@@ -84,8 +108,8 @@ clamp i
 set :: Helicopter -> Option -> Int -> IO Int
 set h o v = do
   let optsVar = getCurrentOptions h
-  opts <- readIORef optsVar
-  writeIORef optsVar $ process opts (o, clamp v)
+  opts <- atomically $ readTVar optsVar
+  atomically $ writeTVar optsVar $ process opts (o, clamp v)
   foo `seq` foo
   where
     foo = flip send (pack [fromIntegral $ fromEnum o, fromIntegral v]) =<< s
