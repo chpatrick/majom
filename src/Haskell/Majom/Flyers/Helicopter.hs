@@ -47,17 +47,26 @@ data Helicopter = Helicopter { getCurrentOptions :: TVar OptionMap }
 startHelicopter :: IO Helicopter
 startHelicopter = do
   var <- (atomically $ newTVar Map.empty)
-  forkIO $ forever $ heliThread var
+  s <- openSerial port defaultSerialSettings { 
+        flowControl = Software }
+  forkIO $ forever $ heliThread s var
   return $ Helicopter var
 
 -- | Message passing time in milliseconds
 stepTime :: Int
-stepTime = 1000
+stepTime = 100
 
-heliThread :: TVar OptionMap -> IO ()
-heliThread var = do
-  putStrLn "ROFL"
+heliThread :: SerialPort -> TVar OptionMap -> IO ()
+heliThread s var = do
+  putStrLn "Reading var..."
+  m <- atomically $ readTVar var
+  putStrLn $ show m
+  putStrLn "Sending to device..."
+  sequence_ $ map foo $ Map.assocs m
+  putStrLn "Waiting for next iter..."
   threadDelay (stepTime * 1000)
+  where
+    foo (o, v) = flip send (pack [fromIntegral $ fromEnum o, fromIntegral v]) s
 
 {-TODO-- | Monitors a stack of helicopter instructions, then merges and sends 
  --- them at predefined intervals. 
@@ -90,10 +99,6 @@ dropValM x = x >> (return ())
 port :: String
 port = "/dev/ttyACM0"
 
--- | Serial port to send data to.
-s :: IO SerialPort
-s = openSerial port defaultSerialSettings { 
-      flowControl = Software }
              
 -- | Clamps the value to the feasible range
 clamp :: Int -> Int 
@@ -104,15 +109,12 @@ clamp i
 
 -- | Sets the option to the supplied value. Will fail if 
 -- the serial port could not be set, or other IO related stuff. 
--- Returns the number of bytes sent.
-set :: Helicopter -> Option -> Int -> IO Int
+set :: Helicopter -> Option -> Int -> IO ()
 set h o v = do
   let optsVar = getCurrentOptions h
   opts <- atomically $ readTVar optsVar
   atomically $ writeTVar optsVar $ process opts (o, clamp v)
-  foo `seq` foo
   where
-    foo = flip send (pack [fromIntegral $ fromEnum o, fromIntegral v]) =<< s
     process :: OptionMap -> (Option, Int) -> OptionMap
     process = flip $ uncurry Map.insert
 
@@ -120,6 +122,5 @@ type OptionMap = Map.Map Option Int
 
 -- | Sends many options at once, in list order (later commands in
 -- the list will be sent after (possibly overriding) previous commands).
--- Returns the total number of bytes sent.
-setMany :: Helicopter -> [(Option, Int)] -> IO Int
-setMany h = fmap sum . sequence . map (uncurry $ set h)
+setMany :: Helicopter -> [(Option, Int)] -> IO ()
+setMany h = sequence_ . map (uncurry $ set h)

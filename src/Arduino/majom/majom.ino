@@ -91,9 +91,9 @@ void loop() {
     if(Serial.available() > 0) {    
       // read the incoming value byte
       incomingValue = Serial.read();
-      Serial.print(incomingInstruction, DEC);
-      Serial.print(", ");
-      Serial.println(incomingValue, DEC);
+      //Serial.print(incomingInstruction, DEC);
+      //Serial.print(", ");
+      //Serial.println(incomingValue, DEC);
 
       switch(incomingInstruction) {
       case YAW:
