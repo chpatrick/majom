@@ -16,9 +16,13 @@
 
 from SimpleCV import *
 import cv2
+import foo
+from numpy import *
 import time
 
 cam = Kinect()
+k = foo.Kalman(2)
+k.Sigma_x = diag([0.0056,0.0101])
 
 def differizer(base):
   i = cam.getImage()
@@ -40,7 +44,9 @@ def differizer(base):
     cleanDepth = np.ma.masked_values (mdepth, 2047)
     centers = map(Blob.centroid, blobs)
     (cx, cy) = average(centers, 0)
-    i.drawCircle((cx,cy), 10, color=Color.RED)
+    k.update(array([cx,cy]))
+    i.drawCircle(tuple(k.mu_hat_est[0,:]), 10, color=Color.RED)
+
     (mx,my) = worldToRGB((0,-0.2,1))
     i.drawCircle((mx,my), 10, color=Color.GREEN)
     #i = loc.sideBySide(i)
@@ -128,6 +134,12 @@ def detect(foo, human=True, filt=None, crop=None):
   # Crop image if necessary
   if crop:
     disp = cam.getImage().crop(crop).show()
+  else:
+    disp = cam.getImage().show()
+
+  # Start running the detector
+  while disp.isNotDone():
+    stats = []
   else:
     disp = cam.getImage().show()
 
@@ -306,9 +318,3 @@ def depthTest():
   m = cam.getDepthMatrix().T
   
   (sx, sy) = d.size()
-  while True:
-    d.drawCircle((sx/2,sy/2),10, Color.GREEN)
-    writeStats(d, ["Center is " + str(rawToMeters(m[sx/2,sy/2])) + "m away"])
-    d.show()
-    d = cam.getDepth()
-    m = cam.getDepthMatrix().T
