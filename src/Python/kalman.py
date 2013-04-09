@@ -53,8 +53,8 @@ if __name__ == "__main__":
     print k.mu_hat_est
 
     print "***** 2d ***********"
-    ndim = 3
-    nsteps = 131
+    ndim = 2
+    nsteps = 100
     k = Kalman(ndim)    
     mu_init=array([-2, 2])
     cov_init=0.1*ones((ndim))

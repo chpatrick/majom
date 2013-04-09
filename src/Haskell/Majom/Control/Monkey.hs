@@ -52,10 +52,10 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  {-let intent = hoverAt (vector [0,0.2,0])
+  let intent = hoverAt (vector [0,1,0])
 
   milliSleep waitTime
-  (_, pos, _) <- observe flyer
+  (_, pos) <- observe flyer
 
   setFly flyer Throttle 0
   posRef <- newIORef (pos, 0)
@@ -64,8 +64,8 @@ runMonkey' flyer = do
 
   -- For sake of experiment, let's assume that initially its landed.
   loop $ do (pos,throttle) <- lift $ readIORef posRef
-            (_,pos',_) <- lift $ observe flyer
-            let vel = (pos - pos')
+            (_,pos') <- lift $ observe flyer
+            let vel = (pos' - pos)
             lift $ writeIORef posRef (pos', throttle + 5)
             while (vectorSize vel == 0.0)
             lift $ setFly flyer Throttle (throttle + 5)
@@ -74,12 +74,10 @@ runMonkey' flyer = do
             
   (pos',_) <- readIORef posRef
   milliSleep waitTime
-  (_, pos'', _) <- observe flyer
+  (_, pos'') <- observe flyer
   let vel = (pos'' - pos) |/| wt
   let initBrain = Brain createNewModel intent (pos', vel, undefined)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
-  -}
-  execMonkeyBrainT (forever $ monkeyDo flyer) undefined
 
 -- | Lets the human fly the flyer with the monkey, controlling a specific
 -- set of options.
@@ -94,13 +92,13 @@ runMonkeyWithHuman humanControl flyer = do
 monkeySay :: (Model a) => 
   (a, a, Power, Position, Velocity, Power, Acceleration) -> IO ()
 monkeySay (model, model', pwr, pos', vel', pwr', accel') = do
-  putStrLn $ (show $ length $ samples model') ++ " samples."
+  --putStrLn $ (show $ length $ samples model') ++ " samples."
   putStrLn $ "Observed pwr: " ++ (show pwr)
   putStrLn $ "New position: " ++ (show pos')
-  putStrLn $ "New velocity: " ++ (show vel')
+  --putStrLn $ "New velocity: " ++ (show vel')
   putStrLn $ "Setting fly to " ++ (show pwr') ++ " for accel " ++ (show accel')
-  putStrLn $ show $ samples model
-  putStrLn ""
+  --putStrLn $ show $ samples model
+  --putStrLn ""
   
 -- | Computes the next step of the monkey process.
 monkeyThink :: (Intent a, Model b) => 
@@ -112,32 +110,26 @@ monkeyThink intent model pwr (pos, pos') vel = do
     vel' = (pos' - pos) |/| wt
     accel = (vel' - vel) |/| wt
     model' = updateModel model (pwr, accel)
-    pwr' = (getMap model') $ getAccel intent vel' pos
+    pwr' = (getMap model') $ getAccel intent vel' pos'
 
 -- The last thing is the return value
 -- | The iterative loop of the monkey.
 monkeyDo :: (Flyable a) => a -> MonkeyBrainT
 monkeyDo flyer = do
-  lift $ milliSleep waitTime
-  lift $ setFly flyer Pitch 40
-  lift $ milliSleep waitTime
-  lift $ setFly flyer Pitch 80
-
- {-
   (Brain model intent (pos, vel, _)) <- get
-  obs@(pwr, pos', _) <- lift $ observe flyer
+  obs@(pwr, pos') <- lift $ observe flyer
   let (model', vel', pwr') = monkeyThink intent model pwr (pos, pos') vel
 
   -- For debugging
-  lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
+  --lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
 
   put $ Brain model' intent (pos', vel', undefined)
   lift $ setFly flyer Throttle pwr'
-  -}
+  lift $ milliSleep waitTime
 
 -- | The iteration time of the monkey (milliseconds)
 waitTime :: Int
-waitTime = 1000
+waitTime = 50
 
 -- | Wait time in seconds.
 wt :: Double

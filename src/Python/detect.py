@@ -16,13 +16,13 @@
 
 from SimpleCV import *
 import cv2
-import foo
+import kalman
 from numpy import *
 import time
 
 cam = Kinect()
-k = foo.Kalman(2)
-k.Sigma_x = diag([0.0056,0.0101])
+k = kalman.Kalman(3)
+k.Sigma_x = diag([0.012,0.012,0.01227])
 
 def differizer(base):
   i = cam.getImage()
@@ -31,7 +31,7 @@ def differizer(base):
   n2 = base.getNumpy()
 
   d = cv2.absdiff(n1,n2)
-  loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().erode().dilate(4)
+  loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).dilate(3).erode().binarize().invert()
 
   loc = correctRGB(loc)
   blobs = loc.findBlobs()
@@ -44,15 +44,18 @@ def differizer(base):
     cleanDepth = np.ma.masked_values (mdepth, 2047)
     centers = map(Blob.centroid, blobs)
     (cx, cy) = average(centers, 0)
-    k.update(array([cx,cy]))
-    i.drawCircle(tuple(k.mu_hat_est[0,:]), 10, color=Color.RED)
 
-    (mx,my) = worldToRGB((0,-0.2,1))
-    i.drawCircle((mx,my), 10, color=Color.GREEN)
-    #i = loc.sideBySide(i)
     (a,b,c) = depthToWorld(cx, cy, cleanDepth.min()) #closest value!
+    (mx,my) = worldToRGB((0,-0.1,c))
+    i.drawCircle((mx,my), 10, color=Color.GREEN)
+
+    k.update(array([a,b,c]))
+    (a,b,c) = tuple(k.mu_hat_est[1,:])
+    i.drawCircle(worldToRGB((a,b,c)), 10, color=Color.RED)
+
+    #i = i.sideBySide(loc)
     i.show()
-    return (round(a, 2),round(b,2),round(c,2))
+    return (round(a, 3),round(b,3),round(c,3))
     #for b in pBlobs:
     #  (x1,y1,x2,y2) = trackBlobs(b, None)
     #  i.drawRectangle(x1,y1,x2-x1,y2-y1)

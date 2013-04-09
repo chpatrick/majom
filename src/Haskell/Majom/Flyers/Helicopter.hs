@@ -17,7 +17,6 @@ import Control.Concurrent
 import Control.Concurrent.STM
 import Control.Monad
 import Network
-import System.CPUTime
 import System.Hardware.Serialport
 
 import Majom.Common
@@ -54,16 +53,12 @@ startHelicopter = do
 
 -- | Message passing time in milliseconds
 stepTime :: Int
-stepTime = 100
+stepTime = 30
 
 heliThread :: SerialPort -> TVar OptionMap -> IO ()
 heliThread s var = do
-  putStrLn "Reading var..."
   m <- atomically $ readTVar var
-  putStrLn $ show m
-  putStrLn "Sending to device..."
   sequence_ $ map foo $ Map.assocs m
-  putStrLn "Waiting for next iter..."
   threadDelay (stepTime * 1000)
   where
     foo (o, v) = flip send (pack [fromIntegral $ fromEnum o, fromIntegral v]) s
@@ -86,10 +81,9 @@ instance Flyable Helicopter where
     (x,y,z) <- get
     let optVar = getCurrentOptions h
     pwr <- fmap (Map.! Throttle) $ atomically $ readTVar optVar
-    picoTime <- getCPUTime
     let pos = vector [x,y,z]
-    putStrLn $ show pos
-    return (pwr, pos, (fromInteger picoTime) / (fromInteger cpuTimePrecision))
+    --putStrLn $ show pos
+    return (pwr, pos)
 
 -- | Drops monadic values we don't care about.
 dropValM :: (Monad m) => m a -> m ()

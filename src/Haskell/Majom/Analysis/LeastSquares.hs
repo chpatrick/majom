@@ -24,7 +24,7 @@ data LeastSquares =
 instance Model LeastSquares where
   createNewModel = (\x -> LeastSquares (constructMap x) $ Map.fromList x)
     [(80, vector [0,0,0]),(0,vector [0,-10,0])]
-  getMap h = (\a -> if (vectorY a) < 0 then 60 else 90) --lsMap
+  getMap h = (\a -> if (vectorY a) <= 0 then 65 else 70) --lsMap
   updateModel ls@(LeastSquares m vs) (p,v) = ls
     -- | sane (p,v) $ Map.toList vs = updateMap $ LeastSquares m (Map.insert p v vs)
     -- | otherwise     = ls
@@ -65,7 +65,7 @@ setLeastSquares vals =
     -- | Only want y value of accel
     d = zip (map fromIntegral pwrs) (map vectorY accels)
 
--- Everything from here downwards deals with single dimension numbers
+  -- Everything from here downwards deals with single dimension numbers
 
 -- | Constructs a weight map from inputs and observations.
 -- [(Weight, (input, output))]

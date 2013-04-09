@@ -1,9 +1,11 @@
 module Main where
 import Majom.Control.GUI
 import Majom.Control.Monkey
+import Majom.Control.Watcher
 import Majom.Flyers.VirtualHelicopter
 import Majom.Flyers.Helicopter
 import Majom.Flyers.Flyable
+
 
 main = do
   putStrLn "Hello, majom!"
@@ -11,4 +13,5 @@ main = do
   --runGUI =<< spawnVirtualHelicopter
   --runMonkey =<< spawnVirtualHelicopter
   --runMonkeyWithHuman [Pitch] =<< spawnVirtualHelicopter
-  runMonkeyWithHuman [Throttle, Yaw, Correction] =<< startHelicopter
+  --runMonkeyWithHuman [Pitch, Yaw, Correction] =<< startHelicopter
+  runWatcher =<< startHelicopter

@@ -20,7 +20,6 @@ import Control.Concurrent.STM
 import Control.Monad.IO.Class
 import Data.IORef
 import qualified Data.Map as Map
-import System.CPUTime
 
 -- | A data type containing base information about a helicopter, such as 
 -- the current options it holds and its current position
@@ -28,7 +27,7 @@ data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)],
 
 -- | Spawns a virtual helicopter at (0,0)
 spawnVirtualHelicopter :: IO VirtualHelicopter
-spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (vector [50,50,0])) <*> (newTVar Map.empty)
+spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (vector [0,0,0])) <*> (newTVar Map.empty)
 
 clamp :: Int -> Int
 clamp i
@@ -47,12 +46,11 @@ instance Flyable VirtualHelicopter where
     return ()
   fly = run 
   observe h = do
-    picoTime <- getCPUTime
     (pwr, pos) <- atomically $ do
       pos <- readTVar $ getPosition h
       pwr <- currentPower
       return (pwr, pos)
-    return (pwr, pos, (fromInteger picoTime) / (fromInteger cpuTimePrecision))
+    return (pwr, pos)
     where
       sequence3 :: Monad m => (m a, m b, m c) -> m (a, b, c)
       sequence3 (m1, m2, m3) = do
@@ -68,9 +66,9 @@ instance Flyable VirtualHelicopter where
 
 -- | Runs the flying simulation
 run h = do 
-  let settings = setFloor (Just (vector [50,50,0])) defaultSettings
+  let settings = setFloor (Just (vector [0,0,0])) defaultSettings
   --let settings = defaultSettings
-  forceVar <- startSimulation settings (getPosition h) $ simpleObject $ vector [50, 50, 0]
+  forceVar <- startSimulation settings (getPosition h) $ simpleObject $ vector [0, 0, 0]
   forever $ do
     options <- atomically $ do
       options <- readTVar optionsVal

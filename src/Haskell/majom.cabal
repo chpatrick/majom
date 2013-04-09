@@ -23,6 +23,7 @@ Library
     Majom.Control.Monkey,
     Majom.Control.Monkey.Intent,
     Majom.Control.Monkey.HoverIntent,
+    Majom.Control.Watcher,
     Majom.Flyers.Flyable,
     Majom.Flyers.Helicopter,
     Majom.Flyers.VirtualHelicopter,

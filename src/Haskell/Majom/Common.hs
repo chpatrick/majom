@@ -56,6 +56,12 @@ vectorY = (V.! 1)
 vectorZ :: Vector -> Double
 vectorZ = (V.! 2)
 
+prettyVec :: Vector -> String
+prettyVec v = 
+  if V.length v /= 3
+    then error "Vector is too short to pretty print..."
+    else show (v V.! 0, v V.! 1, v V.! 2)
+
 -- | Simple Vector, made from doubles.
 type Vector = V.Vector Double
 
