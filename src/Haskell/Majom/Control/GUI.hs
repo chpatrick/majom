@@ -83,8 +83,13 @@ interpretKeyPress flyer valMap = do
       pwr <- liftIO $ readIORef $ valMap Map.! Throttle
       liftIO $ putStrLn $ show (pwr, pos)
       return True
-
+    "Return" -> do -- Start observation
+      liftIO $ putStrLn "Return"
+      liftIO $ setActive flyer True
+      return True
     "Escape" -> do -- Quit the program
+      liftIO $ setActive flyer False
+      liftIO $ putStrLn "Escape"
       liftIO Gtk.mainQuit
       return True
     otherwise -> return False

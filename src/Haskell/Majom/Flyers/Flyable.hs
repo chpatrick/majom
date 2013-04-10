@@ -21,3 +21,5 @@ class Flyable a where
   setFlyMany :: a -> [(Option, Int)] -> IO ()
   fly :: a -> IO ()
   observe :: a -> IO (Power, Position)
+  isActive :: a -> IO Bool
+  setActive :: a -> Bool -> IO ()

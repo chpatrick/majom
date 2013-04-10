@@ -24,6 +24,8 @@ instance Flyable DuoCopter where
     setFlyMany h $ filter ((`elem` os) . fst) vs
   fly (DuoCopter _ h) = fly h
   observe (DuoCopter _ h) = observe h
+  isActive (DuoCopter _ h) = isActive h
+  setActive (DuoCopter _ h) = setActive h
 
 -- | Starts a duocopter instance, returning the corresponding 'mock copters'
 -- that will be given to the two controls.

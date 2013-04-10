@@ -84,6 +84,8 @@ instance Flyable Helicopter where
     let pos = vector [x,y,z]
     --putStrLn $ show pos
     return (pwr, pos)
+  isActive h = undefined
+  setActive h b = undefined
 
 -- | Drops monadic values we don't care about.
 dropValM :: (Monad m) => m a -> m ()

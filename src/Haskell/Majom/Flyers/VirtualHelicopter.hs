@@ -23,11 +23,11 @@ import qualified Data.Map as Map
 
 -- | A data type containing base information about a helicopter, such as 
 -- the current options it holds and its current position
-data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)], getPosition :: TVar Position, getCurrentOptions :: TVar OptionMap }
+data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)], getPosition :: TVar Position, getCurrentOptions :: TVar OptionMap, getActive :: TVar Bool}
 
 -- | Spawns a virtual helicopter at (0,0)
 spawnVirtualHelicopter :: IO VirtualHelicopter
-spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (vector [0,0,0])) <*> (newTVar Map.empty)
+spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (vector [0,0,0])) <*> (newTVar Map.empty) <*> (newTVar False)
 
 clamp :: Int -> Int
 clamp i
@@ -63,6 +63,8 @@ instance Flyable VirtualHelicopter where
         return $ if Map.member Throttle optMap then
           optMap Map.! Throttle else
           0
+  isActive h = atomically $ readTVar (getActive h)
+  setActive h b = atomically $ writeTVar (getActive h) b
 
 -- | Runs the flying simulation
 run h = do 
