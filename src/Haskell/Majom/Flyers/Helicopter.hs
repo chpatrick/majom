@@ -40,7 +40,8 @@ getResponse = do
 get :: IO (Double, Double, Double)
 get = getPosition `fmap` getResponse
 -- | A real helicopter!
-data Helicopter = Helicopter { getCurrentOptions :: TVar OptionMap }
+data Helicopter = Helicopter { getCurrentOptions :: TVar OptionMap,
+  getActive :: TVar Bool}
 
 -- | Starts an instance of the helicopter communication protocol.
 startHelicopter :: IO Helicopter
@@ -49,7 +50,7 @@ startHelicopter = do
   s <- openSerial port defaultSerialSettings { 
         flowControl = Software }
   forkIO $ forever $ heliThread s var
-  return $ Helicopter var
+  atomically $ Helicopter var <$> (newTVar False)
 
 -- | Message passing time in milliseconds
 stepTime :: Int
@@ -84,8 +85,8 @@ instance Flyable Helicopter where
     let pos = vector [x,y,z]
     --putStrLn $ show pos
     return (pwr, pos)
-  isActive h = undefined
-  setActive h b = undefined
+  isActive h = atomically $ readTVar (getActive h)
+  setActive h b = atomically $ writeTVar (getActive h) b
 
 -- | Drops monadic values we don't care about.
 dropValM :: (Monad m) => m a -> m ()

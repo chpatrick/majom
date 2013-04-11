@@ -58,7 +58,7 @@ watch flyer output = do
       lift $ putStrLn "Flyer is no longer active."
       (Brain model (pos, vel)) <- get
       obs@(pwr, pos') <- lift $ observe flyer
-      put (Brain model (pos', vel'))
+      put (Brain model (pos', (pos' - pos) |/| wt))
       lift $ hFlush output
       --lift $ hClose output
       lift $ milliSleep waitTime

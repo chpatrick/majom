@@ -16,11 +16,12 @@
 
 from SimpleCV import *
 import cv2
+import time
 import kalman
 from numpy import *
-import time
 
 cam = Kinect()
+
 k = kalman.Kalman(3)
 k.Sigma_x = diag([0.012,0.012,0.01227])
 
@@ -31,14 +32,16 @@ def differizer(base):
   n2 = base.getNumpy()
 
   d = cv2.absdiff(n1,n2)
-  loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).dilate(3).erode().binarize().invert()
+  loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().erode().dilate(4)
 
   loc = correctRGB(loc)
   blobs = loc.findBlobs()
   i = correctRGB(i)
+  i = loc
   if blobs:
     #ds = assocBlobs(blobs, Image(depths))
     #pBlobs = partitionBlobs(zip(blobs, ds))
+    print map(Blob.area, blobs)
     m = loc.getGrayNumpy()
     mdepth = np.ma.MaskedArray(depths, mask=(m!=255))
     cleanDepth = np.ma.masked_values (mdepth, 2047)
@@ -134,6 +137,15 @@ def detect(foo, human=True, filt=None, crop=None):
   # Get starting time
   oldTime = time.time()
 
+  # Crop image if necessary
+  if crop:
+    disp = cam.getImage().crop(crop).show()
+  else:
+    disp = cam.getImage().show()
+
+  # Start running the detector
+  while disp.isNotDone():
+    stats = []
   # Crop image if necessary
   if crop:
     disp = cam.getImage().crop(crop).show()
@@ -312,12 +324,3 @@ def RGBToVector((x,y)):
   ry = (y - cy_rgb)/fy_rgb
 
   inp = matrix([rx,ry,1,1]).transpose()
-  res = finalMatrix.I * inp
-  [retx],[rety],[retz],[f] = res.tolist()
-  return (retx, rety, retz,)
-
-def depthTest():
-  d = cam.getDepth()
-  m = cam.getDepthMatrix().T
-  
-  (sx, sy) = d.size()
