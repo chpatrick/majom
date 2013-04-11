@@ -18,10 +18,14 @@ data DuoCopter = forall a. Flyable a =>
   DuoCopter { getAllowedOptions :: [Option], getFlyable :: a }
 
 instance Flyable DuoCopter where
+  {-
   setFly (DuoCopter os h) o v = do
     if o `elem` os then setFly h o v else return ()
   setFlyMany (DuoCopter os h) vs = 
     setFlyMany h $ filter ((`elem` os) . fst) vs
+  -}
+  setFly (DuoCopter _ h) o v = setFly h o v
+  setFlyMany (DuoCopter _ h) vs = setFlyMany h vs
   fly (DuoCopter _ h) = fly h
   observe (DuoCopter _ h) = observe h
   isActive (DuoCopter _ h) = isActive h

@@ -20,6 +20,7 @@ import Control.Concurrent.STM
 import Control.Monad.IO.Class
 import Data.IORef
 import qualified Data.Map as Map
+import System.Random
 
 -- | A data type containing base information about a helicopter, such as 
 -- the current options it holds and its current position
@@ -50,8 +51,11 @@ instance Flyable VirtualHelicopter where
       pos <- readTVar $ getPosition h
       pwr <- currentPower
       return (pwr, pos)
-    return (pwr, pos)
+    rand <- sequence [genErr, genErr, genErr]
+    return (pwr, pos + (vector rand))
     where
+      genErr :: IO Double
+      genErr = getStdRandom (randomR (-0.0001,0.0001))
       sequence3 :: Monad m => (m a, m b, m c) -> m (a, b, c)
       sequence3 (m1, m2, m3) = do
         x1 <- m1;
@@ -98,7 +102,7 @@ basicMap o v =
   case o of 
     Yaw -> vector [0,0,0]
     Pitch -> vector [0.1/63,0,0] |*| (fromIntegral $ v - 63)
-    Throttle -> vector [0,0.143,0] |*| (fromIntegral v)
+    Throttle -> vector [0,0.14,0] |*| (fromIntegral v)
     Correction -> vector [0,0,0] 
 
 -- | Takes a list of options and applies them to the model.

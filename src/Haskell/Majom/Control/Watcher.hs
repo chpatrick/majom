@@ -25,7 +25,7 @@ execWatcherBrainT :: WatcherBrainT -> Brain -> IO Brain
 execWatcherBrainT mk k = execStateT mk k
 
 data Brain = Brain  { brainModel :: Kalman,
-                      brainLast :: (Position, Velocity) }
+                      brainLast :: (Position, Velocity, Power) }
 
 runWatcher :: (Flyable a) => a -> IO Brain
 runWatcher flyer = do
@@ -35,8 +35,8 @@ runWatcher flyer = do
   
   (_, pos) <- observe flyer
   milliSleep waitTime
-  (_, pos') <- observe flyer
-  let initBrain = Brain createNewModel (pos', (pos' - pos) |/| wt)
+  (pwr, pos') <- observe flyer
+  let initBrain = Brain createNewModel (pos', (pos' - pos) |/| wt, pwr)
   handle <- openFile "out.csv" WriteMode
   execWatcherBrainT (forever $ watch flyer handle) initBrain
 
@@ -44,21 +44,26 @@ watch :: (Flyable a) => a -> Handle -> WatcherBrainT
 watch flyer output = do
   active <- lift $ isActive flyer
   if active then do
-      (Brain model (pos, vel)) <- get
-      obs@(pwr, pos') <- lift $ observe flyer
+      (Brain model (pos, vel, pwr)) <- get
+      obs@(pwr', pos') <- lift $ observe flyer
       let vel' = (pos' - pos) |/| wt
-      let acc  = (vel' - vel) |/| wt
-
-      lift $ hPutStrLn output $ (show pwr) -- ++ "," ++ (show $ vectorY acc)
-      lift $ putStrLn $ show pwr --(pwr, vectorY acc)
+      if (pwr' == pwr) then 
+        do 
+          let acc  = (vel' - vel) |/| wt
+          let model' = updateModel model (pwr, acc)
+          lift $ putStrLn $ (show pwr) ++ "," ++ (show (vectorY acc))
+          put (Brain model' (pos', vel', pwr'))
+        else 
+          put (Brain model (pos', vel', pwr'))
+      --lift $ putStrLn $ "New p est = " ++ (show (kMuHat model))
+      --lift $ hPutStrLn output $ (show pwr) -- ++ "," ++ (show $ vectorY acc)
     
-      put (Brain model (pos', vel'))
       lift $ milliSleep waitTime
     else do
-      lift $ putStrLn "Flyer is no longer active."
-      (Brain model (pos, vel)) <- get
+      --lift $ putStrLn "Flyer is no longer active."
+      (Brain model (pos, vel, pwr')) <- get
       obs@(pwr, pos') <- lift $ observe flyer
-      put (Brain model (pos', (pos' - pos) |/| wt))
+      put (Brain model (pos', (pos' - pos) |/| wt, pwr'))
       lift $ hFlush output
       --lift $ hClose output
       lift $ milliSleep waitTime

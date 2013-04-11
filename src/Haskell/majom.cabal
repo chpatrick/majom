@@ -58,6 +58,7 @@ Executable majom
     hashable,
     network,
     regex-posix,
+    random,
     HTTP,
     unordered-containers
 

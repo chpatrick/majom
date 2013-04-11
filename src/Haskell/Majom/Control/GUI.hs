@@ -58,10 +58,10 @@ interpretKeyPress flyer valMap = do
       liftIO $ chValue "Right" Yaw (-10)
       return True
     "d" -> do -- Throttle down
-      liftIO $ chValue "d" Throttle (-1)
+      liftIO $ chValue "d" Throttle (-10)
       return True
     "f" -> do -- Throttle up
-      liftIO $ chValue "f" Throttle (1)
+      liftIO $ chValue "f" Throttle (10)
       return True
     "a" -> do -- Correction left
       liftIO $ chValue "a" Correction (-10)

@@ -8,6 +8,7 @@ module Majom.Control.Monkey (
   ) where
 
 import Majom.Analysis.Model
+import Majom.Analysis.Kalman
 import Majom.Analysis.LeastSquares
 import Majom.Common
 import Majom.Flyers.Flyable
@@ -34,7 +35,7 @@ execMonkeyBrainT :: MonkeyBrainT -> Brain -> IO Brain
 execMonkeyBrainT mk k = execStateT mk k
 
 -- | Brain that holds all the relevant data for the monkey brain.
-data Brain = Brain { brainModel :: LeastSquares,
+data Brain = Brain { brainModel :: Kalman,
                      brainIntent :: HoverIntent,
                      brainLast :: (Position, Velocity, FlyState) }
 
@@ -52,7 +53,7 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  let intent = hoverAt (vector [0,1,0])
+  let intent = hoverAt (vector [0,5,0])
 
   milliSleep waitTime
   (_, pos) <- observe flyer
@@ -62,6 +63,7 @@ runMonkey' flyer = do
 
   milliSleep waitTime
 
+  {-
   -- For sake of experiment, let's assume that initially its landed.
   loop $ do (pos,throttle) <- lift $ readIORef posRef
             (_,pos') <- lift $ observe flyer
@@ -75,8 +77,18 @@ runMonkey' flyer = do
   (pos',_) <- readIORef posRef
   milliSleep waitTime
   (_, pos'') <- observe flyer
+  
   let vel = (pos'' - pos) |/| wt
   let initBrain = Brain createNewModel intent (pos', vel, undefined)
+  -}
+  loop $ do active <- lift $ isActive flyer
+            while (not active)
+            lift $ milliSleep waitTime
+  (_, p) <- observe flyer
+  milliSleep waitTime
+  (_, p') <- observe flyer
+  milliSleep waitTime
+  let initBrain = Brain createNewModel intent (p', (p' - p) |/| wt, undefined)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- | Lets the human fly the flyer with the monkey, controlling a specific
