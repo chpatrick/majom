@@ -33,14 +33,6 @@ instance Model Kalman where
       cov = 1
       sigma = 0.0513
       obs = ((vectorY acc) + 9.8)/(fromIntegral pwr)
-      {-
-      muHatEst = a*(kMuHat k)
-      covEst = (a*cov*a) + sigma
-      errorMu = obs - (h * muHatEst)
-      errorCov = (h*cov*h) + (sigma*sigma)
-      p = covEst*h*(1/errorCov)
-      muHat = muHatEst + (p*errorMu)
-      -}
       muHatEst = a*(kMuHat k)
       p' = a*(kP k)*a
       l = p'/(p' + (sigma*sigma))

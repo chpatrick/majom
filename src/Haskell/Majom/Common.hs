@@ -17,7 +17,7 @@ instance (Num a) => Num (V.Vector a) where
   as * bs = V.zipWith (*) as bs
   negate a = V.map negate a
   fromInteger x = error "Cannot instantiate Vector from Integer :("
-  abs m = m
+  abs m = V.map abs m
   signum _ = 1
 
 -- | Vector scaling function.

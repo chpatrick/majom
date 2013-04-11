@@ -67,7 +67,8 @@ simulate settings forceVar positionVar object = do
     force <- atomically $ readTVar forceVar
     atomically $ writeTVar positionVar $ objectLocation object
     threadDelay (stepTime * 1000)
-    let obj' = updatePosition (milliToSeconds stepTime) (force + gravity) object
+    let drag = calcDrag (objectVelocity object)
+    let obj' = updatePosition (milliToSeconds stepTime) (force + gravity + drag) object
     let pos' = objectLocation obj'
     let vel' = objectVelocity obj'
     simulate settings forceVar positionVar $ 
@@ -84,6 +85,9 @@ simulate settings forceVar positionVar object = do
 -- than the first var.
 lowerThan :: Position -> Position -> Bool
 lowerThan p1 p2 = vectorY p1 < vectorY p2
+
+calcDrag :: Velocity -> Force
+calcDrag v = negate (v * (abs v))
 
 displayObject :: Object -> IO ()
 displayObject o = putStrLn $ "Loc: " ++ (show $ objectLocation o) ++ ", Vel: " ++ (show $ objectVelocity o)
