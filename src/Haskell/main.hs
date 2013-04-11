@@ -14,4 +14,5 @@ main = do
   --runMonkey =<< spawnVirtualHelicopter
   --runMonkeyWithHuman [Pitch] =<< spawnVirtualHelicopter
   --runMonkeyWithHuman [Pitch, Yaw, Correction] =<< startHelicopter
-  runWatcher =<< spawnVirtualHelicopter--startHelicopter
+  --runWatcher =<< spawnVirtualHelicopter
+  runWatcher =<< startHelicopter

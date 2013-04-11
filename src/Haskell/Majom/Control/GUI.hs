@@ -46,7 +46,7 @@ interpretKeyPress flyer valMap = do
   keyName <- Gtk.eventKeyName
   case keyName of
     "Up" -> do -- Pitch forwards
-      liftIO $ chValue "Up" Pitch (-10)
+      liftIO $ chValue "Up" Pitch (-1)
       return True
     "Down" -> do -- Pitch backwards
       liftIO $ chValue "Down" Pitch (10)
@@ -58,10 +58,10 @@ interpretKeyPress flyer valMap = do
       liftIO $ chValue "Right" Yaw (-10)
       return True
     "d" -> do -- Throttle down
-      liftIO $ chValue "d" Throttle (-10)
+      liftIO $ chValue "d" Throttle (-1)
       return True
     "f" -> do -- Throttle up
-      liftIO $ chValue "f" Throttle (10)
+      liftIO $ chValue "f" Throttle (1)
       return True
     "a" -> do -- Correction left
       liftIO $ chValue "a" Correction (-10)

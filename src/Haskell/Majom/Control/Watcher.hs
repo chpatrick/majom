@@ -49,8 +49,8 @@ watch flyer output = do
       let vel' = (pos' - pos) |/| wt
       let acc  = (vel' - vel) |/| wt
 
-      lift $ hPutStrLn output $ (show pwr) ++ "," ++ (show $ vectorY acc)
-      lift $ putStrLn $ show (pwr, vectorY acc)
+      lift $ hPutStrLn output $ (show pwr) -- ++ "," ++ (show $ vectorY acc)
+      lift $ putStrLn $ show pwr --(pwr, vectorY acc)
     
       put (Brain model (pos', vel'))
       lift $ milliSleep waitTime

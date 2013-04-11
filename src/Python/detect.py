@@ -26,22 +26,26 @@ k = kalman.Kalman(3)
 k.Sigma_x = diag([0.012,0.012,0.01227])
 
 def differizer(base):
+  print "Gettin images"
   i = cam.getImage()
   depths = cam.getDepthMatrix().T
+  print "Got images..."
   n1 = i.getNumpy()
   n2 = base.getNumpy()
 
   d = cv2.absdiff(n1,n2)
+  print "Makin' image"
   loc = Image(cv2.cvtColor(d, cv2.COLOR_RGB2GRAY)).stretch(50,250).binarize().invert().erode().dilate(4)
-
+  print "Image madeee"
   loc = correctRGB(loc)
+  print "Finding blobs..>"
   blobs = loc.findBlobs()
+  print "blobs found!"
   i = correctRGB(i)
-  i = loc
   if blobs:
+    print "Blobbening!"
     #ds = assocBlobs(blobs, Image(depths))
     #pBlobs = partitionBlobs(zip(blobs, ds))
-    print map(Blob.area, blobs)
     m = loc.getGrayNumpy()
     mdepth = np.ma.MaskedArray(depths, mask=(m!=255))
     cleanDepth = np.ma.masked_values (mdepth, 2047)
@@ -50,12 +54,13 @@ def differizer(base):
 
     (a,b,c) = depthToWorld(cx, cy, cleanDepth.min()) #closest value!
     (mx,my) = worldToRGB((0,-0.1,c))
+    print "Drawing stuffff"
     i.drawCircle((mx,my), 10, color=Color.GREEN)
 
     k.update(array([a,b,c]))
     (a,b,c) = tuple(k.mu_hat_est[1,:])
     i.drawCircle(worldToRGB((a,b,c)), 10, color=Color.RED)
-
+    print "Done drawing!"
     #i = i.sideBySide(loc)
     i.show()
     return (round(a, 3),round(b,3),round(c,3))

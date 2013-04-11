@@ -38,7 +38,7 @@ getResponse = do
   return $ show r
 
 get :: IO (Double, Double, Double)
-get = getPosition `fmap` getResponse
+get = return (1,2,3) --getPosition `fmap` getResponse
 -- | A real helicopter!
 data Helicopter = Helicopter { getCurrentOptions :: TVar OptionMap,
   getActive :: TVar Bool}
@@ -86,7 +86,9 @@ instance Flyable Helicopter where
     --putStrLn $ show pos
     return (pwr, pos)
   isActive h = atomically $ readTVar (getActive h)
-  setActive h b = atomically $ writeTVar (getActive h) b
+  setActive h b = do 
+    putStrLn "Foo!"
+    atomically $ writeTVar (getActive h) b
 
 -- | Drops monadic values we don't care about.
 dropValM :: (Monad m) => m a -> m ()
