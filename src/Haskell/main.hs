@@ -8,11 +8,11 @@ import Majom.Flyers.Flyable
 
 
 main = do
-  putStrLn "Hello, majom!"
+  --putStrLn "Hello, majom!"
   --runGUI =<< startHelicopter
   --runGUI =<< spawnVirtualHelicopter
   --runMonkey =<< spawnVirtualHelicopter
-  --runMonkeyWithHuman [Pitch, Yaw, Correction] =<< spawnVirtualHelicopter
+  runMonkeyWithHuman [Pitch, Yaw, Correction] =<< spawnVirtualHelicopter
   --runMonkeyWithHuman [Pitch, Yaw, Correction] =<< startHelicopter
-  runWatcher =<< spawnVirtualHelicopter
+  --runWatcher =<< spawnVirtualHelicopter
   --runWatcher =<< startHelicopter

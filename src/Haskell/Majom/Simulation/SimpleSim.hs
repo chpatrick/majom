@@ -15,6 +15,7 @@ module Majom.Simulation.SimpleSim (
 import Majom.Common
 import Control.Concurrent.STM
 import Control.Concurrent
+import System.IO
 
 -- | An object type, encompassing the necessary information
 -- that an object should have.
@@ -87,7 +88,10 @@ lowerThan :: Position -> Position -> Bool
 lowerThan p1 p2 = vectorY p1 < vectorY p2
 
 calcDrag :: Velocity -> Force
-calcDrag v = negate (v * (abs v))
+calcDrag v = vector [0,0,0] --negate (v * (abs v))
 
 displayObject :: Object -> IO ()
-displayObject o = putStrLn $ "Loc: " ++ (show $ objectLocation o) ++ ", Vel: " ++ (show $ objectVelocity o)
+displayObject o = do 
+  putStrLn $ prettyVec $ objectLocation o
+  hFlush stdout
+  --putStrLn $ "Loc: " ++ (show $ objectLocation o) ++ ", Vel: " ++ (show $ objectVelocity o)

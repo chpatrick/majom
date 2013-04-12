@@ -60,7 +60,8 @@ prettyVec :: Vector -> String
 prettyVec v = 
   if V.length v /= 3
     then error "Vector is too short to pretty print..."
-    else show (v V.! 0, v V.! 1, v V.! 2)
+    else foldl1 ((++) . (++ ",")) $ map (show . (sigFigs 3)) 
+      [v V.! 0, v V.! 1, v V.! 2]
 
 -- | Simple Vector, made from doubles.
 type Vector = V.Vector Double
@@ -112,3 +113,8 @@ tolerance = 1e-5
 -- | Approximately equals.
 (~=) :: Double -> Double -> Bool
 (~=) a b = abs (a - b) < tolerance
+
+sigFigs :: (RealFrac a) => Int -> a -> a
+sigFigs d n = (fromIntegral (round (n * p))) / p
+  where 
+    p = 10 ^ (d-1)

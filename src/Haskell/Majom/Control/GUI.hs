@@ -96,7 +96,7 @@ interpretKeyPress flyer valMap = do
     where
       chValue :: String -> Option -> Int -> IO ()
       chValue key o v = do
-        putStrLn key
+        --putStrLn key
         value <- readIORef $ valMap Map.! o
         setFly flyer o (value + v)
         writeIORef (valMap Map.! o) (value + v)
