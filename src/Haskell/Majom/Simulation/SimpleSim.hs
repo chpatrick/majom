@@ -78,7 +78,7 @@ simulate settings forceVar positionVar object = do
         Nothing -> obj'
         Just f -> if objectLocation obj' `lowerThan` f
           then
-            obj'{objectLocation = vector [vectorX pos', vectorY f, vectorZ pos'],objectVelocity = vector [vectorX vel', 0.0, vectorZ vel'] }
+            obj'{objectLocation = vector [vectorX pos', vectorY f, vectorZ pos'],objectVelocity = vector [(vectorX vel')*0.5, 0.0, (vectorZ vel')*0.5] }
           else
             obj'
 
@@ -88,7 +88,7 @@ lowerThan :: Position -> Position -> Bool
 lowerThan p1 p2 = vectorY p1 < vectorY p2
 
 calcDrag :: Velocity -> Force
-calcDrag v = vector [0,0,0] --negate (v * (abs v))
+calcDrag v = vector [0,0,0] --TODO negate (v * (abs v))
 
 displayObject :: Object -> IO ()
 displayObject o = do 
