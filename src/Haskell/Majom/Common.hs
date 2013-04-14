@@ -63,11 +63,26 @@ prettyVec v =
     else foldl1 ((++) . (++ ",")) $ map (show . (sigFigs 3)) 
       [v V.! 0, v V.! 1, v V.! 2]
 
+prettyPos :: Position -> String
+prettyPos p = (prettyVec $ getVec p) ++ "," ++ (show $ getFacing p) 
+
 -- | Simple Vector, made from doubles.
 type Vector = V.Vector Double
 
 -- | Position for objects.
-type Position = Vector
+data Position = Position { getVec :: Vector, getFacing :: Int }
+  deriving (Eq, Show)
+
+instance Num (Position) where
+  as + bs = as { getVec = (getVec as) + (getVec bs)}
+  as * bs = as { getVec = (getVec as) * (getVec bs)}
+  negate (Position p o) = Position (negate p) ((o + 180) `mod` 360)
+  fromInteger x = error "Cannot instantiate Position from Integer :("
+  abs m = m { getVec = abs (getVec m) }
+  signum _ = 1
+
+(<+>) :: Position -> Vector -> Position
+(<+>) p v = p { getVec = ((getVec p) + v) }
 
 -- | Velocity for objects.
 type Velocity = Vector
@@ -101,8 +116,8 @@ calcObservedAccel obs = if length obs < 3 then [] else
     calc v@((_, pos'', t''):(_, pos', t'):(pwr, pos, t):vs) =
       (pwr, accel) : calc (tail v)
       where
-        vel' = (pos' - pos'') |/| (t'' - t')
-        vel  = (pos - pos') |/| (t' - t)
+        vel' = (getVec (pos' - pos'')) |/| (t'' - t')
+        vel  = (getVec (pos - pos')) |/| (t' - t)
         accel = (vel - vel') |/| (t' - t)
     calc vs = []
 

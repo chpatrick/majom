@@ -53,7 +53,7 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  let intent = hoverAt (vector [0,5,0])
+  let intent = hoverAt $ Position (vector [0,5,0]) undefined
 
   milliSleep waitTime
   (_, pos) <- observe flyer
@@ -88,7 +88,7 @@ runMonkey' flyer = do
   milliSleep waitTime
   (_, p') <- observe flyer
   milliSleep waitTime
-  let initBrain = Brain createNewModel intent (p', (p' - p) |/| wt, undefined)
+  let initBrain = Brain createNewModel intent (p', (getVec (p' - p)) |/| wt, undefined)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- | Lets the human fly the flyer with the monkey, controlling a specific
@@ -119,7 +119,7 @@ monkeyThink :: (Intent a, Model b) =>
 monkeyThink intent model pwr (pos, pos') vel = do
   (model', vel', pwr')
   where
-    vel' = (pos' - pos) |/| wt
+    vel' = (getVec (pos' - pos)) |/| wt
     accel = (vel' - vel) |/| wt
     model' = updateModel model (pwr, accel)
     pwr' = (getMap model') $ getAccel intent vel' pos'

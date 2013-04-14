@@ -28,7 +28,7 @@ data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)],
 
 -- | Spawns a virtual helicopter at (0,0)
 spawnVirtualHelicopter :: IO VirtualHelicopter
-spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (vector [0,0,0])) <*> (newTVar Map.empty) <*> (newTVar False)
+spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (Position (vector [0,0,0]) 0)) <*> (newTVar Map.empty) <*> (newTVar False)
 
 clamp :: Int -> Int
 clamp i
@@ -52,7 +52,7 @@ instance Flyable VirtualHelicopter where
       pwr <- currentPower
       return (pwr, pos)
     rand <- sequence [genErr, genErr, genErr]
-    return (pwr, pos + (vector rand))
+    return (pwr, (pos <+> (vector rand)))
     where
       genErr :: IO Double
       genErr = getStdRandom (randomR (-0.0001,0.0001))
@@ -74,7 +74,7 @@ instance Flyable VirtualHelicopter where
 run h = do 
   let settings = setFloor (Just (vector [0,0,0])) defaultSettings
   --let settings = defaultSettings
-  forceVar <- startSimulation settings (getPosition h) $ simpleObject $ vector [0, 0, 0]
+  forceVar <- startSimulation settings (getPosition h) $ simpleObject $ Position (vector [0,0,0]) 0
   forever $ do
     options <- atomically $ do
       options <- readTVar optionsVal

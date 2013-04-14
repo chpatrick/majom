@@ -84,7 +84,7 @@ instance Flyable Helicopter where
     pwr <- fmap (Map.! Throttle) $ atomically $ readTVar optVar
     let pos = vector [x,y,z]
     --putStrLn $ show pos
-    return (pwr, pos)
+    return (pwr, Position pos undefined)
   isActive h = atomically $ readTVar (getActive h)
   setActive h b = do 
     putStrLn "Foo!"

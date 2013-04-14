@@ -30,13 +30,13 @@ simpleObject p = Object 1 p (vector [0,0,0])
 -- frame and the forces applied to it in that time frame.
 updatePosition :: Time -> Force -> Object -> Object
 updatePosition t fs (Object m p v) =
-  Object m (p + (v |*| t) + (acc |*| (0.5 * (t^2) ) ) ) newV
+  Object m ((<+>) p $ (v |*| t) + (acc |*| (0.5 * (t^2) ) ) ) newV
   where
     newV = v + (acc |*| t) 
     acc = fs |*| (1/m)
 
 -- | Simulation specific settings that can be defined by the user.
-data SimulationSettings = Settings { simFloor :: Maybe Position } 
+data SimulationSettings = Settings { simFloor :: Maybe Vector} 
   deriving Show
 
 -- | The default settings that will be used if none are specified.
@@ -44,7 +44,7 @@ defaultSettings :: SimulationSettings
 defaultSettings = Settings Nothing
 
 -- | Sets the floor of the simulation to Just position or Nothing.
-setFloor :: Maybe Position -> SimulationSettings -> SimulationSettings
+setFloor :: Maybe Vector -> SimulationSettings -> SimulationSettings
 setFloor p s = s{simFloor = p}
 
 -- | Starts a simulation thread, showing the simulation on a GUI
@@ -76,15 +76,15 @@ simulate settings forceVar positionVar object = do
       -- Check case of floor - could be extracted
       case simFloor settings of
         Nothing -> obj'
-        Just f -> if objectLocation obj' `lowerThan` f
+        Just f -> if getVec (objectLocation obj') `lowerThan` f
           then
-            obj'{objectLocation = vector [vectorX pos', vectorY f, vectorZ pos'],objectVelocity = vector [(vectorX vel')*0.5, 0.0, (vectorZ vel')*0.5] }
+            obj'{objectLocation = Position (vector [vectorX (getVec pos'), vectorY f, vectorZ (getVec pos')]) (getFacing $ objectLocation obj'),objectVelocity = vector [(vectorX vel')*0.5, 0.0, (vectorZ vel')*0.5] }
           else
             obj'
 
 -- | Returns true if the second var is lower (has a lesser Y vector)
 -- than the first var.
-lowerThan :: Position -> Position -> Bool
+lowerThan :: Vector -> Vector -> Bool
 lowerThan p1 p2 = vectorY p1 < vectorY p2
 
 calcDrag :: Velocity -> Force
@@ -92,6 +92,6 @@ calcDrag v = vector [0,0,0] --TODO negate (v * (abs v))
 
 displayObject :: Object -> IO ()
 displayObject o = do 
-  putStrLn $ prettyVec $ objectLocation o
+  putStrLn $ prettyPos $ objectLocation o
   hFlush stdout
   --putStrLn $ "Loc: " ++ (show $ objectLocation o) ++ ", Vel: " ++ (show $ objectVelocity o)

@@ -17,7 +17,7 @@ def drawGrid(srf, rangex = (-1,1), rangey = (0,20), startx=30, starty=30):
 
   ys = range(rangey[0], rangey[1]+1)
   for i in range(len(ys)):
-    label = font.render(str(ys[rangey[1] - i]), 1, (255,255,255))
+    label = font.render(str(ys[len(ys) - i -1]), 1, (255,255,255))
     srf.blit(label, 
         (startx - 25,
         starty + (i*(sy - 2*starty)/(len(ys)-1) -10 ))),
@@ -32,7 +32,7 @@ def main():
       pos = raw_input()
       try:
         #get input
-        (x,y,z) = map(float, pos.split(','))
+        (x,y,z,o) = map(float, pos.split(','))
         (sizex, sizey) = window.get_size()
         #scale value to window size
         floor = 30

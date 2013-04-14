@@ -36,7 +36,7 @@ runWatcher flyer = do
   (_, pos) <- observe flyer
   milliSleep waitTime
   (pwr, pos') <- observe flyer
-  let initBrain = Brain createNewModel (pos', (pos' - pos) |/| wt, pwr)
+  let initBrain = Brain createNewModel (pos', (getVec (pos' - pos)) |/| wt, pwr)
   handle <- openFile "out.csv" WriteMode
   execWatcherBrainT (forever $ watch flyer handle) initBrain
 
@@ -46,7 +46,7 @@ watch flyer output = do
   if active then do
       (Brain model (pos, vel, pwr)) <- get
       obs@(pwr', pos') <- lift $ observe flyer
-      let vel' = (pos' - pos) |/| wt
+      let vel' = (getVec (pos' - pos)) |/| wt
       if (pwr' == pwr) then 
         do 
           let acc  = (vel' - vel) |/| wt
@@ -63,7 +63,7 @@ watch flyer output = do
       --lift $ putStrLn "Flyer is no longer active."
       (Brain model (pos, vel, pwr')) <- get
       obs@(pwr, pos') <- lift $ observe flyer
-      put (Brain model (pos', (pos' - pos) |/| wt, pwr'))
+      put (Brain model (pos', (getVec (pos' - pos)) |/| wt, pwr'))
       lift $ hFlush output
       --lift $ hClose output
       lift $ milliSleep waitTime
