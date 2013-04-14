@@ -9,7 +9,6 @@ module Majom.Flyers.Helicopter (
   ) where
 
 import Data.ByteString(pack)
-import Data.IORef
 import qualified Data.Map as Map
 import Data.Maybe
 import Control.Applicative

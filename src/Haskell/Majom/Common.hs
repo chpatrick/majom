@@ -70,13 +70,16 @@ prettyPos p = (prettyVec $ getVec p) ++ "," ++ (show $ getFacing p)
 type Vector = V.Vector Double
 
 -- | Position for objects.
-data Position = Position { getVec :: Vector, getFacing :: Int }
+data Position = Position { getVec :: Vector, getFacing :: Double }
   deriving (Eq, Show)
+
+radians :: Double -> Double
+radians x = x/180*pi
 
 instance Num (Position) where
   as + bs = as { getVec = (getVec as) + (getVec bs)}
   as * bs = as { getVec = (getVec as) * (getVec bs)}
-  negate (Position p o) = Position (negate p) ((o + 180) `mod` 360)
+  negate (Position p o) = Position (negate p) (o + 180)
   fromInteger x = error "Cannot instantiate Position from Integer :("
   abs m = m { getVec = abs (getVec m) }
   signum _ = 1

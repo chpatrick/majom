@@ -42,6 +42,7 @@ runWatcher flyer = do
 
 watch :: (Flyable a) => a -> Handle -> WatcherBrainT 
 watch flyer output = do
+  {-
   active <- lift $ isActive flyer
   if active then do
       (Brain model (pos, vel, pwr)) <- get
@@ -67,6 +68,11 @@ watch flyer output = do
       lift $ hFlush output
       --lift $ hClose output
       lift $ milliSleep waitTime
+      -}
+  (_, pos) <- lift $ observe flyer
+  lift $ putStrLn $ prettyPos pos
+  lift $ hFlush stdout
+  lift $ milliSleep waitTime
 
 waitTime :: Int
 waitTime = 50

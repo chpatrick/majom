@@ -1,4 +1,5 @@
 -- | Module to fly a virtual, simulated helicopter. Will be used to 
+-- --TODO Make this vary based on position
 -- test AI interface.
 
 module Majom.Flyers.VirtualHelicopter (
@@ -18,7 +19,6 @@ import Control.Monad
 import Control.Concurrent
 import Control.Concurrent.STM
 import Control.Monad.IO.Class
-import Data.IORef
 import qualified Data.Map as Map
 import System.Random
 
@@ -28,7 +28,7 @@ data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)],
 
 -- | Spawns a virtual helicopter at (0,0)
 spawnVirtualHelicopter :: IO VirtualHelicopter
-spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (Position (vector [0,0,0]) 0)) <*> (newTVar Map.empty) <*> (newTVar False)
+spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (Position (vector [0,0,0]) 0)) <*> (newTVar $ Map.fromList flyerInit) <*> (newTVar False)
 
 clamp :: Int -> Int
 clamp i
@@ -80,8 +80,8 @@ run h = do
       options <- readTVar optionsVal
       clearOptions optionsVal
       return options
-    processOptions (getCurrentOptions h) forceVar options
-    milliSleep 120
+    processOptions h forceVar options
+    milliSleep 100
   where
     optionsVal = getOptions h
     clearOptions x = writeTVar x []
@@ -93,29 +93,36 @@ type OptionMap = Map.Map Option Int
 -- | Using a mapping from options and their values to forces, and an option
 -- map, combines all of the resulting force into one. Essentially converts
 -- all of the orders into a final force on the helicopter. 
-convertToForce :: (Option -> Int -> Force) -> OptionMap -> Force
-convertToForce f m = Map.fold (+) (vector [0, 0, 0]) $ Map.mapWithKey f m
+convertToForce :: (Double -> Option -> Int -> Force) -> Double -> OptionMap -> Force
+convertToForce f o m = Map.fold (+) (vector [0, 0, 0]) $ Map.mapWithKey (f o) m
 
 -- | A basic mapping of options to particular forces.
-basicMap :: Option -> Int -> Force
-basicMap o v = 
+basicMap :: Double -> Option -> Int -> Force
+basicMap orientation o v = 
   case o of 
     Yaw -> vector [0,0,0]
-    Pitch -> vector [0.1/63,0,0] |*| (fromIntegral $ v - 63)
+    --TODO Make this vary based on position
     Throttle -> vector [0,0.14,0] |*| (fromIntegral v)
+    Pitch -> vector [sin rs,0,cos rs] |*| ((1.0/63)*(fromIntegral $ v - 63))
     Correction -> vector [0,0,0] 
+  where
+    rs = radians orientation
 
 -- | Takes a list of options and applies them to the model.
-processOptions :: TVar OptionMap -> TVar Force -> [(Option, Int)] -> IO ()
-processOptions oldOptionsVar forceVar options = do
+processOptions :: VirtualHelicopter -> TVar Force -> [(Option, Int)] -> IO ()
+processOptions h forceVar options = do
+  let oldOptionsVar = getCurrentOptions h
   oldOptions <- atomically $ readTVar oldOptionsVar
+  pos <- atomically $ readTVar (getPosition h)
+  let orientation = getFacing pos
   newOptions <- atomically $ do
     let newOptions = foldl process oldOptions options
+    writeTVar (getPosition h) $ pos { getFacing = (getFacing pos) + ((360*(63 - (fromIntegral $ newOptions Map.! Yaw)))/(30*63)) }
     writeTVar forceVar $ 
-      convertToForce basicMap newOptions
+      convertToForce basicMap orientation newOptions
     return newOptions
+  --TODO Do the twist
   atomically $ writeTVar oldOptionsVar newOptions
-
   where
     process :: OptionMap -> (Option, Int) -> OptionMap
     process = flip $ uncurry Map.insert

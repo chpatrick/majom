@@ -19,18 +19,18 @@ import System.IO
 
 -- | An object type, encompassing the necessary information
 -- that an object should have.
-data Object = Object { objectMass :: Double, objectLocation :: Position, objectVelocity :: Velocity }
+data Object = Object { objectMass :: Double, objectLocation :: Vector, objectVelocity :: Velocity }
   deriving (Eq, Show)
 
 -- | Constructs a basic point mass at a given position.
 simpleObject :: Position -> Object
-simpleObject p = Object 1 p (vector [0,0,0])
+simpleObject p = Object 1 (getVec p) (vector [0,0,0])
 
 -- | Updates the position and velocity of an object given a time
 -- frame and the forces applied to it in that time frame.
 updatePosition :: Time -> Force -> Object -> Object
 updatePosition t fs (Object m p v) =
-  Object m ((<+>) p $ (v |*| t) + (acc |*| (0.5 * (t^2) ) ) ) newV
+  Object m (p + (v |*| t) + (acc |*| (0.5 * (t^2) ) ) ) newV
   where
     newV = v + (acc |*| t) 
     acc = fs |*| (1/m)
@@ -64,9 +64,11 @@ milliToSeconds = (/1000) . fromIntegral
 
 simulate :: SimulationSettings -> TVar Force -> TVar Position -> Object -> IO ()
 simulate settings forceVar positionVar object = do
-    displayObject object
+    --displayObject object
     force <- atomically $ readTVar forceVar
-    atomically $ writeTVar positionVar $ objectLocation object
+    atomically $ do
+      pos <- readTVar positionVar 
+      writeTVar positionVar $ pos { getVec = objectLocation object }
     threadDelay (stepTime * 1000)
     let drag = calcDrag (objectVelocity object)
     let obj' = updatePosition (milliToSeconds stepTime) (force + gravity + drag) object
@@ -76,9 +78,9 @@ simulate settings forceVar positionVar object = do
       -- Check case of floor - could be extracted
       case simFloor settings of
         Nothing -> obj'
-        Just f -> if getVec (objectLocation obj') `lowerThan` f
+        Just f -> if objectLocation obj' `lowerThan` f
           then
-            obj'{objectLocation = Position (vector [vectorX (getVec pos'), vectorY f, vectorZ (getVec pos')]) (getFacing $ objectLocation obj'),objectVelocity = vector [(vectorX vel')*0.5, 0.0, (vectorZ vel')*0.5] }
+            obj'{objectLocation = vector [vectorX pos', vectorY f, vectorZ pos'], objectVelocity = vector [(vectorX vel')*0.5, 0.0, (vectorZ vel')*0.5] }
           else
             obj'
 
@@ -92,6 +94,6 @@ calcDrag v = vector [0,0,0] --TODO negate (v * (abs v))
 
 displayObject :: Object -> IO ()
 displayObject o = do 
-  putStrLn $ prettyPos $ objectLocation o
+  putStrLn $ prettyVec $ objectLocation o
   hFlush stdout
   --putStrLn $ "Loc: " ++ (show $ objectLocation o) ++ ", Vel: " ++ (show $ objectVelocity o)

@@ -17,7 +17,6 @@ def drawGrid(srf, rangex = (-10,10), rangey = (-10,10), startx=30, starty=30):
         sy- (starty - 5)))
 
   ys = range(rangey[0], rangey[1]+1)
-  print ys
   for i in range(len(ys)):
     label = font.render(str(ys[len(ys) - i -1]), 1, (255,255,255))
     srf.blit(label, 
@@ -28,6 +27,7 @@ def main():
   pygame.init()
 
   window = pygame.display.set_mode((640,480))
+  font = pygame.font.SysFont("monospace", 15)
 
   while True:
     try:
@@ -46,6 +46,7 @@ def main():
         unity = (sizey - floor)/20
         px = (unitx * (x+offsetX)) + wall
         py = sizey - ((unity * (z+offsetY)) + floor)
+        label = font.render(str(y), 1, (255,255,255))
 
         #clear window and draw new shape
         window.fill((0,0,0))
@@ -60,7 +61,9 @@ def main():
         pygame.draw.line(window, (255,255,255),
             (px-10*sin(r),py+10*cos(r)),
             (px-10*sin(r)-5*sin((pi/2)-r),py+10*cos(r)-5*cos((pi/2)-r)))
+        window.blit(label, (px + 20,py +20))
         pygame.display.flip()
+
       except:
         print "Got", pos, "dunno wot to do lol"
     except:

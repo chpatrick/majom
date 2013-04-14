@@ -7,6 +7,7 @@ module Majom.Flyers.Flyable (
   -- * Classes
   Flyable(..),
   -- * Functions
+  flyerInit,
   ) where
 
 import Majom.Common
@@ -14,6 +15,9 @@ import Majom.Common
 -- | Options for different commands, relevant to some flying thing.
 data Option = Yaw | Pitch | Throttle | Correction
   deriving (Eq, Ord, Show, Enum)
+
+flyerInit :: [(Option, Int)]
+flyerInit = [(Yaw, 63), (Pitch, 63), (Throttle, 0), (Correction, 63)]
 
 -- | Flyable class for flyable things that can fly.
 class Flyable a where
