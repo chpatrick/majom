@@ -74,7 +74,19 @@ data Position = Position { getVec :: Vector, getFacing :: Double }
   deriving (Eq, Show)
 
 radians :: Double -> Double
-radians x = x/180*pi
+radians x = x*pi/180
+
+degrees :: Double -> Double
+degrees x = x*180/pi
+
+degNorm :: Double -> Double
+degNorm x = 
+  head $ dropWhile (< 0) $ iterate (+360) $ head $ dropWhile (>360) $ iterate (flip (-)360) x
+
+degDiff :: Double -> Double -> Double
+degDiff x y
+  | abs (x-y) > 180 = (if x > y then 1 else -1) * ((360 - max x y) + min x y)
+  | otherwise =  y-x
 
 instance Num (Position) where
   as + bs = as { getVec = (getVec as) + (getVec bs)}

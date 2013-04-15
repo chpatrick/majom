@@ -117,7 +117,7 @@ processOptions h forceVar options = do
   let orientation = getFacing pos
   newOptions <- atomically $ do
     let newOptions = foldl process oldOptions options
-    writeTVar (getPosition h) $ pos { getFacing = (getFacing pos) + ((360*(63 - (fromIntegral $ newOptions Map.! Yaw)))/(30*63)) }
+    writeTVar (getPosition h) $ pos { getFacing = (getFacing pos) + ((360*((fromIntegral $ newOptions Map.! Yaw) - 63))/(30*63)) }
     writeTVar forceVar $ 
       convertToForce basicMap orientation newOptions
     return newOptions

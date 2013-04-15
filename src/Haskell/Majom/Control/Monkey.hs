@@ -35,7 +35,8 @@ execMonkeyBrainT :: MonkeyBrainT -> Brain -> IO Brain
 execMonkeyBrainT mk k = execStateT mk k
 
 -- | Brain that holds all the relevant data for the monkey brain.
-data Brain = Brain { brainModel :: Kalman,
+data Brain = Brain { brainVModel :: Kalman,
+                     brainHModel :: Kalman,
                      brainIntent :: HoverIntent,
                      brainLast :: (Position, Velocity, FlyState) }
 
@@ -83,12 +84,14 @@ runMonkey' flyer = do
   -}
   loop $ do active <- lift $ isActive flyer
             while (not active)
+            (_, foo) <- lift $ observe flyer
+            lift $ putStrLn $ prettyPos foo
             lift $ milliSleep waitTime
   (_, p) <- observe flyer
   milliSleep waitTime
   (_, p') <- observe flyer
   milliSleep waitTime
-  let initBrain = Brain createNewModel intent (p', (getVec (p' - p)) |/| wt, undefined)
+  let initBrain = Brain createNewModel createNewModel intent (p', (getVec (p' - p)) |/| wt, undefined)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- | Lets the human fly the flyer with the monkey, controlling a specific
@@ -114,30 +117,48 @@ monkeySay (model, model', pwr, pos', vel', pwr', accel') = do
   
 -- | Computes the next step of the monkey process.
 monkeyThink :: (Intent a, Model b) => 
-  a -> b -> Power -> (Position, Position) -> Velocity 
-  -> (b, Velocity, Power)
-monkeyThink intent model pwr (pos, pos') vel = do
-  (model', vel', pwr')
+  a -> b -> b -> Power -> (Position, Position) -> Velocity 
+  -> (b, b, Velocity, Acceleration)
+monkeyThink intent modelV modelH pwr (pos, pos') vel = do
+  (modelV', modelH', vel', acc)
   where
     vel' = (getVec (pos' - pos)) |/| wt
     accel = (vel' - vel) |/| wt
-    model' = updateModel model (pwr, accel)
-    pwr' = (getMap model') $ getAccel intent vel' pos'
+    modelV' = updateModel modelV (pwr, accel)
+    modelH' = undefined
+    acc = getAccel intent vel' pos'
 
 -- The last thing is the return value
 -- | The iterative loop of the monkey.
 monkeyDo :: (Flyable a) => a -> MonkeyBrainT
 monkeyDo flyer = do
-  (Brain model intent (pos, vel, _)) <- get
+  (Brain modelV modelH intent (pos, vel, _)) <- get
   obs@(pwr, pos') <- lift $ observe flyer
-  let (model', vel', pwr') = monkeyThink intent model pwr (pos, pos') vel
-
+  let (modelV', _, vel', acc) = monkeyThink intent modelV modelH pwr (pos, pos') vel
   -- For debugging
   --lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
-
-  put $ Brain model' intent (pos', vel', undefined)
-  lift $ setFly flyer Throttle pwr'
+  lift $ putStrLn $ prettyPos pos'
+  put $ Brain modelV' modelH intent (pos', vel', undefined)
+  lift $ setFly flyer Yaw $ getYaw acc pos' 
+  lift $ setFly flyer Throttle $ (getMap modelV') acc
   lift $ milliSleep waitTime
+
+--TODO Plz get this working kthx
+getYaw :: Acceleration -> Position -> Int
+getYaw a pos =
+  if abs (degDiff o o') > 10 
+    then 
+        floor $ 63 + (signum (degDiff o o'))*20
+    else 63
+  where
+    acc = vectorUnit a
+    o = degNorm $ getFacing pos
+    o' = 
+      if vectorX acc >= 0 && vectorZ acc >= 0 then base
+      else if vectorX acc >= 0 then 180 + base
+      else if vectorZ acc >= 0 then 360 + base
+      else 180 + base
+    base = degrees $ atan $ (vectorX acc) / (vectorZ acc)
 
 -- | The iteration time of the monkey (milliseconds)
 waitTime :: Int
