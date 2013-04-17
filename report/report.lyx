@@ -2,7 +2,7 @@
 \lyxformat 413
 \begin_document
 \begin_header
-\textclass article
+\textclass report
 \use_default_options true
 \maintain_unincluded_children false
 \language english
@@ -43,9 +43,9 @@
 \shortcut idx
 \color #008000
 \end_index
-\leftmargin 3cm
-\topmargin 4cm
-\rightmargin 3cm
+\leftmargin 4cm
+\topmargin 3cm
+\rightmargin 4cm
 \bottommargin 4cm
 \secnumdepth 3
 \tocdepth 3
@@ -53,8 +53,8 @@
 \paragraph_indentation default
 \quotes_language english
 \papercolumns 1
-\papersides 1
-\paperpagestyle default
+\papersides 2
+\paperpagestyle fancy
 \tracking_changes false
 \output_changes false
 \html_math_output 0
@@ -106,7 +106,7 @@ LatexCommand tableofcontents
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Chapter
 Introduction
 \end_layout
 
@@ -149,7 +149,7 @@ In addition to the connect, all other devices and software are generic and
  easily obtainable, all costing under £30 (excluding the computer).
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Section
 Deconstruction
 \end_layout
 
@@ -232,7 +232,7 @@ The easiest place to see the complexity in this project is by looking at
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Technology
 \end_layout
 
@@ -250,7 +250,7 @@ pre-made
  the minute details.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Kinect
 \end_layout
 
@@ -281,7 +281,7 @@ For the computer vision, I will use a Kinect sensor device, created by Microsoft
  with tools that I might use.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 OpenCV
 \end_layout
 
@@ -293,7 +293,7 @@ OpenCV (Open Source Computer Vision Library) is a library of programming
  I will talk about this in more detail later on.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Arduino
 \end_layout
 
@@ -320,7 +320,7 @@ Arduino is an open-source microcontroller, which lets the user work with
 lf, affordable products.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Syma Remote Control Helicopter
 \end_layout
 
@@ -394,7 +394,7 @@ Pitch movement is gained by spinning the tail rotor.
  from pitching forwards too much by providing a counter force.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Bullet Physics and simulation
 \end_layout
 
@@ -412,7 +412,7 @@ It is an attractive idea to have a simulation environment in which I can
  detection, rigid body dynamics and soft body dynamics, amongst other things.
 \end_layout
 
-\begin_layout Section
+\begin_layout Chapter
 Background
 \end_layout
 
@@ -518,7 +518,7 @@ With my initial goals in mind, I started to build the foundation for the
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Prior work
 \end_layout
 
@@ -533,7 +533,7 @@ Whilst researching methods and learning materials for the project, I came
  Quadcopters are reknown for their stability and simple design.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Quadrocopter experiments, Technical University Munich 
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -628,7 +628,7 @@ In the quadropter experiments, they successfully demonstrated that accurate
  on the methods that they used, and how I can implement it.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Autonomous Camera-Based Navigation of a Quadrocopter
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -664,7 +664,7 @@ l information is gathered, and how flight paths are calculated, which will
  come in useful when I reach the midpoint of my project.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Odometry from RGB-D Cameras for Autonomous Quadrocopters
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -713,7 +713,7 @@ The methods described for least squares, and dealing with outliers by using
  
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 KinectFusion: Real-time 3D Reconstruction and Interaction Using a Moving
  Depth Camera
 \begin_inset CommandInset citation
@@ -782,7 +782,7 @@ The KinectFusion offers many interesting thinking points.
  
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Computer Controlling a Syma Helicopter
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -912,7 +912,7 @@ This resulted in stable, non-stuttering flight that worked from a large
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Learning models
 \end_layout
 
@@ -953,7 +953,7 @@ Some initial considerations were using least squares and various similar
  could emerge if I were to do any other methods in the future.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Least Squares 
 \end_layout
 
@@ -1051,7 +1051,7 @@ There are many different forms of least squares fitting - I will have to
  
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Kalman Filters
 \end_layout
 
@@ -1178,27 +1178,7 @@ As the Kalman filter is a recursive estimator (it only requires information
  see if it improves the quality of the vision tracking.
 \end_layout
 
-\begin_layout Subsubsection
-Next steps
-\end_layout
-
-\begin_layout Standard
-A large portion of the learning implementation in this project will be down
- to trial and error.
- I think it will be difficult for me to decide exactly what learning model
- I should use straight away, and instead I should iterate learning model
- designs, testing them against the current one and seeing if there are any
- improvements.
- It may be that I need to use some combination of learning models to achieve
- the desired outcome.
- The main requirement for me to execute this will be to ensure I have a
- solid set of interfaces seperating the learning model implementation from
- exactly what it needs to accomplish - this should let me swap in and out
- learning models with ease, without affecting the rest of the project.
- 
-\end_layout
-
-\begin_layout Subsection
+\begin_layout Section
 Vision
 \end_layout
 
@@ -1319,7 +1299,7 @@ key "SimpleCV book"
 , which lists many different examples and techniques to get me started.
 \end_layout
 
-\begin_layout Section
+\begin_layout Chapter
 Evaluation plan
 \end_layout
 
@@ -1348,7 +1328,7 @@ I believe that these three points establish the 'baseline' of the functionality
  
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Section
 Quality of functionality
 \end_layout
 
@@ -1406,7 +1386,14 @@ Demonstrates advanced functionality.
  
 \end_layout
 
-\begin_layout Section
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
 System Architecture
 \end_layout
 
@@ -1422,7 +1409,7 @@ ities within the system, and also allows 'swapping' of certain modules with
  in Python.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Crossing points
 \end_layout
 
@@ -1431,6 +1418,7 @@ There are few key crossing points between different modules, where the different
  languages must cooperate with each other.
  These can roughly be seen in the diagram below:
 \begin_inset Float figure
+placement h
 wide false
 sideways false
 status open
@@ -1487,7 +1475,7 @@ Majom
 , which can be picked up directly by the Python simulation viewer.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Modules
 \end_layout
 
@@ -1516,7 +1504,7 @@ Control
 \end_layout
 
 \begin_layout Standard
-The control system is built in Haskell (WHY?).
+The control system is built in Haskell.
  The system uses a Flyer Type Class, which fully defines all of the required
  traits of something that is 
 \begin_inset Quotes eld
@@ -1527,6 +1515,10 @@ flyable
 \end_inset
 
 .
+ Haskell was used for several reasons - it has a good amount of libraries,
+ is strongly typed (useful for testing) and is (largely) pure.
+ Additionally, I (the project writer) have personal experience developing
+ AI in Haskell from previous projects.
 \end_layout
 
 \begin_layout Paragraph*
@@ -1569,14 +1561,20 @@ Arduino
 \end_layout
 
 \begin_layout Standard
-The Arduino
+The Arduino board receives information on what 'orders' to send to the helicopte
+r via a serial cable.
+ It works in cycles, receiving all new orders, then consolidating them into
+ a final order set before sending this to the helicopter.
+ It is written in the Arduino language, a derivative of Processing.
+ It is a high level language that obscures a lot of the lower level working
+ of the board itself, and come pre-packaged with the Arduino board itself.
 \end_layout
 
-\begin_layout Section
+\begin_layout Chapter
 Execution
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Planning
 \end_layout
 
@@ -1596,7 +1594,7 @@ Initial Arduino hacking
 Basic IO with helicopter
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Framework
 \end_layout
 
@@ -1626,7 +1624,7 @@ Debugging methods, testing skeleton
 Allowing room for upgrade
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Vision
 \end_layout
 
@@ -1656,7 +1654,7 @@ Camera set up, troubles
 Initial results
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Assembly
 \end_layout
 
@@ -1685,7 +1683,7 @@ Improvements, filters etc.
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Control
 \end_layout
 
@@ -1697,31 +1695,31 @@ How helicopter will be controlled
 Methods for testing this (virtual first etc.)
 \end_layout
 
-\begin_layout Section
+\begin_layout Chapter
 Evaluation
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Achievements
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Strengths and weaknesses of the system
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Comparison to existing technology
 \end_layout
 
-\begin_layout Section
+\begin_layout Chapter
 Conclusions
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Learning results of this project
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Future work
 \end_layout
 

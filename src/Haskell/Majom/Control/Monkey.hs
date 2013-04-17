@@ -139,26 +139,26 @@ monkeyDo flyer = do
   --lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
   lift $ putStrLn $ prettyPos pos'
   put $ Brain modelV' modelH intent (pos', vel', undefined)
-  lift $ setFly flyer Yaw $ getYaw acc pos' 
+  lift $ setFly flyer Yaw $ getYaw (getHeading intent pos') pos' 
   lift $ setFly flyer Throttle $ (getMap modelV') acc
   lift $ milliSleep waitTime
 
 --TODO Plz get this working kthx
-getYaw :: Acceleration -> Position -> Int
-getYaw a pos =
+getYaw :: Vector -> Position -> Int
+getYaw v pos =
   if abs (degDiff o o') > 10 
     then 
         floor $ 63 + (signum (degDiff o o'))*20
     else 63
   where
-    acc = vectorUnit a
+    vec = vectorUnit v
     o = degNorm $ getFacing pos
     o' = 
-      if vectorX acc >= 0 && vectorZ acc >= 0 then base
-      else if vectorX acc >= 0 then 180 + base
-      else if vectorZ acc >= 0 then 360 + base
+      if vectorX vec >= 0 && vectorZ vec >= 0 then base
+      else if vectorX vec >= 0 then 180 + base
+      else if vectorZ vec >= 0 then 360 + base
       else 180 + base
-    base = degrees $ atan $ (vectorX acc) / (vectorZ acc)
+    base = degrees $ atan $ (vectorX vec) / (vectorZ vec)
 
 -- | The iteration time of the monkey (milliseconds)
 waitTime :: Int

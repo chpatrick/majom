@@ -10,3 +10,4 @@ import Majom.Common
 -- in some direction given a velocity and position.
 class Intent a where
   getAccel :: a -> Velocity -> Position -> Acceleration
+  getHeading :: a -> Position -> Vector
