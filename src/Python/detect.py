@@ -17,13 +17,57 @@
 from SimpleCV import *
 import cv2
 import time
-import kalman
 from numpy import *
 
 cam = Kinect()
 
-k = kalman.Kalman(3)
-k.Sigma_x = diag([0.012,0.012,0.01227])
+def ignoreErr(x):
+  if x == 2047:
+    return 0
+  return x
+
+ignoreErrVec = np.vectorize(ignoreErr)
+
+# Want to assemble a 'tolerance' matrix for different areas to get a quiet image
+def adapt(b):
+  filt = np.zeros((len(b),len(b[0])))
+  r = np.array([6000])
+  while r.sum() > 3000:
+    d = freenect.sync_get_depth()[0]
+    m = (b == 2047) & (d == 2047)
+    m1 = np.ma.MaskedArray(b, mask=m, fill_value=0)
+    m2 = np.ma.MaskedArray(d, mask=m, fill_value=0)
+    r = cv2.absdiff(m1.filled(), m2.filled())
+
+    r = np.ma.MaskedArray(r, mask=(r < filt), fill_value=0).filled()
+
+    loc = Image(r * (255/2047.0)).rotate90()#.erode().binarize(0).invert()
+    loc.show()
+    m3 = np.ma.MaskedArray(r, mask=((r==0)|(r<filt)), fill_value=0)
+    m4 = np.ma.MaskedArray(filt, mask=(r>filt), fill_value=0)
+    filt = m3.filled() + m4.filled()
+  return filt
+
+def diffdiff2(b, filt=None):
+  d = freenect.sync_get_depth()[0]
+  m = (b == 2047) & (d == 2047)
+  m1 = np.ma.MaskedArray(b, mask=m, fill_value=0)
+  m2 = np.ma.MaskedArray(d, mask=m, fill_value=0)
+  
+  r = cv2.absdiff(m1.filled(), m2.filled())
+  if filt != None:
+    m3 = np.ma.MaskedArray(r, mask=(r < filt), fill_value=0)
+  else:
+    m3 = np.ma.MaskedArray(r, mask=(r < 50), fill_value=0)
+  
+  loc = Image(m3.filled() * (255/2047.0)).rotate90().erode().binarize(0).invert()
+  loc.show()
+
+def diffdiff(b):
+  d = ignoreErrVec(freenect.sync_get_depth()[0])
+  r = cv2.absdiff(b,d) * (255/2047.0)
+  loc = Image(r).rotate90().binarize().invert()
+  loc.show()
 
 def differizer(base):
   print "Gettin images"
@@ -57,7 +101,6 @@ def differizer(base):
     print "Drawing stuffff"
     i.drawCircle((mx,my), 10, color=Color.GREEN)
 
-    k.update(array([a,b,c]))
     (a,b,c) = tuple(k.mu_hat_est[1,:])
     i.drawCircle(worldToRGB((a,b,c)), 10, color=Color.RED)
     print "Done drawing!"
