@@ -32,7 +32,7 @@ ignoreErrVec = np.vectorize(ignoreErr)
 def adapt(b):
   filt = np.zeros((len(b),len(b[0])))
   r = np.array([6000])
-  while r.sum() > 3000:
+  while r.sum() > 2000:
     d = freenect.sync_get_depth()[0]
     m = (b == 2047) & (d == 2047)
     m1 = np.ma.MaskedArray(b, mask=m, fill_value=0)
@@ -44,7 +44,7 @@ def adapt(b):
     loc = Image(r * (255/2047.0)).rotate90()#.erode().binarize(0).invert()
     loc.show()
     m3 = np.ma.MaskedArray(r, mask=((r==0)|(r<filt)), fill_value=0)
-    m4 = np.ma.MaskedArray(filt, mask=(r>filt), fill_value=0)
+    m4 = np.ma.MaskedArray(filt, mask=(r>filt), fill_value=10)
     filt = m3.filled() + m4.filled()
   return filt
 
@@ -61,7 +61,15 @@ def diffdiff2(b, filt=None):
     m3 = np.ma.MaskedArray(r, mask=(r < 50), fill_value=0)
   
   loc = Image(m3.filled() * (255/2047.0)).rotate90().erode().binarize(0).invert()
-  loc.show()
+  blobs = loc.findBlobs()
+  if blobs:
+    cents = map(lambda x: (x.centroid(), x.area()),blobs)
+    area = sum(map(Blob.area, blobs))
+    cx,cy = sum(map(lambda ((x,y),w): (int(x*(w/area)),int(y*(w/area))),cents),0)
+    loc.drawCircle((cx,cy), 10, color=Color.GREEN)
+    blobs.show()
+  else:
+    loc.show()
 
 def diffdiff(b):
   d = ignoreErrVec(freenect.sync_get_depth()[0])
