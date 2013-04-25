@@ -17,6 +17,7 @@
 from SimpleCV import *
 import cv2
 import time
+from calibkinect import *
 from numpy import *
 
 cam = Kinect()
@@ -29,10 +30,11 @@ def ignoreErr(x):
 ignoreErrVec = np.vectorize(ignoreErr)
 
 # Want to assemble a 'tolerance' matrix for different areas to get a quiet image
-def adapt(b):
+def adapt(b, limit=1000):
   filt = np.zeros((len(b),len(b[0])))
   r = np.array([6000])
-  while r.sum() > 2000:
+  count = 0
+  while r.sum() > limit or count < 10:
     d = freenect.sync_get_depth()[0]
     m = (b == 2047) & (d == 2047)
     m1 = np.ma.MaskedArray(b, mask=m, fill_value=0)
@@ -46,10 +48,15 @@ def adapt(b):
     m3 = np.ma.MaskedArray(r, mask=((r==0)|(r<filt)), fill_value=0)
     m4 = np.ma.MaskedArray(filt, mask=(r>filt), fill_value=10)
     filt = m3.filled() + m4.filled()
+    if r.sum() < limit:
+      count += 1
+    else:
+      count = 0
   return filt
 
-def diffdiff2(b, filt=None):
+def diffdiff2(b, filt=None, last=[(0,0),(0,0)]):
   d = freenect.sync_get_depth()[0]
+  img = cam.getImage()
   m = (b == 2047) & (d == 2047)
   m1 = np.ma.MaskedArray(b, mask=m, fill_value=0)
   m2 = np.ma.MaskedArray(d, mask=m, fill_value=0)
@@ -67,9 +74,24 @@ def diffdiff2(b, filt=None):
     area = sum(map(Blob.area, blobs))
     cx,cy = sum(map(lambda ((x,y),w): (int(x*(w/area)),int(y*(w/area))),cents),0)
     loc.drawCircle((cx,cy), 10, color=Color.GREEN)
-    blobs.show()
+
+    mb = max(blobs,key=Blob.area).centroid()
+    depth = array([[d[mb[1],mb[0]]]])
+    xyz,uv = depth2xyzuv(depth, cx, cy)
+    try:
+      img.drawCircle((int(uv[0,0]),int(uv[0,1])),10,color=Color.WHITE)
+      last[0] = last[1]
+      last[1] = (uv[0,0],uv[0,1])
+    except:
+      (x1,y1) = last[0]
+      (x2,y2) = last[1]
+      img.drawCircle((2*x2 - x1,2*y2 - y1), 10, color=Color.WHITE)
+
+    img.show()
+    #blobs.show()
   else:
     loc.show()
+  return last
 
 def diffdiff(b):
   d = ignoreErrVec(freenect.sync_get_depth()[0])

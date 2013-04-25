@@ -1574,54 +1574,481 @@ r via a serial cable.
 Execution
 \end_layout
 
+\begin_layout Standard
+One of the key aims for the development of this project was to be able to
+ remain flexible, and to quickly prototype new ideas and methods to see
+ which one worked best for a given task.
+ To achieve this, a solid 'framework' needed to be planned, assigning specific
+ roles to specific areas, and ensuring that the abstract version would in
+ fact work.
+ 
+\end_layout
+
 \begin_layout Section
 Planning
 \end_layout
 
-\begin_layout Itemize
-Milestone set up
+\begin_layout Standard
+To be able to properly develop in a flexible manner, it was important to
+ lay out a good foundation to develop upon.
+ First, the project was divided into distinct milestones, which should in
+ theory be achieved in order, with each milestone providing a place to fall
+ back on if a particular method does not work out.
+ In the initial iteration, the milestones were
 \end_layout
 
 \begin_layout Itemize
-Layout, structure
+Fly the helicopter manually from the computer
 \end_layout
 
 \begin_layout Itemize
-Initial Arduino hacking
+Set up a basic simulation environment for the helicopter
 \end_layout
 
 \begin_layout Itemize
-Basic IO with helicopter
+Track the helicopter in a simple fashion in a simplified environment
 \end_layout
 
+\begin_layout Itemize
+Develop a basic controller that can fly the simulated controller
+\end_layout
+
+\begin_layout Itemize
+Combine controller and simple vision to have a simple flyer
+\end_layout
+
+\begin_layout Itemize
+Improve upon vision system to make it more robust
+\end_layout
+
+\begin_layout Itemize
+Improve upon control system to allow for more complex instructions
+\end_layout
+
+\begin_layout Standard
+As would be revealed as the project progressed, not all of these proved
+ to be viable milestones.
+\begin_inset Newline newline
+\end_inset
+
+In addition to having some set milestones, it was important to have a good
+ skeletal structure for each module, especially so for the controller.
+ This involved setting up contracts in the form of Type Classes for different
+ parts of the controller, that each new test module would need to fulfill.
+ This helped to realise the requirements for each module, and made testing
+ much easier.
+ For instance, the Flyable Type Class, which describes a 
+\begin_inset Quotes eld
+\end_inset
+
+Flyable
+\begin_inset Quotes erd
+\end_inset
+
+ object is written as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Haskell,numbers=left,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+-- | Flyable class for flyable things that can fly.
+\end_layout
+
+\begin_layout Plain Layout
+
+class Flyable a where
+\end_layout
+
+\begin_layout Plain Layout
+
+  setFly :: a -> Option -> Int -> IO ()
+\end_layout
+
+\begin_layout Plain Layout
+
+  setFlyMany :: a -> [(Option, Int)] -> IO ()
+\end_layout
+
+\begin_layout Plain Layout
+
+  fly :: a -> IO ()
+\end_layout
+
+\begin_layout Plain Layout
+
+  observe :: a -> IO (Power, Position)
+\end_layout
+
+\begin_layout Plain Layout
+
+  isActive :: a -> IO Bool
+\end_layout
+
+\begin_layout Plain Layout
+
+  setActive :: a -> Bool -> IO ()
+\end_layout
+
+\end_inset
+
+Each function describes a responsibility for a Flyable object, that must
+ be fulfilled.
+ These include the key components of flying a helicopter, such as sending
+ commands (
+\begin_inset listings
+lstparams "language=Haskell,tabsize=2"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+setFly
+\end_layout
+
+\end_inset
+
+) and observing the whereabouts of the helicopter (
+\begin_inset listings
+lstparams "language=Haskell,tabsize=2"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+observe
+\end_layout
+
+\end_inset
+
+), as well as more minor things such as classifying if a flyable is actually
+ active.
+ 
+\end_layout
+
+\begin_layout Subsection
+Arduino / Helicopter communication
+\end_layout
+
+\begin_layout Standard
+One of the very beginning parts of the project was to acquire and set up
+ an Arduino system for controlling the helicopter.
+ As the whole project itself hinges on the helicopter being flown from the
+ computer, this was an important foundation step.
+ With some helpful tutorials
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Syma,Syma2"
+
+\end_inset
+
+, and online Arduino documentation
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Arduino,Arduino port"
+
+\end_inset
+
+ it was possible to get a first iteration of the helicopter control up and
+ running from a laptop, and from there it was a simple case of trial and
+ error to get a reliable connection to the helicopter.
+ In the final iteration, the Arduino board waits on a serial connection
+ from the computer, reads the incoming commands and then translates them
+ into commands to relay to the helicopter.
+ No response is expected from the helicopter itself.
+\end_layout
+
+\begin_layout Paragraph
+Helicopter communication specifics
+\end_layout
+
+\begin_layout Description
+Transmission
+\begin_inset space ~
+\end_inset
+
+Method The Arduino communicates with the helicopter through an IR LED installed
+ on the Arduino.
+ The LED is pulsed on and off to represent the signal 
+\begin_inset Quotes eld
+\end_inset
+
+on
+\begin_inset Quotes erd
+\end_inset
+
+, which combined with periods of no signal give binary 0 and 1.
+ A 
+\begin_inset Quotes eld
+\end_inset
+
+1
+\begin_inset Quotes erd
+\end_inset
+
+ bit is 320 microseconds on, 680 microseconds off, and a 
+\begin_inset Quotes eld
+\end_inset
+
+0
+\begin_inset Quotes erd
+\end_inset
+
+ bit is 320 microseconds on, 280 microseconds off.
+\end_layout
+
+\begin_layout Description
+Packet
+\begin_inset space ~
+\end_inset
+
+Measurements A packet consists of a header, the main order packet, and a
+ footer.
+ A header consists of 2000 microseconds on, then 2000 microseconds off.
+ A footer consists of 300 microseconds on.
+\begin_inset Newline newline
+\end_inset
+
+The main packet itself is 32 individual bits.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+The first 8 bits (0-8) represent the Yaw value, with 63 being neutral, 0
+ being full left yaw and 127 being full right yaw.
+ 
+\end_layout
+
+\begin_layout Itemize
+The second 8 bits (8-16) represent the Pitch.
+ Like Yaw, 63 is neutral, 0 is full back pitch and 127 is full forwards
+ pitch.
+\end_layout
+
+\begin_layout Itemize
+The third 8 bits (16-24) are the Throttle.
+ This ranges from 0 (no throttle) to 127 (full throttle).
+\end_layout
+
+\begin_layout Itemize
+The last 8 bits (24-32) are the Correction.
+ Correction is a small amount of offset that can be specified manually to
+ keep the helicopter from turning when the controller is in a neutral setting.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The structure of the packet can be easily seen from the Arduino code itself
+ -
+\begin_inset listings
+lstparams "numbers=left,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+void SendCode() {
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  pulseIR(headerOn);
+\end_layout
+
+\begin_layout Plain Layout
+
+  delayMicroseconds(headerOff);
+\end_layout
+
+\begin_layout Plain Layout
+
+  pulseLength= headerOn + headerOff;
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  for(int i=0; i < 32; i++) {
+\end_layout
+
+\begin_layout Plain Layout
+
+    sendPulseValue(pulseValues[i]);
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  //Footer
+\end_layout
+
+\begin_layout Plain Layout
+
+  pulseIR(footerOn);
+\end_layout
+
+\begin_layout Plain Layout
+
+  delayMicroseconds(messageLength - pulseLength - footerOn); 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+Communication
+\begin_inset space ~
+\end_inset
+
+Loop A typical communication loop with Arduino involves:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Wait for incoming instructions from the serial port.
+\end_layout
+
+\begin_layout Enumerate
+Filter the incoming instruction on instruction type (Yaw, Pitch, Throttle
+ or Correction).
+ Set the relevant bits in the new order packet based on these.
+\end_layout
+
+\begin_layout Enumerate
+If there are no more incoming instructions, send the code using the protocol
+ specified above.
+ Otherwise, process new instructions and edit order packet accordingly.
+\end_layout
+
+\begin_layout Enumerate
+Delay by 25 microseconds, then loop.
+ This 25 microsecond delay prevented too many orders being sent to the helicopte
+r in quick succession, thus confusing it.
+\end_layout
+
+\end_deeper
 \begin_layout Section
 Framework
+\end_layout
+
+\begin_layout Standard
+An important part of the initial set up was developing suitable tools to
+ make testing and development much easier.
+ These could be best simplified to two parts - reliable communication methods
+ between different modules, and powerful test tools to make prototyping
+ and developing much easier.
+\end_layout
+
+\begin_layout Subsection
+Communication methods
+\end_layout
+
+\begin_layout Subsection
+Testing tools
+\end_layout
+
+\begin_layout Paragraph
+GUI for human control
+\end_layout
+
+\begin_layout Standard
+One of the first and most basic of the testing tools that was developed
+ was a GUI to let the user control the helicopter manually from the laptop.
+ This served as a suitable test for the capabilities of the Arduino communicatio
+n between the computer and the helicopter.
+ Additionally, it enabled the system to output the specific values that
+ were being sent to the helicopter, something that was not possible from
+ flying the helicopter using the remote control.
+ As detailed below, it also played a part in some other parts of the testing
+ tools.
+\end_layout
+
+\begin_layout Paragraph
+DuoCopter
+\end_layout
+
+\begin_layout Standard
+After experimenting with some basic control methods for the helicopter early
+ on in the project, it became obvious that it would be useful to restrict
+ (and thus simplify) the parts of the helicopter that the controller can
+ actually control.
+ However, it would then be necessary for something else to control the rest
+ of the helicopter, otherwise it might fly out of control whilst testing.
+ To fulfill this purpose, a special 
+\begin_inset Quotes eld
+\end_inset
+
+Duocopter
+\begin_inset Quotes erd
+\end_inset
+
+ flyer was created.
+ This Duocopter created two copies of the same helicopter control, and gave
+ one to each controller.
+ Incoming instructions from both of the controllers would be received by
+ the Duocopter, filtered according order type, and then sent onwards to
+ the helicopter itself.
+ This process is invisible to both of the controllers and the helicopter.
+\begin_inset Newline newline
+\end_inset
+
+For example, initially it was useful to let the Monkey control the Throttle
+ of the helicopter, whilst stabilising and steering were controlled by a
+ human operator through the GUI.
+ The Duocopter would throw away any instruction received from the Monkey
+ that was not a Throttle instruction, and likewise for non-Throttle instructions
+ from the human.
+ In this manner it was possible to test the Monkey Throttle control in a
+ simplified environment without having to worry about the helicopter crashing!
+\end_layout
+
+\begin_layout Paragraph
+Viewing methods
 \end_layout
 
 \begin_layout Itemize
 GUI for direct control
 \end_layout
 
-\begin_layout Itemize
-Structure of helicopter control
-\end_layout
-
 \begin_deeper
 \begin_layout Itemize
-Diagrams?
+Combining control methods for debugging/testing
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Skeleton for computer control
+Communication methods between programming languages
 \end_layout
 
 \begin_layout Itemize
-Debugging methods, testing skeleton
-\end_layout
-
-\begin_layout Itemize
-Allowing room for upgrade
+Virtual environment set up
 \end_layout
 
 \begin_layout Section
