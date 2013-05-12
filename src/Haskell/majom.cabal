@@ -23,6 +23,7 @@ Library
     Majom.Control.Monkey,
     Majom.Control.Monkey.Intent,
     Majom.Control.Monkey.HoverIntent,
+--    Majom.Control.MonocleMonkey,
     Majom.Control.Watcher,
     Majom.Flyers.Flyable,
     Majom.Flyers.Helicopter,
@@ -61,6 +62,7 @@ Executable majom
     random,
     HTTP,
     unordered-containers
+  --  lens
 
   Extensions:
   Ghc-options: -O -threaded

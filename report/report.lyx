@@ -2033,26 +2033,228 @@ For example, initially it was useful to let the Monkey control the Throttle
 Viewing methods
 \end_layout
 
-\begin_layout Itemize
-GUI for direct control
+\begin_layout Standard
+In addition with testing tools for controlling the helicopter, it was deemed
+ useful to be able to 
+\begin_inset Quotes eld
+\end_inset
+
+see what the controller sees
+\begin_inset Quotes erd
+\end_inset
+
+, that is to have a method of visualising the data that is received by the
+ Monkey when it tries to observe the helicopter.
+ Original concepts for this revolved around outputting an image of the current
+ observed position of the helicopter every iteration, and then making an
+ animation out of the produced images.
+ However, this lacked the real-time aspect that is required with most testing
+ tools.
+ These images could instead be displayed in a window created by the Monkey
+ - the downside to this is that it is not overwhelmingly easy to do in Haskell,
+ which reduces the ability to iterate on the design.
+\begin_inset Newline newline
+\end_inset
+
+The idea chosen in the end was to develop it in Python - Python has many
+ pre-installed modules that deal exactly with window output in a very simple
+ and concise manner.
+ Using the Pygame
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Pygame"
+
+\end_inset
+
+ module (which is already used in the SimpleCV module used for vision),
+ creating a window of a specific size was as simple as 
+\begin_inset listings
+lstparams "language=Python,numbers=left,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def main():
 \end_layout
 
-\begin_deeper
-\begin_layout Itemize
-Combining control methods for debugging/testing
+\begin_layout Plain Layout
+
+  pygame.init()
 \end_layout
 
-\end_deeper
-\begin_layout Itemize
-Communication methods between programming languages
+\begin_layout Plain Layout
+
+  window = pygame.display.set_mode((640,480))
 \end_layout
 
-\begin_layout Itemize
-Virtual environment set up
+\end_inset
+
+From here, a simple two dimensional viewer was developed, one for a 
+\begin_inset Quotes eld
+\end_inset
+
+side-on
+\begin_inset Quotes erd
+\end_inset
+
+ perspective, showing 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+ data, and another 
+\begin_inset Quotes eld
+\end_inset
+
+top-down
+\begin_inset Quotes erd
+\end_inset
+
+ perspective showing 
+\begin_inset Formula $x,y,z$
+\end_inset
+
+ and 
+\begin_inset Formula $orientation$
+\end_inset
+
+ data.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename presentTop.png
+	width 15cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It was desirable to make the connection between the Monkey (in Haskell)
+ and the Python viewer as simple as possible, to reduce any potential mistakes.
+ The resulting method was simply using 
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+stdin/stdout
+\end_layout
+
+\end_inset
+
+ - the Monkey would print the positional information, and then by piping
+ the output of one to the other in a Bash shell, the viewer would read the
+ output, parse it and then display it.
+ 
+\begin_inset Newline newline
+\end_inset
+
+This proved to be a simple yet effective manner for co-ordinating the two
+ programs, with no need to worry about complicated cross-language tools
+ or synchronisation problems, as all of the threading is handled by the
+ Bash shell itself.
 \end_layout
 
 \begin_layout Section
 Vision
+\end_layout
+
+\begin_layout Standard
+The vision system is an integral part to the project - it is needed to track
+ the helicopter in its surroundings, and then report the 3D position of
+ the helicopter (and orientation) back to the controller.
+ As discussed earlier, this has to be achieved with one stationary Kinect
+ (RGB-D) camera, and a laptop.
+ Additionally, the tracking method has to have sufficient granularity so
+ that the controller can get updates in real time.
+ This section will cover the various steps taken to achieve this, pitfalls
+ that were encountered, and how the current system works.
+\end_layout
+
+\begin_layout Subsection
+Initial requirements and decisions
+\end_layout
+
+\begin_layout Standard
+At the beginning of the project, the following requirements were assembled
+ that were deemed to be necessary for 'basic flight':
+\end_layout
+
+\begin_layout Enumerate
+To be able to get a reasonable estimate for the 3D coordinates of the helicopter
+ in a stationary environment.
+\end_layout
+
+\begin_layout Enumerate
+To be able to estimate the orientation of the helicopter from some prior
+ knowledge and the 'tracked' image of the helicopter.
+\end_layout
+
+\begin_layout Enumerate
+To be able to do the above 2 things sufficiently quickly that the system
+ can be used in a real-time situation.
+\end_layout
+
+\begin_layout Enumerate
+The system should be sufficiently robust that 'unavoidable' interference
+ (such as subtle lighting changes, shadows etc.) in the scene should not
+ impair the tracking to any great degree.
+\end_layout
+
+\begin_layout Standard
+With these requirements in mind, initial research was carried out into possible
+ languages to implement the vision system in, and what libraries to use.
+ 
+\begin_inset Newline newline
+\end_inset
+
+The first consideration was to use Haskell, as the main control system is
+ written entirely in Haskell.
+ This would make integration very simple.
+ However, after further research it was discovered that vision libraries
+ for Haskell are slim, and not particularly well supported.
+ Most of the libraries are cross-language, partial implementations of the
+ C++ OpenCV libraries.
+ Due to their partial and experimental nature, and previous inexperience
+ with OpenCV, it was deemed too risky to attempt to proceed with the vision
+ module in Haskell.
+\begin_inset Newline newline
+\end_inset
+
+The second consideration was using C++ and OpenCV.
+ This was an obvious consideration, as huge amounts of computer vision research
+ is done in OpenCV and C++, with the language/library pair being considered
+ the 'main' computer vision method.
+ However, this approach was not entirely without flaw - inexperience with
+ both C++ and vision in general made this quite daunting.
+ Whilst a good choice if no other alternative are found, it seemed that
+ a further search for a simpler language/implementation might prove to be
+ beneficial.
+\begin_inset Newline newline
+\end_inset
+
+The last consideration was the SimpleCV library, which is written in Python.
+ The SimpleCV uses the Python implementation of OpenCV, but provides a large
+ amount of 'simple' methods and data structures that hide the more complex
+ data structures below.
+ Additionally, it is well supported with many tutorials and examples.
+ 
 \end_layout
 
 \begin_layout Itemize
@@ -2404,6 +2606,17 @@ DEMAAGD, K., OLIVER, A., & OOSTENDORP, N.
  (2012).
  Practical computer vision with SimpleCV.
  Beijing, O'Reilly.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Pygame"
+
+\end_inset
+
+Pygame.org (2012) News - pygame - python game development.
+ [online] Available at: http://www.pygame.org [Accessed: 25 Apr 2013].
 \end_layout
 
 \begin_layout Standard

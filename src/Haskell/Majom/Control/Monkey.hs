@@ -47,7 +47,7 @@ data FlyState = Flying | Landed deriving (Show, Eq)
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
   forkIO $ fly flyer
-  putStrLn "I am a monkey"
+  --putStrLn "I am a monkey"
 
   runMonkey' flyer
 
@@ -100,7 +100,7 @@ runMonkeyWithHuman :: (Flyable a) => [Option] -> a -> IO Brain
 runMonkeyWithHuman humanControl flyer = do
   let (human, monkey) = startDuoCopter flyer humanControl
   forkIO $ runGUI human
-  putStrLn "I am a monkey"
+  --putStrLn "I am a monkey"
   runMonkey' monkey
 
 -- | Gives information on what the monkey is currently thinking to stdout.
