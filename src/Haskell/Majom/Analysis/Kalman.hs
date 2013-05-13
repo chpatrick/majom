@@ -24,7 +24,7 @@ data Kalman =
 instance Model Kalman where
   createNewModel =
     Kalman 0.1 1 0
-  getMap k = (\x -> round (((vectorY x) + 9.8)/(kMuHat k)))
+  getMap k x = if (vectorY x) <= 0 then 70 else 100--(\x -> round (((vectorY x) + 9.8)/(kMuHat k)))
   updateModel k (pwr,acc) =
     k { kMuHat = muHat, kP = p }
     where

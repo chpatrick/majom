@@ -85,7 +85,8 @@ interpretKeyPress flyer valMap = do
       return True
     "Return" -> do -- Start observation
       liftIO $ putStrLn "Return"
-      liftIO $ setActive flyer True
+      active <- liftIO $ isActive flyer
+      liftIO $ setActive flyer (not active)
       return True
     "Escape" -> do -- Quit the program
       liftIO $ setActive flyer False

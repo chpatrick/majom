@@ -54,34 +54,16 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  let intent = hoverAt $ Position (vector [0,5,0]) undefined
+  let intent = hoverAt $ Position (vector [0,0.15,0]) undefined
 
   milliSleep waitTime
   (_, pos) <- observe flyer
 
   setFly flyer Throttle 0
+  setFly flyer Yaw 63
   posRef <- newIORef (pos, 0)
 
   milliSleep waitTime
-
-  {-
-  -- For sake of experiment, let's assume that initially its landed.
-  loop $ do (pos,throttle) <- lift $ readIORef posRef
-            (_,pos') <- lift $ observe flyer
-            let vel = (pos' - pos)
-            lift $ writeIORef posRef (pos', throttle + 5)
-            while (vectorSize vel == 0.0)
-            lift $ setFly flyer Throttle (throttle + 5)
-            lift $ putStrLn $ "Taking off... new throttle = " ++ (show $ throttle + 2)
-            lift $ milliSleep waitTime
-            
-  (pos',_) <- readIORef posRef
-  milliSleep waitTime
-  (_, pos'') <- observe flyer
-  
-  let vel = (pos'' - pos) |/| wt
-  let initBrain = Brain createNewModel intent (pos', vel, undefined)
-  -}
   loop $ do active <- lift $ isActive flyer
             while (not active)
             (_, foo) <- lift $ observe flyer
@@ -100,7 +82,7 @@ runMonkeyWithHuman :: (Flyable a) => [Option] -> a -> IO Brain
 runMonkeyWithHuman humanControl flyer = do
   let (human, monkey) = startDuoCopter flyer humanControl
   forkIO $ runGUI human
-  --putStrLn "I am a monkey"
+  putStrLn "I am a monkey"
   runMonkey' monkey
 
 -- | Gives information on what the monkey is currently thinking to stdout.
@@ -132,18 +114,41 @@ monkeyThink intent modelV modelH pwr (pos, pos') vel = do
 -- | The iterative loop of the monkey.
 monkeyDo :: (Flyable a) => a -> MonkeyBrainT
 monkeyDo flyer = do
-  (Brain modelV modelH intent (pos, vel, _)) <- get
-  obs@(pwr, pos') <- lift $ observe flyer
-  let (modelV', _, vel', acc) = monkeyThink intent modelV modelH pwr (pos, pos') vel
-  -- For debugging
-  --lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
-  lift $ putStrLn $ prettyPos pos'
-  put $ Brain modelV' modelH intent (pos', vel', undefined)
-  lift $ setFly flyer Yaw $ getYaw (getHeading intent pos') pos' 
-  lift $ setFly flyer Throttle $ (getMap modelV') acc
+  active <- lift $ isActive flyer
+  if active 
+    then do
+      (Brain modelV modelH intent (pos, vel, _)) <- get
+      obs@(pwr, pos') <- lift $ observe flyer
+      let (modelV', _, vel', acc) = monkeyThink intent modelV modelH pwr (pos, pos') vel
+      -- For debugging
+      --lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
+      lift $ putStrLn $ prettyPos pos'
+      put $ Brain modelV' modelH intent (pos', vel', undefined)
+      --lift $ setFly flyer Yaw $ getYaw (getHeading intent pos') pos' 
+      lift $ setFly flyer Throttle $ (getMap modelV') acc
+    else do
+      iters <- lift $ fmap length $ 
+        takeWhileIO (not . id) $
+          repeat (milliSleep waitTime >> observe flyer >> isActive flyer)
+      (Brain modelV modelH intent (pos, vel, _)) <- get
+      obs@(pwr, pos') <- lift $ observe flyer
+      let vel' = (getVec (pos' - pos)) |/| (wt * (fromIntegral iters))
+      put $ Brain modelV modelH intent (pos', vel', undefined)
+      lift $ putStrLn ("Was not active for " ++ (show iters) ++ " cycles.")
+
   lift $ milliSleep waitTime
 
---TODO Plz get this working kthx
+
+takeWhileIO :: (a -> Bool) -> [IO a] -> IO [a]
+takeWhileIO _ [] = return []
+takeWhileIO p (ix:ixs) = do
+  x <- ix 
+  if p x 
+    then
+      (return . (x:)) =<< takeWhileIO p ixs
+    else 
+      return []
+
 getYaw :: Vector -> Position -> Int
 getYaw v pos =
   if abs (degDiff o o') > 10 

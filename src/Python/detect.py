@@ -30,18 +30,16 @@ def ignoreErr(x):
 def setup():
   b = freenect.sync_get_depth()[0].copy()
   f = adapt(b, 2000)
-  last = diffdiff2(b,f)
   while True:
     try:
-      last = diffdiff2(b,f,last)
+      out = diffdiff2(b,f)
     except:
       return (b,f)
 
 def loop(b, f):
-  last = diffdiff2(b,f)
   while True:
     try:
-      last = diffdiff2(b,f,last)
+      diffdiff2(b,f)
     except:
       break
 ignoreErrVec = np.vectorize(ignoreErr)
@@ -71,7 +69,7 @@ def adapt(b, limit=1000):
       count = 0
   return filt
 
-def diffdiff2(b, filt=None, last=[(0,0),(0,0)]):
+def diffdiff2(b, filt=None):
   print 0
   d = freenect.sync_get_depth()[0]
   print 0.1
@@ -118,17 +116,14 @@ def diffdiff2(b, filt=None, last=[(0,0),(0,0)]):
           break;
     xyz,uv = depth2xyzuv(depth, cx, cy)
     print 9
-    loc.drawCircle((mb[0],mb[1]),10,color=Color.WHITE)
-    loc.show()
-    return last
     try:
       x,y,z = xyz[0]
       img.drawCircle((int(uv[0,0]),int(uv[0,1])),10,color=Color.WHITE)
       img.drawText(str((round(x,2),round(y,2),round(z,2))), int(uv[0,0])+10, int(uv[0,1])+10)
-      last[0] = last[1]
-      last[1] = (uv[0,0],uv[0,1])
+      img.show()
+      return (round(x,2), round(y,2), round(z,2),0)
     except:
-      img.drawCircle(last[1], 10, color=Color.WHITE)
+      pass
 
 
     print 10
@@ -136,7 +131,7 @@ def diffdiff2(b, filt=None, last=[(0,0),(0,0)]):
     #blobs.show()
   else:
     loc.show()
-  return last
+  return None
 
 def diffdiff(b):
   d = ignoreErrVec(freenect.sync_get_depth()[0])

@@ -15,7 +15,7 @@ data HoverIntent = HoverIntent { hoverPosition :: Position }
 -- Assuming unit mass...
 instance Intent HoverIntent where
   getAccel intent v pos = 
-    ((vectorUnit (getVec dir)) |*| s) - v
+    getVec dir--((vectorUnit (getVec dir)) |*| s) - v
     where
       dir = q - pos
       dist = vectorSize (getVec dir)

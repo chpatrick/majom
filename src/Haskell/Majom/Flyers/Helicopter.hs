@@ -79,15 +79,16 @@ instance Flyable Helicopter where
   setFlyMany h vs = dropValM $ setMany h vs
   fly h = return ()
   observe h = do
-    (x,y,z,_) <- get
+    (x,y,z,v) <- get
     let optVar = getCurrentOptions h
     pwr <- fmap (Map.! Throttle) $ atomically $ readTVar optVar
+    case v of
+      0 -> setActive h True
+      1 -> setActive h False
     let pos = vector [x,y,z]
-    --putStrLn $ show pos
-    return (pwr, Position pos undefined)
+    return (pwr, Position pos 0.0)--TODO
   isActive h = atomically $ readTVar (getActive h)
   setActive h b = do 
-    putStrLn "Foo!"
     atomically $ writeTVar (getActive h) b
 
 -- | Drops monadic values we don't care about.

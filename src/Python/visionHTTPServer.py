@@ -11,7 +11,7 @@ class VisionServer(SimpleHTTPServer.SimpleHTTPRequestHandler):
     pos = diffdiff2(base, filt)
     if pos:
       (x,y,z,v) = pos
-      pos = str((x,-y,z,v))
+      pos = str((x,y,z,v))
     else:
       pos = "(0.0,0.1,0.0,1)"
 
@@ -28,16 +28,16 @@ filt = adapt(base,2000)
 
 print "Starting server..."
 
-while True:
-  pos = diffdiff2(base, filt)
-  if pos:
-    (x,y,z,v) = pos
-    print "{},{},{},{}".format(x,-y,z,v)
+#while True:
+#  pos = diffdiff2(base, filt)
+#  if pos:
+#    (x,y,z,v) = pos
+#    print "{},{},{},{}".format(x,-y,z,v)
 
 try:
-  #server.serve_forever()
+  server.serve_forever()
   pass
 except:
   print "Bye :("
-  #server.socket.close()
-  #server.shutdown()
+  server.socket.close()
+  server.shutdown()
