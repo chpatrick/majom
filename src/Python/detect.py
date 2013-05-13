@@ -27,6 +27,23 @@ def ignoreErr(x):
     return 0
   return x
 
+def setup():
+  b = freenect.sync_get_depth()[0].copy()
+  f = adapt(b, 2000)
+  last = diffdiff2(b,f)
+  while True:
+    try:
+      last = diffdiff2(b,f,last)
+    except:
+      return (b,f)
+
+def loop(b, f):
+  last = diffdiff2(b,f)
+  while True:
+    try:
+      last = diffdiff2(b,f,last)
+    except:
+      break
 ignoreErrVec = np.vectorize(ignoreErr)
 
 # Want to assemble a 'tolerance' matrix for different areas to get a quiet image
@@ -55,38 +72,66 @@ def adapt(b, limit=1000):
   return filt
 
 def diffdiff2(b, filt=None, last=[(0,0),(0,0)]):
+  print 0
   d = freenect.sync_get_depth()[0]
+  print 0.1
   img = cam.getImage()
-  m = (b == 2047) & (d == 2047)
+  print 0.2
+  m = (b == 2047) | (d == 2047)
   m1 = np.ma.MaskedArray(b, mask=m, fill_value=0)
   m2 = np.ma.MaskedArray(d, mask=m, fill_value=0)
   
+  print 1
   r = cv2.absdiff(m1.filled(), m2.filled())
   if filt != None:
     m3 = np.ma.MaskedArray(r, mask=(r < filt), fill_value=0)
   else:
     m3 = np.ma.MaskedArray(r, mask=(r < 50), fill_value=0)
   
+  print 2
   loc = Image(m3.filled() * (255/2047.0)).rotate90().erode().binarize(0).invert()
-  blobs = loc.findBlobs()
+  print 3
+  blobs = loc.findBlobs(appx_level=10)
+
+  #if blobs:
+  #  blobs.show()
+  #return
+  print 4
   if blobs:
     cents = map(lambda x: (x.centroid(), x.area()),blobs)
     area = sum(map(Blob.area, blobs))
     cx,cy = sum(map(lambda ((x,y),w): (int(x*(w/area)),int(y*(w/area))),cents),0)
+    print 6
     loc.drawCircle((cx,cy), 10, color=Color.GREEN)
-
+    print 7
     mb = max(blobs,key=Blob.area).centroid()
+    print 8
     depth = array([[d[mb[1],mb[0]]]])
+    if depth == 2047:
+      print " oh noesss!"
+      for x in range(3):
+        for y in range(3):
+          depth = array([[d[mb[1]-1+y,mb[0]-1+x]]])
+          if depth != 2047:
+            break;
+        if depth != 2047:
+          break;
     xyz,uv = depth2xyzuv(depth, cx, cy)
+    print 9
+    loc.drawCircle((mb[0],mb[1]),10,color=Color.WHITE)
+    loc.show()
+    return last
     try:
+      x,y,z = xyz[0]
       img.drawCircle((int(uv[0,0]),int(uv[0,1])),10,color=Color.WHITE)
+      img.drawText(str((round(x,2),round(y,2),round(z,2))), int(uv[0,0])+10, int(uv[0,1])+10)
       last[0] = last[1]
       last[1] = (uv[0,0],uv[0,1])
     except:
-      (x1,y1) = last[0]
-      (x2,y2) = last[1]
-      img.drawCircle((2*x2 - x1,2*y2 - y1), 10, color=Color.WHITE)
+      img.drawCircle(last[1], 10, color=Color.WHITE)
 
+
+    print 10
     img.show()
     #blobs.show()
   else:
