@@ -7,7 +7,7 @@ module Majom.Analysis.Model (
   -- * Functions
   ) where
 
-import Majom.Common(Acceleration, Power)
+import Majom.Common(Vector, Power, Acceleration)
 
 -- Input is a time and position
 -- Output is an approximate mapping between power and acceleration
@@ -18,6 +18,5 @@ import Majom.Common(Acceleration, Power)
 -- | Default model functions.
 class Model a where
   getMap :: a -> (Acceleration -> Power)
-  updateModel :: a -> (Power, Acceleration) -> a
+  updateModel :: a -> (Power, Vector) -> a
   createNewModel :: a
-  samples :: a -> [(Power, Acceleration)]

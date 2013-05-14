@@ -8,13 +8,14 @@ module Majom.Control.Monkey (
   ) where
 
 import Majom.Analysis.Model
+import Majom.Analysis.AdLib
 import Majom.Analysis.Kalman
 import Majom.Analysis.LeastSquares
 import Majom.Common
 import Majom.Flyers.Flyable
 import Majom.Control.GUI
 import Majom.Control.Monkey.Intent
-import Majom.Control.Monkey.HoverIntent
+import Majom.Control.Monkey.SimpleHoverIntent
 import Majom.Lang.LoopWhile
 import Majom.Flyers.Special.DuoCopter
 
@@ -35,10 +36,10 @@ execMonkeyBrainT :: MonkeyBrainT -> Brain -> IO Brain
 execMonkeyBrainT mk k = execStateT mk k
 
 -- | Brain that holds all the relevant data for the monkey brain.
-data Brain = Brain { brainVModel :: Kalman,
-                     brainHModel :: Kalman,
-                     brainIntent :: HoverIntent,
-                     brainLast :: (Position, Velocity, FlyState) }
+data Brain = Brain { brainVModel :: AdLib,
+                     brainHModel :: AdLib,
+                     brainIntent :: SimpleHoverIntent,
+                     brainLast :: (Position, Velocity, Power) }
 
 -- | The current state of the flyer - either flying, or landed.
 data FlyState = Flying | Landed deriving (Show, Eq)
@@ -54,7 +55,7 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  let intent = hoverAt $ Position (vector [0,0.15,0]) undefined
+  let intent = simpleHoverAt $ Position (vector [0,5,0]) undefined
 
   milliSleep waitTime
   (_, pos) <- observe flyer
@@ -73,7 +74,7 @@ runMonkey' flyer = do
   milliSleep waitTime
   (_, p') <- observe flyer
   milliSleep waitTime
-  let initBrain = Brain createNewModel createNewModel intent (p', (getVec (p' - p)) |/| wt, undefined)
+  let initBrain = Brain createNewModel createNewModel intent (p', (getVec (p' - p)) |/| wt, 0)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- | Lets the human fly the flyer with the monkey, controlling a specific
@@ -106,7 +107,7 @@ monkeyThink intent modelV modelH pwr (pos, pos') vel = do
   where
     vel' = (getVec (pos' - pos)) |/| wt
     accel = (vel' - vel) |/| wt
-    modelV' = updateModel modelV (pwr, accel)
+    modelV' = updateModel modelV (pwr, vel')
     modelH' = undefined
     acc = getAccel intent vel' pos'
 
@@ -117,27 +118,60 @@ monkeyDo flyer = do
   active <- lift $ isActive flyer
   if active 
     then do
-      (Brain modelV modelH intent (pos, vel, _)) <- get
-      obs@(pwr, pos') <- lift $ observe flyer
-      let (modelV', _, vel', acc) = monkeyThink intent modelV modelH pwr (pos, pos') vel
+      (Brain modelV modelH intent (pos, vel, pwr)) <- get
+      obs@(pwr', pos') <- lift $ observe flyer
+      let (_, _, vel', acc) = monkeyThink intent modelV modelH pwr (pos, pos') vel
+      let modelV' = adlib modelV pwr acc vel
       -- For debugging
       --lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
       lift $ putStrLn $ prettyPos pos'
-      put $ Brain modelV' modelH intent (pos', vel', undefined)
+      put $ Brain modelV' modelH intent (pos', vel', pwr')
       --lift $ setFly flyer Yaw $ getYaw (getHeading intent pos') pos' 
       lift $ setFly flyer Throttle $ (getMap modelV') acc
+      lift $ putStrLn $ show $ (pwr, sigFigs 2 $ vectorY vel')
+      lift $ putStrLn $ show $ getMap modelV (vector [0, 0, 0])
     else do
+      monkeyFindZero flyer
+      {-
       iters <- lift $ fmap length $ 
         takeWhileIO (not . id) $
           repeat (milliSleep waitTime >> observe flyer >> isActive flyer)
       (Brain modelV modelH intent (pos, vel, _)) <- get
       obs@(pwr, pos') <- lift $ observe flyer
       let vel' = (getVec (pos' - pos)) |/| (wt * (fromIntegral iters))
-      put $ Brain modelV modelH intent (pos', vel', undefined)
+      put $ Brain modelV modelH intent (pos', vel', pwr)
       lift $ putStrLn ("Was not active for " ++ (show iters) ++ " cycles.")
+      -}
 
   lift $ milliSleep waitTime
 
+monkeyFindZero :: (Flyable a) => a -> MonkeyBrainT
+monkeyFindZero flyer = do
+  lift $ putStrLn "Finding zero..."
+  let iters = 3
+  b <- get
+  p <- lift $ newIORef (((\(x,_,_) -> x) $ brainLast b), 0)
+  let guess = getMap (brainVModel b) (vector [0, 0, 0])
+  lift $ setFly flyer Throttle guess
+  lift $ loop $ do 
+            (pos,_) <- lift $ readIORef p
+            lift $ milliSleep (iters*waitTime)
+            (pwr', pos') <- lift $ observe flyer
+            let v = (getVec (pos' - pos)) |/| ((fromIntegral iters) * wt)
+            lift $ putStrLn $ show (pwr', sigFigs 2 (vectorY v))
+            lift $ putStrLn $ prettyPos pos'
+            if vectorSize v > 0.1
+              then 
+                if getDirection v == 1
+                  then lift $ setFly flyer Throttle (pwr' - 1)
+                  else lift $ setFly flyer Throttle (pwr' + 1)
+              else
+                return ()
+            lift $ writeIORef p (pos', pwr')
+            while (vectorSize v > 0.1)
+  (_,zeroPwr) <- lift $ readIORef p
+  lift $ putStrLn ("Zero power was at " ++ (show zeroPwr))
+  lift $ setActive flyer True
 
 takeWhileIO :: (a -> Bool) -> [IO a] -> IO [a]
 takeWhileIO _ [] = return []

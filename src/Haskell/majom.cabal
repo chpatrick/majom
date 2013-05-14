@@ -15,6 +15,7 @@ extra-source-files:
 
 Library
   Exposed-modules:
+    Majom.Analysis.AdLib,
     Majom.Analysis.Kalman,
     Majom.Analysis.LeastSquares,
     Majom.Analysis.Model,
@@ -23,6 +24,7 @@ Library
     Majom.Control.Monkey,
     Majom.Control.Monkey.Intent,
     Majom.Control.Monkey.HoverIntent,
+    Majom.Control.Monkey.SimpleHoverIntent,
 --    Majom.Control.MonocleMonkey,
     Majom.Control.Watcher,
     Majom.Flyers.Flyable,

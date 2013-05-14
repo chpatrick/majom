@@ -24,7 +24,7 @@ print "Getting base image..."
 cam = Kinect()
 #base = cam.getImage()
 base = freenect.sync_get_depth()[0].copy()
-filt = adapt(base,2000)
+filt = adapt(base,4000)
 
 print "Starting server..."
 

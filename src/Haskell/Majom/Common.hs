@@ -30,7 +30,11 @@ instance (Num a) => Num (V.Vector a) where
 
 -- | Unit a vector
 vectorUnit :: Vector -> Vector
-vectorUnit v = v |/| (vectorSize v)
+vectorUnit v
+  | size > 0  = v |/| size
+  | otherwise = error "Tried taking unit vector of a size-zero vector!"
+  where
+    size = vectorSize v
 
 -- | Size a vector
 vectorSize :: Vector -> Double
@@ -55,6 +59,14 @@ vectorY = (V.! 1)
 -- | Gets the Z value of a vector.
 vectorZ :: Vector -> Double
 vectorZ = (V.! 2)
+
+getDirection :: Vector -> Int
+getDirection v
+  | y == 0  = 0
+  | y > 0   = 1
+  | y < 1   = -1
+  where
+    y = vectorY v
 
 prettyVec :: Vector -> String
 prettyVec v = 

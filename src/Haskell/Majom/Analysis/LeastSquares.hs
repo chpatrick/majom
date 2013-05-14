@@ -28,7 +28,6 @@ instance Model LeastSquares where
   updateModel ls@(LeastSquares m vs) (p,v) = ls
     -- | sane (p,v) $ Map.toList vs = updateMap $ LeastSquares m (Map.insert p v vs)
     -- | otherwise     = ls
-  samples = Map.assocs . lsSamples
 
 -- | TODO Perform sanity checks - Just gravity check for now
 sane :: (Power, Acceleration) -> [(Power, Acceleration)] -> Bool

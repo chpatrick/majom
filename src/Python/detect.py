@@ -29,7 +29,7 @@ def ignoreErr(x):
 
 def setup():
   b = freenect.sync_get_depth()[0].copy()
-  f = adapt(b, 2000)
+  f = adapt(b, 4000)
   while True:
     try:
       out = diffdiff2(b,f)
