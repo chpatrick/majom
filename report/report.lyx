@@ -2254,7 +2254,239 @@ The last consideration was the SimpleCV library, which is written in Python.
  amount of 'simple' methods and data structures that hide the more complex
  data structures below.
  Additionally, it is well supported with many tutorials and examples.
+ This seemed to fulfill the most requirements without many downsides, so
+ development began using that.
+\end_layout
+
+\begin_layout Subsection
+Basic Software and Setup
+\end_layout
+
+\begin_layout Itemize
+Freenect
+\end_layout
+
+\begin_layout Itemize
+SimpleCV Kinect
+\end_layout
+
+\begin_layout Itemize
+Calibration
+\end_layout
+
+\begin_layout Subsection
+RBG Vision
+\end_layout
+
+\begin_layout Standard
+The first method that was tested for performing the position detection was
+ based around using the RGB camera for initial detection, and using the
+ depth camera to 'augment' the detection for accuracy and depth measurements.
+ The founding for this idea was that the RGB camera was less noisy than
+ the depth camera, which was prone to casting depth 'shadows', areas where
+ no depth information could be recovered.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename shadow_example.jpg
+	width 10cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Figure showing the appearance of 'depth-shadows', visualised as white areas
+ in the image.
+ The Kinect device is incapable of obtaining depth information these areas.
+ These shadows are a by-product of the depth-detection method, and unfortunately
+ cannot be avoided using the Kinect 'as-is'.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Groundwork
+\end_layout
+
+\begin_layout Standard
+Following the assumptions stated in 5.3.1, an idea to initially locate the
+ helicopter was to take one image of the static scene without the helicopter
+ present, and then to subtract this base image from the new images that
+ were being taken.
+ As the helicopter was assumed to be the only moving object in the scene,
+ this should in theory leave just the shape of the helicopter, which could
+ be refined using standard imaging techniques.
+ Having successfully segmented the helicopter from the rest of the scene,
+ it was now necessary to work out the corresponding location of the helicopter
+ in the depth map.
+ This, however, was where the problems began.
+ Without the depth information of the helicopter, it was impossible (or
+ at least, very difficult) to reconstruct the position of the helicopter
+ into three-dimensions - and without this 3D projection, it was not possible
+ to project it again into the depth camera simply by using the RGB camera
+ alone.
  
+\begin_inset Newline newline
+\end_inset
+
+Several methods were tried to remedy this:
+\end_layout
+
+\begin_layout Itemize
+Best-guess search TODO
+\end_layout
+
+\begin_layout Itemize
+Estimating the camera parameters TODO
+\end_layout
+
+\begin_layout Standard
+It seemed that short of using the depth camera purely to locate the helicopter,
+ it would be very difficult to recreate the helicopter in three dimensions
+ using the RGB camera.
+ So that is exactly what we tried to do next (Section 5.3.4).
+\end_layout
+
+\begin_layout Subsubsection
+Prototyping results
+\end_layout
+
+\begin_layout Itemize
+Stable lighting problems
+\end_layout
+
+\begin_layout Itemize
+Shadows
+\end_layout
+
+\begin_layout Itemize
+Similar colours
+\end_layout
+
+\begin_layout Subsection
+D Vision
+\end_layout
+
+\begin_layout Standard
+Having tested out the RGB camera methods, the next idea was to try to recreate
+ the best parts of the RGB detection using just the depth camera, whilst
+ trying to minimise the downsides of the depth camera itself (as mentioned
+ earlier, one of the main problems was excessive noise in depth images caused
+ by 'depth-shadowing').
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Groundwork
+\end_layout
+
+\begin_layout Standard
+There were a few differences between the depth camera and the RGB camera
+ that needed to be considered before development could be started on the
+ depth detection.
+\begin_inset Formula 
+\[
+\begin{array}{ccc}
+ & \mbox{RGB} & \mbox{D}\\
+Noise & \mbox{Not noisy} & \mbox{Noisy}\\
+Dimensions & (0-255)^{3} & (0-2047)\\
+Errors & \mbox{No} & \mbox{Yes}\\
+Spectrum & \mbox{Visible light} & \mbox{IR light}
+\end{array}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Noise
+\end_layout
+
+\begin_layout Standard
+One of the main benefits of the RGB images was that they were not overly
+ prone to noise - as long as the objects in the scene remained stationary,
+ two consecutive images would be essentially identical.
+ The depth images, by comparison, were very prone to noise as the depth-shadows
+ moved in the scene.
+ This meant that an otherwise stationary scene would still cause noise in
+ a naive subtraction detection algorithm.
+\end_layout
+
+\begin_layout Paragraph
+Dimensions
+\end_layout
+
+\begin_layout Standard
+The RGB camera operates with 3 dimensions of values (as the name suggests)
+ - 0-255 for each of Red, Green and Blue.
+ This means that there is a total of 16581375 different values for each
+ pixel.
+ The depth camera, by contrast, only takes values from 0-2047, with 2047
+ being the error value.
+ Whilst this may seem that the detail provided is significantly less, in
+ practise this does not affect the ability of the camera to detect the helicopte
+r to any noticeable degree.
+\end_layout
+
+\begin_layout Paragraph
+Errors
+\end_layout
+
+\begin_layout Standard
+Every pixel on an RGB image was valid - the closest that one could get to
+ an error value on an RGB image was a 'too light' or 'too dark' area, which
+ would manifest themselves as the values 0 or 255 respectively.
+ For the depth images, this was also true - too close values would appear
+ as 0, and too far values would appear as 2046, however in addition areas
+ that could not be properly reconstructed would appear as 2047, the error
+ value.
+\end_layout
+
+\begin_layout Paragraph
+Spectrum
+\end_layout
+
+\begin_layout Standard
+This is a fairly obvious difference - the RGB camera operates purely over
+ visible light, whereas the depth camera operated using IR light.
+ This was the key factor that set the depth camera apart from the RGB camera
+ - it meant that it was not sensitive to changing lighting conditions, or
+ to shadows cast by objects or the helicopter.
+\end_layout
+
+\begin_layout Subsubsection
+Prototyping results
+\end_layout
+
+\begin_layout Subsection
+Orientation Detection
+\end_layout
+
+\begin_layout Subsubsection
+Groundwork
 \end_layout
 
 \begin_layout Itemize
