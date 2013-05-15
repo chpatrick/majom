@@ -17,6 +17,7 @@
 from SimpleCV import *
 import cv2
 import time
+import orient
 from calibkinect import *
 from numpy import *
 
@@ -29,7 +30,7 @@ def ignoreErr(x):
 
 def setup():
   b = freenect.sync_get_depth()[0].copy()
-  f = adapt(b, 4000)
+  f = adapt(b, 10000)
   while True:
     try:
       out = diffdiff2(b,f)
@@ -40,14 +41,15 @@ def loop(b, f):
   while True:
     try:
       diffdiff2(b,f)
-    except:
-      break
+    except e:
+      print e
+
 ignoreErrVec = np.vectorize(ignoreErr)
 
 # Want to assemble a 'tolerance' matrix for different areas to get a quiet image
 def adapt(b, limit=1000):
   filt = np.zeros((len(b),len(b[0])))
-  r = np.array([6000])
+  r = np.array([limit+1])
   count = 0
   while r.sum() > limit or count < 10:
     d = freenect.sync_get_depth()[0]
@@ -84,7 +86,7 @@ def diffdiff2(b, filt=None):
   if filt != None:
     m3 = np.ma.MaskedArray(r, mask=(r < filt), fill_value=0)
   else:
-    m3 = np.ma.MaskedArray(r, mask=(r < 50), fill_value=0)
+    m3 = np.ma.MaskedArray(r, mask=(r < 0), fill_value=0)
   
   print 2
   loc = Image(m3.filled() * (255/2047.0)).rotate90().erode().binarize(0).invert()
@@ -120,7 +122,10 @@ def diffdiff2(b, filt=None):
       x,y,z = xyz[0]
       img.drawCircle((int(uv[0,0]),int(uv[0,1])),10,color=Color.WHITE)
       img.drawText(str((round(x,2),round(y,2),round(z,2))), int(uv[0,0])+10, int(uv[0,1])+10)
-      img.show()
+      heli = orient.cut(img, (int(uv[0,0]),int(uv[0,1])))
+      heliD = orient.cut(loc, (cx,cy))
+      heli.sideBySide(heliD).show()
+      #img.sideBySide(heli).show()
       return (round(x,2), round(y,2), round(z,2),0)
     except:
       pass
