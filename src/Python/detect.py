@@ -37,10 +37,10 @@ def setup():
     except:
       return (b,f)
 
-def loop(b, f):
+def loop(b, f, b2=None):
   while True:
     try:
-      diffdiff2(b,f)
+      diffdiff2(b,f, b2)
     except e:
       print e
 
@@ -71,7 +71,7 @@ def adapt(b, limit=1000):
       count = 0
   return filt
 
-def diffdiff2(b, filt=None):
+def diffdiff2(b, filt=None, imgBase=None):
   print 0
   d = freenect.sync_get_depth()[0]
   print 0.1
@@ -124,10 +124,17 @@ def diffdiff2(b, filt=None):
       img.drawText(str((round(x,2),round(y,2),round(z,2))), int(uv[0,0])+10, int(uv[0,1])+10)
       heli = orient.cut(img, (int(uv[0,0]),int(uv[0,1])))
       heliD = orient.cut(loc, (cx,cy))
-      heli.sideBySide(heliD).show()
+      b = orient.cut(imgBase, (int(uv[0,0]),int(uv[0,1])))
+
+      d = diffDetect(b,heli)
+      extHeli = d.stretch(30,250).binarize(0).invert()
+
+      heli.sideBySide(extHeli).show()
+      return (heli,extHeli)
       #img.sideBySide(heli).show()
       return (round(x,2), round(y,2), round(z,2),0)
-    except:
+    except e:
+      print e
       pass
 
 
