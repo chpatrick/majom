@@ -68,11 +68,20 @@ def cutBlades2(img):
   i1 = findBlade2(xs)
   i2 = findBlade2(xs[i1:])
   return img.crop(0,i1+i2,w,h)
-def graph(xs):
+
+def graph(xs, m1=None, m2=None):
   height = max(xs)
   g = Image((len(xs),400))
   for x in range(len(xs)):
     g.drawLine((x,400),(x,400 - (xs[x]*400/height)), color=Color.WHITE)
+
+  if m1:
+    g.drawText("m1",m1,330)
+    g.drawLine((m1,350),(m1,390), color=Color.RED, thickness=3)
+  if m2:
+    g.drawLine((m2[0],370),(m2[1],370), color=Color.GREEN, thickness=2)
+    g.drawText("m2L",m2[0],350)
+    g.drawText("m2R",m2[1],350)
   return g
 
 def iterateImages(foo):
@@ -81,3 +90,23 @@ def iterateImages(foo):
     foo(img)
     print "Applying to image h_{}.jpg...".format(str(i).zfill(3))
     raw_input()
+
+def getMean(xs):
+  m = sum(xs)/2
+  s = 0
+  for i in xrange(len(xs)):
+    s += xs[i]
+    if s > m:
+      return i
+
+def getQuartiles(xs):
+  m1 = sum(xs)/6
+  m2 = 5*sum(xs)/6
+  j = 0
+  s = 0
+  for i in xrange(len(xs)):
+    s += xs[i]
+    if s > m1 and j == 0:
+      j = i
+    if s > m2:
+      return (j,i)
