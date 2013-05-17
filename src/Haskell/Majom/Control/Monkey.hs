@@ -15,6 +15,7 @@ import Majom.Common
 import Majom.Flyers.Flyable
 import Majom.Control.GUI
 import Majom.Control.Monkey.Intent
+import Majom.Control.Monkey.HoverIntent
 import Majom.Control.Monkey.SimpleHoverIntent
 import Majom.Lang.LoopWhile
 import Majom.Flyers.Special.DuoCopter
@@ -36,9 +37,9 @@ execMonkeyBrainT :: MonkeyBrainT -> Brain -> IO Brain
 execMonkeyBrainT mk k = execStateT mk k
 
 -- | Brain that holds all the relevant data for the monkey brain.
-data Brain = Brain { brainVModel :: AdLib,
-                     brainHModel :: AdLib,
-                     brainIntent :: SimpleHoverIntent,
+data Brain = Brain { brainVModel :: Kalman,
+                     brainHModel :: Kalman,
+                     brainIntent :: HoverIntent,
                      brainLast :: (Position, Velocity, Power) }
 
 -- | The current state of the flyer - either flying, or landed.
@@ -55,7 +56,7 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  let intent = simpleHoverAt $ Position (vector [0,5,0]) undefined
+  let intent = hoverAt $ Position (vector [0,5,0]) undefined
 
   milliSleep waitTime
   (_, pos) <- observe flyer
@@ -74,7 +75,7 @@ runMonkey' flyer = do
   milliSleep waitTime
   (_, p') <- observe flyer
   milliSleep waitTime
-  let initBrain = Brain createNewModel createNewModel intent (p', (getVec (p' - p)) |/| wt, 0)
+  let initBrain = Brain createNewModel createNewModel intent (p', (getVec (p' - p)) |/| wt, 50)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- | Lets the human fly the flyer with the monkey, controlling a specific
@@ -107,7 +108,7 @@ monkeyThink intent modelV modelH pwr (pos, pos') vel = do
   where
     vel' = (getVec (pos' - pos)) |/| wt
     accel = (vel' - vel) |/| wt
-    modelV' = updateModel modelV (pwr, vel')
+    modelV' = updateModel modelV (pwr, accel)
     modelH' = undefined
     acc = getAccel intent vel' pos'
 
@@ -120,8 +121,8 @@ monkeyDo flyer = do
     then do
       (Brain modelV modelH intent (pos, vel, pwr)) <- get
       obs@(pwr', pos') <- lift $ observe flyer
-      let (_, _, vel', acc) = monkeyThink intent modelV modelH pwr (pos, pos') vel
-      let modelV' = adlib modelV pwr acc vel
+      let (modelV', _, vel', acc) = monkeyThink intent modelV modelH pwr (pos, pos') vel
+      --let modelV' = adlib modelV pwr acc vel
       -- For debugging
       --lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
       lift $ putStrLn $ prettyPos pos'
