@@ -11,6 +11,7 @@ module Majom.Flyers.VirtualHelicopter (
     ) where
 
 import Majom.Common
+import Majom.Control.PID
 import Majom.Flyers.Flyable
 import Majom.Simulation.SimpleSim
 
@@ -24,11 +25,17 @@ import System.Random
 
 -- | A data type containing base information about a helicopter, such as 
 -- the current options it holds and its current position
-data VirtualHelicopter = VirtualHelicopter { getOptions :: TVar [(Option, Int)], getPosition :: TVar Position, getCurrentOptions :: TVar OptionMap, getActive :: TVar Bool}
+data VirtualHelicopter = 
+  VirtualHelicopter 
+  { getOptions :: TVar [(Option, Int)], 
+    getPosition :: TVar Position, 
+    getCurrentOptions :: TVar OptionMap, 
+    getActive :: TVar Bool,
+    getPID :: TVar PID}
 
 -- | Spawns a virtual helicopter at (0,0)
 spawnVirtualHelicopter :: IO VirtualHelicopter
-spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (Position (vector [0,0,0]) 0)) <*> (newTVar $ Map.fromList flyerInit) <*> (newTVar False)
+spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (Position (vector [0,0,0]) 0)) <*> (newTVar $ Map.fromList flyerInit) <*> (newTVar False) <*> (newTVar newPID)
 
 clamp :: Int -> Int
 clamp i
@@ -55,7 +62,7 @@ instance Flyable VirtualHelicopter where
     return (pwr, (pos <+> (vector rand)))
     where
       genErr :: IO Double
-      genErr = getStdRandom (randomR (-0.0001,0.0001))
+      genErr = getStdRandom (randomR (-0.01,0.01))
       sequence3 :: Monad m => (m a, m b, m c) -> m (a, b, c)
       sequence3 (m1, m2, m3) = do
         x1 <- m1;
@@ -69,6 +76,8 @@ instance Flyable VirtualHelicopter where
           0
   isActive h = atomically $ readTVar (getActive h)
   setActive h b = atomically $ writeTVar (getActive h) b
+  getController h = atomically $ readTVar (getPID h)
+  setController h p = atomically $ writeTVar (getPID h) p 
 
 -- | Runs the flying simulation
 run h = do 

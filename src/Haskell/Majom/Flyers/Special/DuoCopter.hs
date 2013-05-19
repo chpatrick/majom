@@ -30,6 +30,8 @@ instance Flyable DuoCopter where
   observe (DuoCopter _ h) = observe h
   isActive (DuoCopter _ h) = isActive h
   setActive (DuoCopter _ h) = setActive h
+  getController (DuoCopter _ h) = getController h
+  setController (DuoCopter _ h) = setController h
 
 -- | Starts a duocopter instance, returning the corresponding 'mock copters'
 -- that will be given to the two controls.

@@ -11,6 +11,7 @@ module Majom.Flyers.Flyable (
   ) where
 
 import Majom.Common
+import Majom.Control.PID
 
 -- | Options for different commands, relevant to some flying thing.
 data Option = Yaw | Pitch | Throttle | Correction
@@ -27,3 +28,5 @@ class Flyable a where
   observe :: a -> IO (Power, Position)
   isActive :: a -> IO Bool
   setActive :: a -> Bool -> IO ()
+  getController :: a -> IO PID
+  setController :: a -> PID -> IO ()

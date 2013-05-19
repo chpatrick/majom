@@ -19,6 +19,7 @@ import Network
 import System.Hardware.Serialport
 
 import Majom.Common
+import Majom.Control.PID
 import Majom.Flyers.Flyable
 
 import qualified Network.HTTP as HTTP
@@ -41,7 +42,7 @@ get = getPosition `fmap` getResponse
 
 -- | A real helicopter!
 data Helicopter = Helicopter { getCurrentOptions :: TVar OptionMap,
-  getActive :: TVar Bool}
+  getActive :: TVar Bool, getPID :: TVar PID}
 
 -- | Starts an instance of the helicopter communication protocol.
 startHelicopter :: IO Helicopter
@@ -50,7 +51,7 @@ startHelicopter = do
   s <- openSerial port defaultSerialSettings { 
         flowControl = Software }
   forkIO $ forever $ heliThread s var
-  atomically $ Helicopter var <$> (newTVar False)
+  atomically $ Helicopter var <$> (newTVar False) <*> (newTVar (newPID))
 
 -- | Message passing time in milliseconds
 stepTime :: Int
@@ -88,8 +89,9 @@ instance Flyable Helicopter where
     let pos = vector [x,y,z]
     return (pwr, Position pos 0.0)--TODO
   isActive h = atomically $ readTVar (getActive h)
-  setActive h b = do 
-    atomically $ writeTVar (getActive h) b
+  setActive h b = atomically $ writeTVar (getActive h) b
+  getController h = atomically $ readTVar (getPID h)
+  setController h p = atomically $ writeTVar (getPID h) p
 
 -- | Drops monadic values we don't care about.
 dropValM :: (Monad m) => m a -> m ()

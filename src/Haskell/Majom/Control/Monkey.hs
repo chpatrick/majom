@@ -17,6 +17,7 @@ import Majom.Control.GUI
 import Majom.Control.Monkey.Intent
 import Majom.Control.Monkey.HoverIntent
 import Majom.Control.Monkey.SimpleHoverIntent
+import Majom.Control.PID
 import Majom.Lang.LoopWhile
 import Majom.Flyers.Special.DuoCopter
 
@@ -40,7 +41,7 @@ execMonkeyBrainT mk k = execStateT mk k
 data Brain = Brain { brainVModel :: Kalman,
                      brainHModel :: Kalman,
                      brainIntent :: HoverIntent,
-                     brainLast :: (Position, Velocity, Power) }
+                     brainLast :: (Position, Power) }
 
 -- | The current state of the flyer - either flying, or landed.
 data FlyState = Flying | Landed deriving (Show, Eq)
@@ -75,7 +76,7 @@ runMonkey' flyer = do
   milliSleep waitTime
   (_, p') <- observe flyer
   milliSleep waitTime
-  let initBrain = Brain createNewModel createNewModel intent (p', (getVec (p' - p)) |/| wt, 50)
+  let initBrain = Brain createNewModel createNewModel intent (p', 50)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- | Lets the human fly the flyer with the monkey, controlling a specific
@@ -119,18 +120,25 @@ monkeyDo flyer = do
   active <- lift $ isActive flyer
   if active 
     then do
-      (Brain modelV modelH intent (pos, vel, pwr)) <- get
+      (Brain modelV modelH intent (pos, pwr)) <- get
+      pid <- lift $ getController flyer
       obs@(pwr', pos') <- lift $ observe flyer
-      let (modelV', _, vel', acc) = monkeyThink intent modelV modelH pwr (pos, pos') vel
+      --let (modelV', _, vel', acc) = monkeyThink intent modelV modelH pwr (pos, pos') vel
       --let modelV' = adlib modelV pwr acc vel
       -- For debugging
       --lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
       lift $ putStrLn $ prettyPos pos'
-      put $ Brain modelV' modelH intent (pos', vel', pwr')
+      let err = 5.0 - (vectorY $ getVec pos')
+      let (pid', m) = getMV pid err
+
+      --put $ Brain modelV' modelH intent (pos', vel', pwr')
+      put $ Brain modelV modelH intent (pos, pwr)
+      lift $ setFly flyer Throttle $ floor m
+      lift $ setController flyer pid'
       --lift $ setFly flyer Yaw $ getYaw (getHeading intent pos') pos' 
-      lift $ setFly flyer Throttle $ (getMap modelV') acc
-      lift $ putStrLn $ show $ (pwr, sigFigs 2 $ vectorY vel')
-      lift $ putStrLn $ show $ getMap modelV (vector [0, 0, 0])
+      --lift $ setFly flyer Throttle $ (getMap modelV') acc
+      --lift $ putStrLn $ show $ (pwr, sigFigs 2 $ vectorY vel')
+      --lift $ putStrLn $ show $ getMap modelV (vector [0, 0, 0])
     else do
       monkeyFindZero flyer
       {-
@@ -151,7 +159,7 @@ monkeyFindZero flyer = do
   lift $ putStrLn "Finding zero..."
   let iters = 3
   b <- get
-  p <- lift $ newIORef (((\(x,_,_) -> x) $ brainLast b), 0)
+  p <- lift $ newIORef (((\(x,_) -> x) $ brainLast b), 0)
   let guess = getMap (brainVModel b) (vector [0, 0, 0])
   lift $ setFly flyer Throttle guess
   lift $ loop $ do 

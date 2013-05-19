@@ -10,9 +10,11 @@ module Majom.Control.GUI (
 
 import Majom.Common
 import Majom.Flyers.Flyable
+import Majom.Control.PID
 
 import Control.Monad.IO.Class
 import Control.Concurrent
+import Control.Concurrent.STM
 import Data.IORef
 import qualified Data.Map as Map
 import qualified Graphics.UI.Gtk as Gtk
@@ -35,10 +37,73 @@ guiSetup flyer = do
   vals <- fmap (Map.fromList . zip [Yaw, Pitch, Throttle, Correction])
         $ mapM newIORef [63, 63, 0, 63]
 
+  vb <- Gtk.vBoxNew False 0
+  Gtk.containerAdd window vb
+   
+  hb1 <- Gtk.hBoxNew False 0
+  Gtk.boxPackStart vb hb1 Gtk.PackNatural 0
+  hb2 <- Gtk.hBoxNew False 0
+  Gtk.boxPackStart vb hb2 Gtk.PackNatural 0
+            
+  lab1 <- Gtk.labelNew (Just "Enter KP")
+  Gtk.boxPackStart hb1 lab1 Gtk.PackNatural 0
+  nrfield1 <- Gtk.entryNew
+  Gtk.entrySetText nrfield1 "0"
+  Gtk.boxPackStart hb1 nrfield1 Gtk.PackNatural 5
+
+  lab1 <- Gtk.labelNew (Just "Enter KI")
+  Gtk.boxPackStart hb1 lab1 Gtk.PackNatural 0
+  nrfield2 <- Gtk.entryNew
+  Gtk.entrySetText nrfield2 "0"
+  Gtk.boxPackStart hb1 nrfield2 Gtk.PackNatural 5
+
+  lab1 <- Gtk.labelNew (Just "Enter KD")
+  Gtk.boxPackStart hb1 lab1 Gtk.PackNatural 0
+  nrfield3 <- Gtk.entryNew
+  Gtk.entrySetText nrfield3 "0"
+  Gtk.boxPackStart hb1 nrfield3 Gtk.PackNatural 5
+
+  Gtk.onEntryActivate nrfield1 (updateKP flyer nrfield1)
+  Gtk.onEntryActivate nrfield2 (updateKI flyer nrfield2)
+  Gtk.onEntryActivate nrfield3 (updateKD flyer nrfield2)
+
+  accbox    <- Gtk.hBoxNew False 0
+  Gtk.boxPackStart vb accbox Gtk.PackNatural 5
+  im <- Gtk.imageNewFromStock Gtk.stockApply Gtk.IconSizeButton
+  acceptButton <- Gtk.buttonNewWithLabel "Accept"
+  Gtk.buttonSetImage acceptButton im
+  Gtk.boxPackStart accbox acceptButton Gtk.PackRepel 0
+
+  Gtk.onPressed acceptButton $ do
+    updateKP flyer nrfield1
+    updateKI flyer nrfield2
+    updateKD flyer nrfield3
+
   Gtk.on window Gtk.keyPressEvent $ do
     interpretKeyPress flyer vals 
   Gtk.widgetSetCanFocus window True
   Gtk.widgetShowAll window
+
+updateKP :: (Flyable a) => a -> Gtk.Entry -> IO ()
+updateKP flyer fld = do 
+  val <- fmap read $ Gtk.entryGetText fld
+  pid <- getController flyer
+  putStrLn $ "Setting KP to " ++ (show val)
+  setController flyer (pid { getKP = val })
+
+updateKI :: (Flyable a) => a -> Gtk.Entry -> IO ()
+updateKI flyer fld = do 
+  val <- fmap read $ Gtk.entryGetText fld
+  pid <- getController flyer
+  putStrLn $ "Setting KI to " ++ (show val)
+  setController flyer (pid { getKI = val })
+
+updateKD :: (Flyable a) => a -> Gtk.Entry -> IO ()
+updateKD flyer fld = do 
+  val <- fmap read $ Gtk.entryGetText fld
+  pid <- getController flyer
+  putStrLn $ "Setting KD to " ++ (show val)
+  setController flyer (pid { getKD = val })
 
 -- | Takes a key press and turns it into a helicopter command.
 interpretKeyPress :: (Flyable a) => a -> Map.Map Option (IORef Int) -> Gtk.EventM Gtk.EKey Bool
@@ -83,8 +148,7 @@ interpretKeyPress flyer valMap = do
       pwr <- liftIO $ readIORef $ valMap Map.! Throttle
       liftIO $ putStrLn $ show (pwr, pos)
       return True
-    "Return" -> do -- Start observation
-      liftIO $ putStrLn "Return"
+    "q" -> do -- Start observation
       active <- liftIO $ isActive flyer
       liftIO $ setActive flyer (not active)
       return True
