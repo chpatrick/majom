@@ -122,16 +122,17 @@ def diffdiff2(b, filt=None, imgBase=None):
       x,y,z = xyz[0]
       img.drawCircle((int(uv[0,0]),int(uv[0,1])),10,color=Color.WHITE)
       img.drawText(str((round(x,2),round(y,2),round(z,2))), int(uv[0,0])+10, int(uv[0,1])+10)
-      heli = orient.cut(img, (int(uv[0,0]),int(uv[0,1])))
-      heliD = orient.cut(loc, (cx,cy))
-      b = orient.cut(imgBase, (int(uv[0,0]),int(uv[0,1])))
+      #heli = orient.cut(img, (int(uv[0,0]),int(uv[0,1])))
+      #heliD = orient.cut(loc, (cx,cy))
+      #b = orient.cut(imgBase, (int(uv[0,0]),int(uv[0,1])))
 
-      d = diffDetect(b,heli)
-      extHeli = d.stretch(30,250).binarize(0).invert()
+      #d = diffDetect(b,heli)
+      #extHeli = d.stretch(30,250).binarize(0).invert()
 
-      heli.sideBySide(extHeli).show()
-      return (heli,extHeli)
+      #heli.sideBySide(extHeli).show()
+      #return (heli,extHeli)
       #img.sideBySide(heli).show()
+      img.show()
       return (round(x,2), round(y,2), round(z,2),0)
     except e:
       print e

@@ -57,7 +57,7 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  let intent = hoverAt $ Position (vector [0,5,0]) undefined
+  let intent = hoverAt $ Position (vector [0,10,0]) undefined
 
   milliSleep waitTime
   (_, pos) <- observe flyer
@@ -67,16 +67,17 @@ runMonkey' flyer = do
   posRef <- newIORef (pos, 0)
 
   milliSleep waitTime
-  loop $ do active <- lift $ isActive flyer
+  {-loop $ do active <- lift $ isActive flyer
             while (not active)
             (_, foo) <- lift $ observe flyer
             lift $ putStrLn $ prettyPos foo
             lift $ milliSleep waitTime
   (_, p) <- observe flyer
   milliSleep waitTime
+  -}
   (_, p') <- observe flyer
   milliSleep waitTime
-  let initBrain = Brain createNewModel createNewModel intent (p', 50)
+  let initBrain = Brain createNewModel createNewModel intent (p', 0)
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- | Lets the human fly the flyer with the monkey, controlling a specific
@@ -128,29 +129,29 @@ monkeyDo flyer = do
       -- For debugging
       --lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
       lift $ putStrLn $ prettyPos pos'
-      let err = 5.0 - (vectorY $ getVec pos')
+      let err = 10.0 - (vectorY $ getVec pos')
       let (pid', m) = getMV pid err
 
       --put $ Brain modelV' modelH intent (pos', vel', pwr')
       put $ Brain modelV modelH intent (pos, pwr)
-      lift $ setFly flyer Throttle $ floor m
+      lift $ setFly flyer Throttle $ 60 + floor m
       lift $ setController flyer pid'
       --lift $ setFly flyer Yaw $ getYaw (getHeading intent pos') pos' 
       --lift $ setFly flyer Throttle $ (getMap modelV') acc
       --lift $ putStrLn $ show $ (pwr, sigFigs 2 $ vectorY vel')
       --lift $ putStrLn $ show $ getMap modelV (vector [0, 0, 0])
     else do
-      monkeyFindZero flyer
-      {-
+      --monkeyFindZero flyer
+      
       iters <- lift $ fmap length $ 
         takeWhileIO (not . id) $
           repeat (milliSleep waitTime >> observe flyer >> isActive flyer)
-      (Brain modelV modelH intent (pos, vel, _)) <- get
+      (Brain modelV modelH intent (pos,  _)) <- get
       obs@(pwr, pos') <- lift $ observe flyer
       let vel' = (getVec (pos' - pos)) |/| (wt * (fromIntegral iters))
-      put $ Brain modelV modelH intent (pos', vel', pwr)
-      lift $ putStrLn ("Was not active for " ++ (show iters) ++ " cycles.")
-      -}
+      put $ Brain modelV modelH intent (pos',pwr)
+      --lift $ putStrLn ("Was not active for " ++ (show iters) ++ " cycles.")
+      
 
   lift $ milliSleep waitTime
 

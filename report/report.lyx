@@ -913,7 +913,7 @@ This resulted in stable, non-stuttering flight that worked from a large
 \end_layout
 
 \begin_layout Section
-Learning models
+Control models
 \end_layout
 
 \begin_layout Standard
@@ -1176,6 +1176,154 @@ As the Kalman filter is a recursive estimator (it only requires information
  it should fit well into the vision module of the project.
  At the very least, it is worth trying to implement on a basic level to
  see if it improves the quality of the vision tracking.
+\end_layout
+
+\begin_layout Subsection
+PID Controller
+\end_layout
+
+\begin_layout Standard
+The majority of the papers mentioned above used a PID Controller (Proportional
+ Integral Derivative Controller) as a control mechanism.
+ The PID controller is a simple and robust method of controlling a device
+ by performing control loop feedback.
+\end_layout
+
+\begin_layout Paragraph
+Formulation
+\end_layout
+
+\begin_layout Standard
+The PID mechanism is best described by its three constituent parts; a proportion
+al term, integral term, and a derivative term.
+ The sum of these three terms makes the new input parameter.
+ That is,
+\begin_inset Formula 
+\[
+input=proportional+integral+derivative
+\]
+
+\end_inset
+
+Each of the three terms is comprised of an input parameter (
+\begin_inset Formula $K_{p},K_{i}$
+\end_inset
+
+and 
+\begin_inset Formula $K_{d}$
+\end_inset
+
+ for proportional, integral and derivative respectively), and some combination
+ of the previous and current error in the sytem (the error being the difference
+ between the current state and the desired state).
+ These are described in more detail below.
+\end_layout
+
+\begin_layout Paragraph
+Proportional term
+\end_layout
+
+\begin_layout Standard
+The proportional term is defined as 
+\begin_inset Formula 
+\[
+K_{p}e(t)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $e(t)$
+\end_inset
+
+ is the error at time 
+\begin_inset Formula $t$
+\end_inset
+
+.
+ As described by its name, this term increases proportional to the size
+ of the error between the desired and current state.
+ As such, large 
+\begin_inset Formula $K_{p}$
+\end_inset
+
+ values will cause a large change in the input value as the error change,
+ which can cause system instability (see later for more on stability).
+\end_layout
+
+\begin_layout Paragraph
+Integral term
+\end_layout
+
+\begin_layout Standard
+The integral term is defined as
+\begin_inset Formula 
+\[
+K_{i}\int_{0}^{t}e(x)dx
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\int_{0}^{t}e(x)dx$
+\end_inset
+
+ is the cumulative error over time.
+ This essentially accounts for error that should have previously been corrected
+ by the system, and grows as this error perpetuates.
+\end_layout
+
+\begin_layout Paragraph
+Derivative term
+\end_layout
+
+\begin_layout Standard
+The derivative term is defined as
+\begin_inset Formula 
+\[
+K_{d}\frac{d}{dt}e(t)
+\]
+
+\end_inset
+
+or in a discrete system, simply
+\begin_inset Formula 
+\[
+K_{d}(e(t)-e(t-1))
+\]
+
+\end_inset
+
+which is the rate of change of the error.
+ This accounts for the 
+\begin_inset Quotes eld
+\end_inset
+
+approach speed
+\begin_inset Quotes erd
+\end_inset
+
+ of the device, predicting the 
+\begin_inset Quotes eld
+\end_inset
+
+velocity
+\begin_inset Quotes erd
+\end_inset
+
+ of the error and dampening it accordingly.
+\end_layout
+
+\begin_layout Paragraph
+Tuning
+\end_layout
+
+\begin_layout Paragraph
+Stability
+\end_layout
+
+\begin_layout Paragraph
+Suitability
 \end_layout
 
 \begin_layout Section
@@ -2556,6 +2704,10 @@ How helicopter will be controlled
 Methods for testing this (virtual first etc.)
 \end_layout
 
+\begin_layout Itemize
+PID
+\end_layout
+
 \begin_layout Chapter
 Evaluation
 \end_layout
@@ -2849,6 +3001,30 @@ key "Pygame"
 
 Pygame.org (2012) News - pygame - python game development.
  [online] Available at: http://www.pygame.org [Accessed: 25 Apr 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "PID Wiki"
+
+\end_inset
+
+En.wikipedia.org (1890) PID controller - Wikipedia, the free encyclopedia.
+ [online] Available at: http://en.wikipedia.org/wiki/PID_controller [Accessed:
+ 20 May 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "PID Tuning"
+
+\end_inset
+
+Zhong, J.
+ (2006) PID Controller Tuning: A short tutorial.
+ [e-book] http://wwwdsa.uqac.ca/~rbeguena/Systemes_Asservis/PID.pdf.
 \end_layout
 
 \begin_layout Standard

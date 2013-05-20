@@ -62,7 +62,7 @@ instance Flyable VirtualHelicopter where
     return (pwr, (pos <+> (vector rand)))
     where
       genErr :: IO Double
-      genErr = getStdRandom (randomR (-0.01,0.01))
+      genErr = getStdRandom (randomR (-0.0001,0.0001))
       sequence3 :: Monad m => (m a, m b, m c) -> m (a, b, c)
       sequence3 (m1, m2, m3) = do
         x1 <- m1;
