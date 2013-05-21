@@ -1,4 +1,5 @@
 import SimpleHTTPServer
+import sys
 import SocketServer
 import time
 from detect import *
@@ -28,16 +29,18 @@ filt = adapt(base,4000)
 
 print "Starting server..."
 
-#while True:
-#  pos = diffdiff2(base, filt)
-#  if pos:
-#    (x,y,z,v) = pos
-#    print "{},{},{},{}".format(x,-y,z,v)
+if len(sys.argv) > 1 and sys.argv[1] == 'test':
+  while True:
+    pos = diffdiff2(base, filt)
+    if pos:
+      (x,y,z,v) = pos
+      print "{},{},{},{}".format(x,-y,z,v)
 
-try:
-  server.serve_forever()
-  pass
-except:
-  print "Bye :("
-  server.socket.close()
-  server.shutdown()
+else:
+  try:
+    server.serve_forever()
+    pass
+  except:
+    print "Bye :("
+    server.socket.close()
+    server.shutdown()

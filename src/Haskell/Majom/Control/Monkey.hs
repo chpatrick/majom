@@ -46,6 +46,9 @@ data Brain = Brain { brainVModel :: Kalman,
 -- | The current state of the flyer - either flying, or landed.
 data FlyState = Flying | Landed deriving (Show, Eq)
 
+desiredPos :: Vector
+desiredPos = vector [0, 0.25, 0]
+
 -- | Starts the monkey (starts the flyer too)
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
@@ -57,7 +60,7 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  let intent = hoverAt $ Position (vector [0,10,0]) undefined
+  let intent = hoverAt $ Position desiredPos undefined
 
   milliSleep waitTime
   (_, pos) <- observe flyer
@@ -129,12 +132,12 @@ monkeyDo flyer = do
       -- For debugging
       --lift $ monkeySay (model, model', pwr, pos', vel', pwr', getAccel intent vel' pos)
       lift $ putStrLn $ prettyPos pos'
-      let err = 10.0 - (vectorY $ getVec pos')
+      let err = (vectorY desiredPos) - (vectorY $ getVec pos')
       let (pid', m) = getMV pid err
 
       --put $ Brain modelV' modelH intent (pos', vel', pwr')
       put $ Brain modelV modelH intent (pos, pwr)
-      lift $ setFly flyer Throttle $ 60 + floor m
+      lift $ setFly flyer Throttle $ 70 + floor m
       lift $ setController flyer pid'
       --lift $ setFly flyer Yaw $ getYaw (getHeading intent pos') pos' 
       --lift $ setFly flyer Throttle $ (getMap modelV') acc

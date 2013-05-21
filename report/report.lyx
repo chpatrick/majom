@@ -1318,12 +1318,36 @@ velocity
 Tuning
 \end_layout
 
+\begin_layout Itemize
+Relevance of parameters
+\end_layout
+
+\begin_layout Itemize
+Tuning methods
+\end_layout
+
+\begin_layout Itemize
+Impact of tuning
+\end_layout
+
 \begin_layout Paragraph
 Stability
 \end_layout
 
+\begin_layout Itemize
+Improving stability
+\end_layout
+
 \begin_layout Paragraph
 Suitability
+\end_layout
+
+\begin_layout Itemize
+Using it in the project
+\end_layout
+
+\begin_layout Itemize
+How it will be adapted
 \end_layout
 
 \begin_layout Section
