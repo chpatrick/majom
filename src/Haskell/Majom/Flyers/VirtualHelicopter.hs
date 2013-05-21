@@ -90,7 +90,7 @@ run h = do
       clearOptions optionsVal
       return options
     processOptions h forceVar options
-    milliSleep 100
+    milliSleep 50
   where
     optionsVal = getOptions h
     clearOptions x = writeTVar x []

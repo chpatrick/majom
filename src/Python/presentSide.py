@@ -33,6 +33,7 @@ def main():
       try:
         #get input
         (x,y,z,o) = map(float, pos.split(','))
+        y = y*10
         (sizex, sizey) = window.get_size()
         #scale value to window size
         floor = 30

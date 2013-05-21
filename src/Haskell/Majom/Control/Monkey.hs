@@ -47,7 +47,9 @@ data Brain = Brain { brainVModel :: Kalman,
 data FlyState = Flying | Landed deriving (Show, Eq)
 
 desiredPos :: Vector
-desiredPos = vector [0, 0.25, 0]
+desiredPos = vector [0, 0.2, 0]
+base :: Power
+base = 70
 
 -- | Starts the monkey (starts the flyer too)
 runMonkey :: (Flyable a) => a -> IO Brain
@@ -121,12 +123,13 @@ monkeyThink intent modelV modelH pwr (pos, pos') vel = do
 -- | The iterative loop of the monkey.
 monkeyDo :: (Flyable a) => a -> MonkeyBrainT
 monkeyDo flyer = do
+  obs@(pwr', pos') <- lift $ observe flyer
   active <- lift $ isActive flyer
   if active 
     then do
       (Brain modelV modelH intent (pos, pwr)) <- get
       pid <- lift $ getController flyer
-      obs@(pwr', pos') <- lift $ observe flyer
+
       --let (modelV', _, vel', acc) = monkeyThink intent modelV modelH pwr (pos, pos') vel
       --let modelV' = adlib modelV pwr acc vel
       -- For debugging
@@ -134,10 +137,12 @@ monkeyDo flyer = do
       lift $ putStrLn $ prettyPos pos'
       let err = (vectorY desiredPos) - (vectorY $ getVec pos')
       let (pid', m) = getMV pid err
+      lift $ putStrLn $ show pid
+      lift $ putStrLn $ show (base + floor m)
 
       --put $ Brain modelV' modelH intent (pos', vel', pwr')
       put $ Brain modelV modelH intent (pos, pwr)
-      lift $ setFly flyer Throttle $ 70 + floor m
+      lift $ setFly flyer Throttle $ base + floor m
       lift $ setController flyer pid'
       --lift $ setFly flyer Yaw $ getYaw (getHeading intent pos') pos' 
       --lift $ setFly flyer Throttle $ (getMap modelV') acc

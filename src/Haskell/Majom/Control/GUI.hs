@@ -65,7 +65,7 @@ guiSetup flyer = do
 
   Gtk.onEntryActivate nrfield1 (updateKP flyer nrfield1)
   Gtk.onEntryActivate nrfield2 (updateKI flyer nrfield2)
-  Gtk.onEntryActivate nrfield3 (updateKD flyer nrfield2)
+  Gtk.onEntryActivate nrfield3 (updateKD flyer nrfield3)
 
   accbox    <- Gtk.hBoxNew False 0
   Gtk.boxPackStart vb accbox Gtk.PackNatural 5
@@ -111,10 +111,10 @@ interpretKeyPress flyer valMap = do
   keyName <- Gtk.eventKeyName
   case keyName of
     "Up" -> do -- Pitch forwards
-      liftIO $ chValue "Up" Pitch (10)
+      liftIO $ chValue "Up" Pitch (-10)
       return True
     "Down" -> do -- Pitch backwards
-      liftIO $ chValue "Down" Pitch (-10)
+      liftIO $ chValue "Down" Pitch (10)
       return True
     "Left" -> do -- Yaw left
       liftIO $ chValue "Left" Yaw (10)

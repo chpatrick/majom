@@ -90,7 +90,7 @@ lowerThan :: Vector -> Vector -> Bool
 lowerThan p1 p2 = vectorY p1 < vectorY p2
 
 calcDrag :: Velocity -> Force
-calcDrag v = negate (v * (abs v))
+calcDrag v = negate (v * (abs v) |*| 2)
 
 displayObject :: Object -> IO ()
 displayObject o = do 

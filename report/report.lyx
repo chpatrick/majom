@@ -1318,36 +1318,40 @@ velocity
 Tuning
 \end_layout
 
-\begin_layout Itemize
-Relevance of parameters
-\end_layout
+\begin_layout Standard
+Each of the parameters reflects a different property of the control loop
+ that needs to be addressed.
+ The proportional parameter reflects the response to error - small values
+ will not have a significant effect on the input, however large errors can
+ cause unwanted oscillatory behaviour.
+ The integral parameter deal with accumulated error - it is in this way
+ that it can compensate for 'droop' in the system, where there is a control
+ bias that needs to be accounted for.
+ Small values will take a long time to compensate for these, but large values
+ will overcompensate causing overshooting.
+ The derivative term 'dampens' the approach, but will increase the time
+ required to reach stability.
+ 
+\begin_inset Newline newline
+\end_inset
 
-\begin_layout Itemize
-Tuning methods
-\end_layout
-
-\begin_layout Itemize
-Impact of tuning
-\end_layout
-
-\begin_layout Paragraph
-Stability
-\end_layout
-
-\begin_layout Itemize
-Improving stability
+Each of the costs and benefits of these terms needs to be weighted against
+ the other, and this process is referred to as 'tuning' the controller.
+ There are a variety of methods for tuning the controller, from simple manual
+ observation and adjustment to full automated methods.
 \end_layout
 
 \begin_layout Paragraph
 Suitability
 \end_layout
 
-\begin_layout Itemize
-Using it in the project
-\end_layout
-
-\begin_layout Itemize
-How it will be adapted
+\begin_layout Standard
+The PID controller was used in the majority of the quadcopter papers, so
+ it definitely has a use in automated flying.
+ For the helicopter in particular, it fits the requirements very well -
+ in the vertical case, for instance, the input is the throttle and the output
+ is the observed position, with the error being the difference between the
+ required position and the current position.
 \end_layout
 
 \begin_layout Section
@@ -1469,6 +1473,22 @@ key "SimpleCV book"
 \end_inset
 
 , which lists many different examples and techniques to get me started.
+\end_layout
+
+\begin_layout Section
+Language tools
+\end_layout
+
+\begin_layout Itemize
+STM
+\end_layout
+
+\begin_layout Itemize
+Package management
+\end_layout
+
+\begin_layout Itemize
+GHCi - individual module loading for testing
 \end_layout
 
 \begin_layout Chapter
@@ -2142,6 +2162,14 @@ An important part of the initial set up was developing suitable tools to
 Communication methods
 \end_layout
 
+\begin_layout Itemize
+Communication between vision and monkey module (http server)
+\end_layout
+
+\begin_layout Itemize
+Communication between monkey and simulation module
+\end_layout
+
 \begin_layout Subsection
 Testing tools
 \end_layout
@@ -2343,6 +2371,22 @@ This proved to be a simple yet effective manner for co-ordinating the two
  Bash shell itself.
 \end_layout
 
+\begin_layout Paragraph
+Simulation
+\end_layout
+
+\begin_layout Itemize
+VirtualHelicopter
+\end_layout
+
+\begin_layout Itemize
+Control variations
+\end_layout
+
+\begin_layout Itemize
+Accuracy of the simulation
+\end_layout
+
 \begin_layout Section
 Vision
 \end_layout
@@ -2434,16 +2478,25 @@ The last consideration was the SimpleCV library, which is written in Python.
 Basic Software and Setup
 \end_layout
 
-\begin_layout Itemize
-Freenect
-\end_layout
+\begin_layout Standard
+Before prototyping could begin, it was necessary to find pre-existing software
+ packages that would perform a lot of the 'heavy lifting' of hardware management
+ with the Kinect.
+ Fortunately, all of this was well described by the SimpleCV documentation
+ - for hardware drivers, the open source Kinect library OpenKinect (via
+ freenect) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "freenect website"
 
-\begin_layout Itemize
-SimpleCV Kinect
-\end_layout
+\end_inset
 
-\begin_layout Itemize
-Calibration
+ was used.
+ This provided basic Kinect functions for Python.
+ The SimpleCV library is then built on top of this, adding extra functions
+ for general image processing and video processing.
+ Finally, it was necessary to calibrate the Kinect, which was also simple
+ given the provision of a tutorial for calibration in the freenect package.
 \end_layout
 
 \begin_layout Subsection
@@ -2525,12 +2578,36 @@ Following the assumptions stated in 5.3.1, an idea to initially locate the
 Several methods were tried to remedy this:
 \end_layout
 
-\begin_layout Itemize
-Best-guess search TODO
+\begin_layout Description
+Best-guess
+\begin_inset space ~
+\end_inset
+
+search One method that was tried was locating the position of the helicopter
+ in the RGB camera, getting shape information of the helicopter, and then
+ trying to again locate this shape (or similar shapes) in an area that would
+ approximately match that on the depth camera.
+ Drawbacks of this method included additional overhead of doing image analysis
+ twice, difficulty locating similar shapes in both cameras (as each camera
+ had a different 'type' of error that it would pick up) and being somewhat
+ overcomplicated.
 \end_layout
 
-\begin_layout Itemize
-Estimating the camera parameters TODO
+\begin_layout Description
+Estimating
+\begin_inset space ~
+\end_inset
+
+camera
+\begin_inset space ~
+\end_inset
+
+parameters Another naive method used was just to 'guess' where the helicopter
+ would be in the depth camera from ad-hoc observations about relative positions
+ in the depth and RGB images.
+ This proved to not be accurate enough at all, and upon later reflection
+ to be a bit of a waste of time.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -2700,6 +2777,14 @@ Problems integrating the two languages
 Approaches used, tested, thrown out
 \end_layout
 
+\begin_layout Itemize
+Thrift
+\end_layout
+
+\begin_layout Itemize
+HTTP server instead (why, what it fulfills)
+\end_layout
+
 \end_deeper
 \begin_layout Itemize
 Initial observations
@@ -2720,16 +2805,90 @@ Improvements, filters etc.
 Control
 \end_layout
 
+\begin_layout Standard
+Accurate detection was only one of the requirements that needed to be fulfilled
+ - armed with positional data, it was now important to decide how to control
+ the helicopter itself.
+ Fortunately, the design of the helicopter itself allows for conceptual
+ simple controls for a human controller, and as such it is (relatively)
+ simple to automate also.
+ 
+\begin_inset Newline newline
+\end_inset
+
+The control of the helicopter can be split into two separate areas with
+ minimal overlap.
+ The first of these is the vertical motion of the helicopter, governed by
+ the main rotors and the throttle - increasing the throttle of the helicopter
+ results in an increase in vertical velocity and vice versa for decreasing
+ throttle.
+ The second area is motion in the 
+\begin_inset Formula $x-z$
+\end_inset
+
+ plane, which is controlled by the pitch and yaw of the helicopter.
+ Due to the simplistic design, the helicopter is incapable of deliberate
+ strafing motion left and right (of course it is still susceptible to sideways
+ drift from air currents or its own momentum), so navigation is accoplished
+ by pointing the helicopter in the desired direction, then changing the
+ pitch until the desired velocity is acquired.
+ These two areas are mostly disjoint, however there is still a small amount
+ of overlap.
+ The degree of forward motion provided by a change of pitch is increased
+ accordingly with the amount of throttle currently being used, and corresponding
+ly the upwards velocity is decreased as the pitch increases (as upwards
+ velocity becomes a diagonal-forward velocity.
+ The decrease is proportional to 
+\begin_inset Formula $\cos\theta$
+\end_inset
+
+, where 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the angle between the 
+\begin_inset Formula $y-axis$
+\end_inset
+
+ and the upward vector of the helicopter).
+ 
+\begin_inset Newline newline
+\end_inset
+
+Based on these observations, it is possible to construct several different
+ control methods.
+\end_layout
+
+\begin_layout Subsection
+Control methods
+\end_layout
+
 \begin_layout Itemize
 How helicopter will be controlled
 \end_layout
 
 \begin_layout Itemize
-Methods for testing this (virtual first etc.)
+Started considering how a human does it
 \end_layout
 
 \begin_layout Itemize
 PID
+\end_layout
+
+\begin_layout Paragraph
+Intentions
+\end_layout
+
+\begin_layout Paragraph
+Enacting Intentions
+\end_layout
+
+\begin_layout Itemize
+Simple point and drive
+\end_layout
+
+\begin_layout Itemize
+Combinations
 \end_layout
 
 \begin_layout Chapter
@@ -3049,6 +3208,18 @@ key "PID Tuning"
 Zhong, J.
  (2006) PID Controller Tuning: A short tutorial.
  [e-book] http://wwwdsa.uqac.ca/~rbeguena/Systemes_Asservis/PID.pdf.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "freenect website"
+
+\end_inset
+
+Openkinect.org (2000) OpenKinect.
+ [online] Available at: http://openkinect.org/wiki/Main_Page [Accessed: 21
+ May 2013].
 \end_layout
 
 \begin_layout Standard
