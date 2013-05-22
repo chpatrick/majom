@@ -1376,7 +1376,7 @@ As has been mentioned earlier, I have decided to use a Kinect camera as
  implementation of the vision package.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 OpenCV
 \end_layout
 
@@ -1475,20 +1475,78 @@ key "SimpleCV book"
 , which lists many different examples and techniques to get me started.
 \end_layout
 
+\begin_layout Subsection
+SIFT Descriptors
+\end_layout
+
 \begin_layout Section
 Language tools
 \end_layout
 
-\begin_layout Itemize
-STM
+\begin_layout Standard
+The language Haskell was used for the bulk of the coding because of a variety
+ of tools that it brings to the project.
+ These include simple concurrency through the use of STMs, a robust package
+ management system and a powerful interpreter for testing individual modules.
+ In this section we will go over each of these different areas and analyse
+ what they offer to this project.
 \end_layout
 
-\begin_layout Itemize
-Package management
+\begin_layout Paragraph
+Standard Transactional Memory
 \end_layout
 
-\begin_layout Itemize
-GHCi - individual module loading for testing
+\begin_layout Standard
+Haskell comes packaged with a powerful method of concurrency, under the
+ guise of the STM monad.
+ The STM monad allows...
+ 
+\begin_inset Newline newline
+\end_inset
+
+STM works by...
+\begin_inset Newline newline
+\end_inset
+
+STM is more useful in this case because...
+\end_layout
+
+\begin_layout Paragraph
+Cabal package management
+\end_layout
+
+\begin_layout Standard
+Whilst creating a large project, it is unavoidable that many other modules
+ will be imported along the way (unless one wishes to write everything themselve
+s from scratch).
+ The default package manager for Haskell, Cabal, manages all of this...
+\begin_inset Newline newline
+\end_inset
+
+Cabal was picked instead of other package managers such as...
+\end_layout
+
+\begin_layout Paragraph
+GHCi 
+\end_layout
+
+\begin_layout Standard
+GHCi is the interpreter built into the Glasgow Haskell Compiler.
+ It allows the user to dynamically load modules into the interpreter, automatica
+lly locating dependencies and loading those too.
+ The user can then use any of these loaded functions in the interpreter
+ environment, creating data structures dynamically and testing the system.
+ 
+\begin_inset Newline newline
+\end_inset
+
+In this project it was particularly useful for testing out various data
+ structures and learning methods.
+ For example, it was useful to be able to create a PID controller inside
+ the interpreter environment, and then provide it with dummy values to see
+ how the corresponding output would change with input.
+ Whilst being beneficial for general prototyping, it was also useful for
+ learning!
 \end_layout
 
 \begin_layout Chapter
@@ -2734,34 +2792,265 @@ Prototyping results
 Orientation Detection
 \end_layout
 
+\begin_layout Standard
+The second vital part of the helicopter detection is finding out which way
+ the helicopter is facing - without this knowledge, it is impossible to
+ steer the helicopter in any particular direction.
+ Orientation detection presented an interesting challenge, and was probably
+ the more complicated part of the Vision module.
+ This complexity was exaggerated by the low resolution of the RGBD images
+ - both of which operate at 640x480 pixels.
+ At any one point, it is unlikely that the helicopter would take up more
+ than a 100x100 pixel square in the original image!
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename r_000.jpg
+	width 10cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+An example image of the helicopter after basic position detection.
+ Basic detail is obtained, but the distinction between helicopter and background
+ is less obvious on the metal chassis and on the blades themselves.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsubsection
 Groundwork
 \end_layout
 
-\begin_layout Itemize
-Language decision, libraries
+\begin_layout Standard
+From the previous work with helicopter detection, it was obvious that using
+ the depth camera to also perform orientation analysis would not be sufficient.
+ The reflective property of the helicopter, combined with its small size
+ and the low fidelity of the depth image meant that a meaningful capture
+ of the helicopter would be too difficult.
+ Instead, we decided to focus on using the RGB camera.
+ Figure 5.2 appears to show that we can get enough information from a well-lit
+ RGB image to discern the orientation.
+\end_layout
+
+\begin_layout Paragraph
+Naive extraction
+\end_layout
+
+\begin_layout Standard
+As an initial stepping stone, a basic extraction method using image subtraction
+ was used.
+ This was a two-step process - given a 'base' image of the scene, without
+ the helicopter, and another with the helicopter in it:
+\end_layout
+
+\begin_layout Enumerate
+Take the absolute difference between the two images to obtain a greyscale
+ 'difference' image.
+\end_layout
+
+\begin_layout Enumerate
+Perform image thresholding on the resulting image, keeping values that are
+ different enough and discarding the rest (being regarded as image noise).
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# Get the numpy array of values
+\end_layout
+
+\begin_layout Plain Layout
+
+n1 = base.getNumpy() 
+\end_layout
+
+\begin_layout Plain Layout
+
+n2 = img.getNumpy()
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Take the absolute difference between them
+\end_layout
+
+\begin_layout Plain Layout
+
+diff = Image(absdiff(n1,n2))
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Perform basic thresholding and erosion to get 
+\end_layout
+
+\begin_layout Plain Layout
+
+# rid of noise and leave a black and white mask
+\end_layout
+
+\begin_layout Plain Layout
+
+mask = diff.binarize().erode()
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This gave a reasonably good depiction of the outline of the helicopter as
+ can be seen in Figure 5.3.
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename h_000.jpg
+	width 10cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Extraction of the helicopter from the image in Figure 5.2, using the subtractive
+ method.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Signal decomposition
+\end_layout
+
+\begin_layout Standard
+One suggested method of orientation analysis was to decompose the silhouette
+ of the helicopter into height along the y-axis.
+ The basis of this was that the front of the helicopter has more 'stuff'
+ to it - it is taller and rounder than the tail of the helicopter, which
+ is comparitively small.
+ Thus the decomposition would result in a graph that is taller at one end
+ and shorter at the other, and the distance between these two features would
+ discern the orientation of the helicopter.
+\begin_inset Newline newline
+\end_inset
+
+Initial tests with this method were not particularly conclusive - a clear
+ peak can be 
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename g_000.jpg
+	width 10cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Initial signal decomposition of the helicopter.
+ A peak is clearly present on the left hand side, comprised of the two helicopte
+r blades and the main body of the helicopter.
+ 
+\end_layout
+
+\end_inset
+
+seen for the two helicopter blades and the main body of the helicopter.
+ However, it is unclear where the body of the helicopter ends - this is
+ caused by the fact that the helicopter blades take up a large portion of
+ the length of the helicopter.
+ Another problem that they cause is they are quite noisy - their detected
+ position in any subsequent images may be different and thus subsequent
+ generated graphs would also be quite noisy.
+\begin_inset Newline newline
+\end_inset
+
+To attempt to remedy this, a simple method was devised to remove the helicopter
+ blades from the scene.
 \end_layout
 
 \begin_layout Itemize
-Methods tried
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Images, observations
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Initial method settled on
+Removal of blades
 \end_layout
 
 \begin_layout Itemize
-Camera set up, troubles
+Comparison of with/without blades
 \end_layout
 
 \begin_layout Itemize
-Initial results
+Problems
+\end_layout
+
+\begin_layout Itemize
+Resulting graphs
+\end_layout
+
+\begin_layout Paragraph
+Sift descriptor
+\end_layout
+
+\begin_layout Standard
+After discussing the above findings with the supervisor, it was decided
+ that it might be beneficial to try an alternate approach, using a 'Sift
+ Descriptor'.
 \end_layout
 
 \begin_layout Section
