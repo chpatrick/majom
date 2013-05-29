@@ -2220,11 +2220,161 @@ An important part of the initial set up was developing suitable tools to
 Communication methods
 \end_layout
 
-\begin_layout Itemize
-Communication between vision and monkey module (http server)
+\begin_layout Standard
+Some considerable thought was put into deciding what method should be used
+ to link different language sections of the system.
+ With such vastly different languages being used as Python and Haskell,
+ it was no simple thing to just 
+\begin_inset listings
+lstparams "language=Python"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+import monkey
+\end_layout
+
+\end_inset
+
+ or 
+\begin_inset listings
+lstparams "language=Haskell"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+import Vision
+\end_layout
+
+\end_inset
+
+!
+\begin_inset Newline newline
+\end_inset
+
+The main requirements for the communication method were simple; it needed
+ to 
 \end_layout
 
 \begin_layout Itemize
+Support the sending of a tuple/list of doubles, somewhere around the range
+ of 4 or 5.
+ This is to transmit the 
+\begin_inset Formula $x$
+\end_inset
+
+, 
+\begin_inset Formula $y$
+\end_inset
+
+, 
+\begin_inset Formula $z$
+\end_inset
+
+ and postional information from the vision system to the control system.
+\end_layout
+
+\begin_layout Itemize
+Be fast.
+\end_layout
+
+\begin_layout Standard
+Initially, we were hoping that it would be possible to use the Foreign Function
+ Interface (FFI) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "FFI"
+
+\end_inset
+
+ feature that comes with Haskell.
+ However, it proved much more complicated to use than previously hoped,
+ and it became evident early on that it would be wiser to search for alternative
+ methods.
+\end_layout
+
+\begin_layout Subsubsection
+Thrift
+\end_layout
+
+\begin_layout Standard
+One method that was discovered was the software framework Apache Thrift
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Thrift"
+
+\end_inset
+
+.
+ This seemed like a simple, effective and most of all flexible solution
+ to the communication problem.
+ With Thrift, it was possible to design C-like language-independent data
+ structures, and then Thrift would provide all of the heavy lifting and
+ translation between the two languages as required.
+ For instance, for the simple relaying of positional information, the data
+ structure definition was simply
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+struct Position {
+\end_layout
+
+\begin_layout Plain Layout
+
+  1: double x,
+\end_layout
+
+\begin_layout Plain Layout
+
+  2: double y,
+\end_layout
+
+\begin_layout Plain Layout
+
+  3: double z
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+service Vision {
+\end_layout
+
+\begin_layout Plain Layout
+
+  Position observe()
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+where the struct is the data structure, and observe is the cross-language
+ function call.
+\end_layout
+
+\begin_layout Standard
+Communication between vision and monkey module (http server)
+\end_layout
+
+\begin_layout Standard
 Communication between monkey and simulation module
 \end_layout
 
@@ -2937,7 +3087,7 @@ This gave a reasonably good depiction of the outline of the helicopter as
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Caption
@@ -2988,7 +3138,7 @@ Initial tests with this method were not particularly conclusive - a clear
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Caption
@@ -3005,7 +3155,7 @@ status collapsed
 
 \end_inset
 
-Initial signal decomposition of the helicopter.
+Initial horizontal signal decomposition of the helicopter.
  A peak is clearly present on the left hand side, comprised of the two helicopte
 r blades and the main body of the helicopter.
  
@@ -3018,29 +3168,89 @@ seen for the two helicopter blades and the main body of the helicopter.
  caused by the fact that the helicopter blades take up a large portion of
  the length of the helicopter.
  Another problem that they cause is they are quite noisy - their detected
- position in any subsequent images may be different and thus subsequent
+ position in any subsequent images may be different and thus subsequently
  generated graphs would also be quite noisy.
 \begin_inset Newline newline
 \end_inset
 
 To attempt to remedy this, a simple method was devised to remove the helicopter
  blades from the scene.
+ The helicopter always has two large shadows, one for each helicopter blade.
+ By looking at the horizontal scanlines, rather than the vertical scanlines
+ (Figure 5.5) it is possible to see that these are clearly identifiable as
+ the first two 'large' peaks.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
 \end_layout
 
-\begin_layout Itemize
-Removal of blades
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gv_000.jpg
+	width 10cm
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Itemize
-Comparison of with/without blades
+\end_inset
+
+Vertical decomposition of the helicopter signal.
+ The two large peaks on the left are caused by the two main blades of the
+ helicopter.
 \end_layout
 
-\begin_layout Itemize
-Problems
+\end_inset
+
+By cropping the portion of the image that holds these two peaks, (achived
+ by searching linearly from the left until two 'large' peaks are met.
+ The exact definition of large is relative to the rest of the signal) it
+ is possible to remove the blades from the image entirely, providing the
+ clearer horizontal decomposition in Figure 5.6.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
 \end_layout
 
-\begin_layout Itemize
-Resulting graphs
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gh_000.jpg
+	width 10cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+New horizontal decomposition, with helicopter blades removed.
+ Now two entities are clearly visible - the large cockpit of the helicopter
+ on the left, and the smaller tail rotor on the right.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
@@ -3509,6 +3719,29 @@ key "freenect website"
 Openkinect.org (2000) OpenKinect.
  [online] Available at: http://openkinect.org/wiki/Main_Page [Accessed: 21
  May 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "FFI"
+
+\end_inset
+
+Haskell.org (n.d.) 8 Foreign Function Interface.
+ [online] Available at: http://www.haskell.org/onlinereport/haskell2010/haskellch8.
+html [Accessed: 29 May 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Thrift"
+
+\end_inset
+
+Thrift.apache.org (2012) Apache Thrift.
+ [online] Available at: http://thrift.apache.org/ [Accessed: 29 May 2013].
 \end_layout
 
 \begin_layout Standard

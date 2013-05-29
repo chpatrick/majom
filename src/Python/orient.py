@@ -64,7 +64,7 @@ class HeliGraph:
         else:
           return i+j
 
-  def graph(self, m1=None, m2=None):
+  def graph(self, m1=None, m2=None, save=None):
     xs = self.gs
     height = max(xs)
     g = Image((len(xs),400))
@@ -81,6 +81,8 @@ class HeliGraph:
       g.drawText("m2L",m2[0],350)
       g.drawText("m2R",m2[1],350)
     g.show()
+    if save:
+      g.save(save)
 
   def getNtiles(self, n):
     xs = self.gs
