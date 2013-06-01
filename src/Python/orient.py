@@ -129,6 +129,7 @@ class HeliImage:
     i1 = xs.findBlade()
     i2 = xs[i1:].findBlade()
     self.img = self.img.crop(0,i1+i2,w,h)
+    return self
 
   def cutBlades2(self):
     (w,h) = self.img.size()
@@ -136,6 +137,7 @@ class HeliImage:
     i1 = xs.findBlade2()
     i2 = xs[i1:].findBlade2()
     self.img =  self.img.crop(0,i1+i2,w,h)
+    return self
 
   def show(self):
     self.img.show()

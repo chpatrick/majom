@@ -71,7 +71,53 @@ def adapt(b, limit=1000):
       count = 0
   return filt
 
-def diffdiff2(b, filt=None, imgBase=None):
+def drawArrow(img, (c1, c2), width, direction):
+  pt1 = sin(radians(direction))
+  pt2 = cos(radians(direction))
+  pt1 = pt1 * width
+  pt2 = pt2 * width / 3
+  img.drawLine((pt1+c1, -pt2+c2), (-pt1+c1, pt2+c2), color=Color.RED, thickness=2)
+  img.drawLine((pt1+c1, -pt2+c2),
+      (-pt1+c1 + 5*sin((pi/2)-radians(direction)),
+      pt2+c2 + 5*cos((pi/2)-radians(direction))), color=Color.RED, thickness=2)
+  img.drawLine((pt1+c1, -pt2+c2),
+      (-pt1+c1 - 5*sin((pi/2)-radians(direction)),
+      pt2+c2 - 5*cos((pi/2)-radians(direction))), color=Color.RED, thickness=2)
+
+def getVels(ps):
+  if len(ps) < 2:
+    return None
+  vs = []
+  for i in range(len(ps)-1):
+    p1 = ps[i] 
+    p2 = ps[i+1]
+    v = []
+    for j in range(len(p1)):
+      v.append(p1[j] - p2[j])
+    vs.append(tuple(v))
+  return vs
+
+def avgVel(vs):
+  return average(vs, axis=0)
+
+def velDirection(v):
+  size = sqrt(sum(map(lambda x: x**2, v), axis=0))
+  d = map(lambda x: x / size, v)
+  theta = asin(d[0]) 
+  if approxEq(cos(theta), d[1]): theta = degrees(theta)
+  elif approxEq(cos(theta + pi/2), d[1]): theta = degrees(theta + pi/2)
+  elif approxEq(cos(theta - pi/2), d[1]): theta = degrees(theta - pi/2)
+  elif approxEq(cos(theta + pi), d[1]): theta = degrees(theta + pi)
+  else: return None
+  if theta < 0:
+    return 360 + theta
+  else:
+    return theta
+
+def approxEq(a,b):
+  return abs(a-b) < 1e-10
+
+def diffdiff2(b, filt=None, imgBase=None, history=[]):
   print 0
   d = freenect.sync_get_depth()[0]
   print 0.1
@@ -132,7 +178,14 @@ def diffdiff2(b, filt=None, imgBase=None):
       #heli.sideBySide(extHeli).show()
       #return (heli,extHeli)
       #img.sideBySide(heli).show()
+      history = history[:9]
+      if len(history > 1):
+        vels = getVels(history)
+        v = avgVel(vels)
+        d = velDirection(v)
+        drawArrow(img, (320,100), 100, d)
       img.show()
+
       return (round(x,2), round(y,2), round(z,2),0)
     except e:
       print e

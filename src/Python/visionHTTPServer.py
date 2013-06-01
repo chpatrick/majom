@@ -30,10 +30,12 @@ filt = adapt(base,4000)
 print "Starting server..."
 
 if len(sys.argv) > 1 and sys.argv[1] == 'test':
+  history = []
   while True:
-    pos = diffdiff2(base, filt)
+    pos = diffdiff2(base, filt, history)
     if pos:
       (x,y,z,v) = pos
+      history.insert(0,(x,z))
       print "{},{},{},{}".format(x,-y,z,v)
 
 else:

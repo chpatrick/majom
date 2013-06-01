@@ -1549,93 +1549,6 @@ In this project it was particularly useful for testing out various data
  learning!
 \end_layout
 
-\begin_layout Chapter
-Evaluation plan
-\end_layout
-
-\begin_layout Subsubsection
-Required functionality
-\end_layout
-
-\begin_layout Enumerate
-Automated flight with no input other than camera.
-\end_layout
-
-\begin_layout Enumerate
-Input of 'intentions', and automatic execution of them.
-\end_layout
-
-\begin_layout Enumerate
-Movement in one, two and three dimensions.
-\end_layout
-
-\begin_layout Standard
-I believe that these three points establish the 'baseline' of the functionality
- I should achieve.
- Successful execution of these should demonstrate complexity in computer
- vision, AI and general design, and should be sufficiently challenging to
- perform.
- 
-\end_layout
-
-\begin_layout Section
-Quality of functionality
-\end_layout
-
-\begin_layout Standard
-It should prove to be quite simple to ascertain the quality of the functionality
-:
-\end_layout
-
-\begin_layout Description
-Observation It will be fairly evident from how the helicopter flies according
- to the given instructions how well the project is performing.
- For instance, a steady, certain flight path would be good whereas a juddering
- path, or even crashing, would indicate bad performance!
-\end_layout
-
-\begin_layout Description
-Execution The ability to execute more and more complicated intentions.
- Simply hovering in a given position should prove to be a (comparatively)
- simple feat, whereas flying from one position to another is more demanding.
- Extending this to customisable paths in three dimensional space would show
- that the underlying mechanisms are of high quality and performance.
-\end_layout
-
-\begin_layout Description
-Extensibility If the system is set up well, it should be easy to extend
- it with new abilities and features, using the existing functionality.
-\end_layout
-
-\begin_layout Standard
-These could be measured using the following demonstration, for example:
-\end_layout
-
-\begin_layout Enumerate
-Demonstrate the ability to fly the helicopter from the computer manually.
- 
-\shape italic
-Demonstrates the foundations of the project.
- 
-\end_layout
-
-\begin_layout Enumerate
-Demonstrate the ability to hover the helicopter in place, even when displaced.
- 
-\shape italic
-Demonstrates the static control of the helicopter from a single camera source
- in multiple dimensions.
- 
-\end_layout
-
-\begin_layout Enumerate
-Demonstrate the ability to move in a predefined path.
- 
-\shape italic
-Demonstrates advanced functionality.
- 
-\end_layout
-
 \begin_layout Standard
 \begin_inset Newpage pagebreak
 \end_inset
@@ -3392,6 +3305,168 @@ Combinations
 
 \begin_layout Chapter
 Evaluation
+\end_layout
+
+\begin_layout Paragraph
+Required functionality
+\end_layout
+
+\begin_layout Enumerate
+Automated flight with no input other than camera.
+\end_layout
+
+\begin_layout Enumerate
+Input of 'intentions', and automatic execution of them.
+\end_layout
+
+\begin_layout Enumerate
+Movement in one, two and three dimensions.
+\end_layout
+
+\begin_layout Standard
+I believe that these three points establish the 'baseline' of the functionality
+ I should achieve.
+ Successful execution of these should demonstrate complexity in computer
+ vision, AI and general design, and should be sufficiently challenging to
+ perform.
+ 
+\end_layout
+
+\begin_layout Section
+Quality of functionality
+\end_layout
+
+\begin_layout Standard
+It should prove to be quite simple to ascertain the quality of the functionality
+:
+\end_layout
+
+\begin_layout Description
+Observation It will be fairly evident from how the helicopter flies according
+ to the given instructions how well the project is performing.
+ For instance, a steady, certain flight path would be good whereas a juddering
+ path, or even crashing, would indicate bad performance!
+\end_layout
+
+\begin_layout Description
+Execution The ability to execute more and more complicated intentions.
+ Simply hovering in a given position should prove to be a (comparatively)
+ simple feat, whereas flying from one position to another is more demanding.
+ Extending this to customisable paths in three dimensional space would show
+ that the underlying mechanisms are of high quality and performance.
+\end_layout
+
+\begin_layout Description
+Extensibility If the system is set up well, it should be easy to extend
+ it with new abilities and features, using the existing functionality.
+\end_layout
+
+\begin_layout Standard
+These could be measured using the following demonstration, for example:
+\end_layout
+
+\begin_layout Enumerate
+Demonstrate the ability to fly the helicopter from the computer manually.
+ 
+\shape italic
+Demonstrates the foundations of the project.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Demonstrate the ability to hover the helicopter in place, even when displaced.
+ 
+\shape italic
+Demonstrates the static control of the helicopter from a single camera source
+ in multiple dimensions.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Demonstrate the ability to move in a predefined path.
+ 
+\shape italic
+Demonstrates advanced functionality.
+ 
+\end_layout
+
+\begin_layout Section
+Qualitative analysis of the system
+\end_layout
+
+\begin_layout Standard
+To evaluate the limitations of the system, several tests were set up.
+ These tests were designed to quantitavely see the exact capabilities and
+ limiations of the system.
+ Qualities tested (split into traits) were:
+\end_layout
+
+\begin_layout Paragraph
+Position detection (vision)
+\end_layout
+
+\begin_layout Itemize
+Range of detection
+\end_layout
+
+\begin_layout Itemize
+Robustness of detection
+\end_layout
+
+\begin_layout Itemize
+Accuracy of detection
+\end_layout
+
+\begin_layout Itemize
+Limitations
+\end_layout
+
+\begin_layout Paragraph
+Orientation detection (vision)
+\end_layout
+
+\begin_layout Itemize
+Accuracy of detection
+\end_layout
+
+\begin_layout Itemize
+Limitations
+\end_layout
+
+\begin_layout Paragraph
+System properties
+\end_layout
+
+\begin_layout Itemize
+Helicopter response times
+\end_layout
+
+\begin_layout Itemize
+Multiple signals
+\end_layout
+
+\begin_layout Itemize
+Control range/robustness (Arduino)
+\end_layout
+
+\begin_layout Itemize
+Problems with the system
+\end_layout
+
+\begin_layout Paragraph
+Helicopter properties
+\end_layout
+
+\begin_layout Itemize
+Speeds of helicopter
+\end_layout
+
+\begin_layout Itemize
+Flight time of helicopter
+\end_layout
+
+\begin_layout Itemize
+Range of motion of helicopter
 \end_layout
 
 \begin_layout Section
