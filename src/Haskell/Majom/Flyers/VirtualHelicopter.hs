@@ -112,7 +112,7 @@ basicMap orientation o v =
   case o of 
     Yaw -> vector [0,0,0]
     --TODO Make this vary based on position
-    Throttle -> vector [0,0.14,0] |*| (fromIntegral v)
+    Throttle -> vector [0,0.1225,0] |*| (fromIntegral v)
     Pitch -> vector [sin rs,0,cos rs] |*| ((1.0/63)*(fromIntegral $ 63 - v))
     Correction -> vector [0,0,0] 
   where

@@ -23,6 +23,7 @@ instance Intent HoverIntent where
       q = hoverPosition intent
       s = speedMax * (if dist > stop then 1.0 else (dist/stop))
   getHeading i pos = getVec $ (hoverPosition i) - pos
+  getIntendedPos = hoverPosition
 
 -- | The maximum speed.
 speedMax :: Double

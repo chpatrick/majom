@@ -11,3 +11,4 @@ import Majom.Common
 class Intent a where
   getAccel :: a -> Velocity -> Position -> Acceleration
   getHeading :: a -> Position -> Vector
+  getIntendedPos :: a -> Position

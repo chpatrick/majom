@@ -22,6 +22,7 @@ instance Intent SimpleHoverIntent where
       dir = q - pos
       q = hoverPosition intent
   getHeading i pos = getVec $ (hoverPosition i) - pos
+  getIntendedPos = hoverPosition
 
 -- | Makes a hover intent.
 simpleHoverAt :: Position -> SimpleHoverIntent
