@@ -85,9 +85,6 @@ def main():
           vels = detect.getVels(history)
           v = detect.avgVel(vels)
           d = detect.velDirection(v)
-          print history
-          print "Vel is ", v
-          print "Dir is ", d
           if d != None:
             drawArrow(window, (320,100), 100, d)
 

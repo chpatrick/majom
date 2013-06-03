@@ -48,19 +48,19 @@ guiSetup flyer = do
   lab1 <- Gtk.labelNew (Just "Enter KP")
   Gtk.boxPackStart hb1 lab1 Gtk.PackNatural 0
   nrfield1 <- Gtk.entryNew
-  Gtk.entrySetText nrfield1 "5"
+  Gtk.entrySetText nrfield1 "20"
   Gtk.boxPackStart hb1 nrfield1 Gtk.PackNatural 5
 
   lab1 <- Gtk.labelNew (Just "Enter KI")
   Gtk.boxPackStart hb1 lab1 Gtk.PackNatural 0
   nrfield2 <- Gtk.entryNew
-  Gtk.entrySetText nrfield2 "0.1"
+  Gtk.entrySetText nrfield2 "0.2"
   Gtk.boxPackStart hb1 nrfield2 Gtk.PackNatural 5
 
   lab1 <- Gtk.labelNew (Just "Enter KD")
   Gtk.boxPackStart hb1 lab1 Gtk.PackNatural 0
   nrfield3 <- Gtk.entryNew
-  Gtk.entrySetText nrfield3 "5"
+  Gtk.entrySetText nrfield3 "1"
   Gtk.boxPackStart hb1 nrfield3 Gtk.PackNatural 5
 
   Gtk.onEntryActivate nrfield1 (updateKP flyer nrfield1)

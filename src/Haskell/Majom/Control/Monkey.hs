@@ -47,9 +47,9 @@ data Brain = Brain { brainVModel :: Kalman,
 data FlyState = Flying | Landed deriving (Show, Eq)
 
 desiredPos :: Vector
-desiredPos = vector [0, 0.2, 0]
+desiredPos = vector [0, 0.1, -2]
 base :: Power
-base = 70
+base = 80
 
 -- | Starts the monkey (starts the flyer too)
 runMonkey :: (Flyable a) => a -> IO Brain
@@ -83,6 +83,7 @@ runMonkey' flyer = do
   (_, p') <- observe flyer
   milliSleep waitTime
   let initBrain = Brain createNewModel createNewModel intent (p', 0)
+  setFly flyer Pitch 53
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- | Lets the human fly the flyer with the monkey, controlling a specific
@@ -144,7 +145,7 @@ monkeyDo flyer = do
       put $ Brain modelV modelH intent (pos, pwr)
       lift $ setFly flyer Throttle $ base + floor m
       lift $ setController flyer pid'
-      --lift $ setFly flyer Yaw $ getYaw (getHeading intent pos') pos' 
+      lift $ setFly flyer Yaw $ getYaw (getHeading intent pos') pos' 
       --lift $ setFly flyer Throttle $ (getMap modelV') acc
       --lift $ putStrLn $ show $ (pwr, sigFigs 2 $ vectorY vel')
       --lift $ putStrLn $ show $ getMap modelV (vector [0, 0, 0])

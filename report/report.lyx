@@ -3176,6 +3176,41 @@ After discussing the above findings with the supervisor, it was decided
  Descriptor'.
 \end_layout
 
+\begin_layout Subsection
+Orientation Inferrence
+\end_layout
+
+\begin_layout Standard
+Another, simpler, method of orientation analysis attempted was inferrence.
+ This worked on the underlying assumption that as the helicopter is incapable
+ of 'strafing' motion (that is motion to the left or right whilst facing
+ forwards), provided there is some forwards pitch the helicopter will move
+ in the direction it is facing.
+ Taking an average of the 
+\begin_inset Formula $N$
+\end_inset
+
+ most recent velocities from the 
+\begin_inset Formula $N+1$
+\end_inset
+
+ positions recorded dampens most of the observational noise, and provides
+ a fairly accurate representation of the current heading - larger values
+ of 
+\begin_inset Formula $N$
+\end_inset
+
+ will be slower to react to velocity changes, yet will be more resilient
+ to noise.
+ These velocities are averaged, and the heading is then extracted (in our
+ case, values 0 - 359 are used, with 0 being directly away from the camera,
+ increasing clockwise).
+\end_layout
+
+\begin_layout Subsubsection
+Rough results
+\end_layout
+
 \begin_layout Section
 Assembly
 \end_layout
@@ -3241,7 +3276,7 @@ The control of the helicopter can be split into two separate areas with
  plane, which is controlled by the pitch and yaw of the helicopter.
  Due to the simplistic design, the helicopter is incapable of deliberate
  strafing motion left and right (of course it is still susceptible to sideways
- drift from air currents or its own momentum), so navigation is accoplished
+ drift from air currents or its own momentum), so navigation is accomplished
  by pointing the helicopter in the desired direction, then changing the
  pitch until the desired velocity is acquired.
  These two areas are mostly disjoint, however there is still a small amount

@@ -180,16 +180,16 @@ def diffdiff2(b, filt=None, imgBase=None, history=[]):
       #return (heli,extHeli)
       #img.sideBySide(heli).show()
       history = history[:10]
+      d = 0
       if len(history) > 1:
         vels = getVels(history)
         v = avgVel(vels)
         d = velDirection(v)
         if d:
           drawArrow(img, (320,100), 100, d)
-        print "foo!"
       img.show()
 
-      return (round(x,4), round(y,4), -round(z,4),0)
+      return (round(x,4), round(y,4), round(z,4), d, 0)
     else:
       pass
 

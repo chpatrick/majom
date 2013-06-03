@@ -25,10 +25,10 @@ import Majom.Flyers.Flyable
 import qualified Network.HTTP as HTTP
 import Text.Regex.Posix
 
-getPosition :: String -> (Double, Double, Double, Int)
+getPosition :: String -> (Double, Double, Double, Double, Int)
 getPosition s
   | length m > 0 = read $ head m
-  | otherwise = (0,0,0,0)
+  | otherwise = (0,0,0,0,0)
   where
     m = getAllTextMatches $ s =~ "[(].*[)]" :: [String]
 
@@ -37,7 +37,7 @@ getResponse = do
   r <- HTTP.simpleHTTP (HTTP.getRequest "http://localhost:8080/")
   return $ show r
 
-get :: IO (Double, Double, Double, Int)
+get :: IO (Double, Double, Double, Double, Int)
 get = getPosition `fmap` getResponse
 
 -- | A real helicopter!
@@ -80,14 +80,14 @@ instance Flyable Helicopter where
   setFlyMany h vs = dropValM $ setMany h vs
   fly h = return ()
   observe h = do
-    (x,y,z,v) <- get
+    (x,y,z,o,v) <- get
     let optVar = getCurrentOptions h
     pwr <- fmap (Map.! Throttle) $ atomically $ readTVar optVar
     case v of
       0 -> setActive h True
       1 -> setActive h False
     let pos = vector [x,y,z]
-    return (pwr, Position pos 0.0)--TODO
+    return (pwr, Position pos o)
   isActive h = atomically $ readTVar (getActive h)
   setActive h b = atomically $ writeTVar (getActive h) b
   getController h = atomically $ readTVar (getPID h)
