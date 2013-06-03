@@ -49,7 +49,7 @@ data FlyState = Flying | Landed deriving (Show, Eq)
 desiredPos :: Vector
 desiredPos = vector [0, 0.2, 0]
 base :: Power
-base = 86
+base = 70
 
 -- | Starts the monkey (starts the flyer too)
 runMonkey :: (Flyable a) => a -> IO Brain

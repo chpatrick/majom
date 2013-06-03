@@ -59,7 +59,8 @@ instance Flyable VirtualHelicopter where
       pwr <- currentPower
       return (pwr, pos)
     rand <- sequence [genErr, genErr, genErr]
-    return (pwr, (pos <+> (vector rand)))
+    --return (pwr, (pos <+> (vector rand)))
+    return (pwr, pos)
     where
       genErr :: IO Double
       genErr = getStdRandom (randomR (-0.0001,0.0001))
@@ -112,7 +113,7 @@ basicMap orientation o v =
     Yaw -> vector [0,0,0]
     --TODO Make this vary based on position
     Throttle -> vector [0,0.14,0] |*| (fromIntegral v)
-    Pitch -> vector [sin rs,0,cos rs] |*| ((1.0/63)*(fromIntegral $ v - 63))
+    Pitch -> vector [sin rs,0,cos rs] |*| ((1.0/63)*(fromIntegral $ 63 - v))
     Correction -> vector [0,0,0] 
   where
     rs = radians orientation

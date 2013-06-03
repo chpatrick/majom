@@ -72,7 +72,7 @@ prettyVec :: Vector -> String
 prettyVec v = 
   if V.length v /= 3
     then error "Vector is too short to pretty print..."
-    else foldl1 ((++) . (++ ",")) $ map (show . (sigFigs 3)) 
+    else foldl1 ((++) . (++ ",")) $ map (show . (sigFigs 5)) 
       [v V.! 0, v V.! 1, v V.! 2]
 
 prettyPos :: Position -> String

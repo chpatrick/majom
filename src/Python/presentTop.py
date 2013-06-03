@@ -1,5 +1,19 @@
 import pygame
+import detect
 from math import *
+
+def drawArrow(srf, (c1, c2), width, direction):
+  pt1 = sin(radians(direction))
+  pt2 = cos(radians(direction))
+  pt1 = pt1 * width
+  pt2 = pt2 * width / 3
+  pygame.draw.line(srf, (255,0,0), (pt1+c1, -pt2+c2), (-pt1+c1, pt2+c2))
+  pygame.draw.line(srf, (255,0,0),(-pt1+c1, pt2+c2),
+    (-pt1+c1 + 5*sin((pi/2)-radians(direction)),
+    pt2+c2 + 5*cos((pi/2)-radians(direction))))
+  pygame.draw.line(srf, (255,0,0),(-pt1+c1, pt2+c2),
+    (-pt1+c1 - 5*sin((pi/2)-radians(direction)),
+    pt2+c2 - 5*cos((pi/2)-radians(direction))))
 
 def drawGrid(srf, rangex = (-10,10), rangey = (-10,10), startx=30, starty=30):
   (sx,sy) = srf.get_size()
@@ -28,6 +42,7 @@ def main():
 
   window = pygame.display.set_mode((640,480))
   font = pygame.font.SysFont("monospace", 15)
+  history = []
 
   while True:
     try:
@@ -62,11 +77,25 @@ def main():
             (px-10*sin(r),py+10*cos(r)),
             (px-10*sin(r)-5*sin((pi/2)-r),py+10*cos(r)-5*cos((pi/2)-r)))
         window.blit(label, (px + 20,py +20))
+
+        history.insert(0, (x,z))
+        history = history[:5]
+
+        if len(history) > 1:
+          vels = detect.getVels(history)
+          v = detect.avgVel(vels)
+          d = detect.velDirection(v)
+          print history
+          print "Vel is ", v
+          print "Dir is ", d
+          if d != None:
+            drawArrow(window, (320,100), 100, d)
+
         pygame.display.flip()
 
       except:
         print "Got", pos, "dunno wot to do lol"
-    except:
+    except: 
       print "Input broken. Exiting..."
       break
 

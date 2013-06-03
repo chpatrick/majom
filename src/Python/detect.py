@@ -77,10 +77,10 @@ def drawArrow(img, (c1, c2), width, direction):
   pt1 = pt1 * width
   pt2 = pt2 * width / 3
   img.drawLine((pt1+c1, -pt2+c2), (-pt1+c1, pt2+c2), color=Color.RED, thickness=2)
-  img.drawLine((pt1+c1, -pt2+c2),
+  img.drawLine((-pt1+c1, pt2+c2),
       (-pt1+c1 + 5*sin((pi/2)-radians(direction)),
       pt2+c2 + 5*cos((pi/2)-radians(direction))), color=Color.RED, thickness=2)
-  img.drawLine((pt1+c1, -pt2+c2),
+  img.drawLine((-pt1+c1, pt2+c2),
       (-pt1+c1 - 5*sin((pi/2)-radians(direction)),
       pt2+c2 - 5*cos((pi/2)-radians(direction))), color=Color.RED, thickness=2)
 
@@ -102,17 +102,18 @@ def avgVel(vs):
 
 def velDirection(v):
   size = sqrt(sum(map(lambda x: x**2, v), axis=0))
+  if size == 0:
+    return None
   d = map(lambda x: x / size, v)
-  theta = asin(d[0]) 
-  if approxEq(cos(theta), d[1]): theta = degrees(theta)
-  elif approxEq(cos(theta + pi/2), d[1]): theta = degrees(theta + pi/2)
-  elif approxEq(cos(theta - pi/2), d[1]): theta = degrees(theta - pi/2)
-  elif approxEq(cos(theta + pi), d[1]): theta = degrees(theta + pi)
-  else: return None
-  if theta < 0:
-    return 360 + theta
+  theta = asin(abs(d[0]))
+  if d[0] >= 0 and d[1] >= 0:
+    return degrees(theta)
+  elif d[0] <= 0 and d[1] <= 0:
+    return degrees(theta + pi)
+  elif d[0] <= 0:
+    return degrees(2*pi - theta)
   else:
-    return theta
+    return degrees(pi - theta)
 
 def approxEq(a,b):
   return abs(a-b) < 1e-10
@@ -164,7 +165,7 @@ def diffdiff2(b, filt=None, imgBase=None, history=[]):
           break;
     xyz,uv = depth2xyzuv(depth, cx, cy)
     print 9
-    try:
+    if (xyz != None) and len(xyz) > 0:
       x,y,z = xyz[0]
       img.drawCircle((int(uv[0,0]),int(uv[0,1])),10,color=Color.WHITE)
       img.drawText(str((round(x,2),round(y,2),round(z,2))), int(uv[0,0])+10, int(uv[0,1])+10)
@@ -178,17 +179,18 @@ def diffdiff2(b, filt=None, imgBase=None, history=[]):
       #heli.sideBySide(extHeli).show()
       #return (heli,extHeli)
       #img.sideBySide(heli).show()
-      history = history[:9]
-      if len(history > 1):
+      history = history[:10]
+      if len(history) > 1:
         vels = getVels(history)
         v = avgVel(vels)
         d = velDirection(v)
-        drawArrow(img, (320,100), 100, d)
+        if d:
+          drawArrow(img, (320,100), 100, d)
+        print "foo!"
       img.show()
 
-      return (round(x,2), round(y,2), round(z,2),0)
-    except e:
-      print e
+      return (round(x,4), round(y,4), -round(z,4),0)
+    else:
       pass
 
 
