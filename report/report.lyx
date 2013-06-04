@@ -3254,7 +3254,7 @@ Control
 
 \begin_layout Standard
 Accurate detection was only one of the requirements that needed to be fulfilled
- - armed with positional data, it was now important to decide how to control
+ - armed with positi4onal data, it was now important to decide how to control
  the helicopter itself.
  Fortunately, the design of the helicopter itself allows for conceptual
  simple controls for a human controller, and as such it is (relatively)

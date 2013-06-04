@@ -43,12 +43,12 @@ data Brain = Brain { brainVModel :: Kalman,
 data FlyState = Flying | Landed deriving (Show, Eq)
 
 desiredPos :: Vector
-desiredPos = vector [0, 0.1, -2]
+desiredPos = vector [0, 0.1, -1.5]
 
 getNextPos :: (Intent a) => a -> Vector
 getNextPos i
-  |  iVec == v1 = (vector [0, 0.5, 2])
-  |  otherwise  = (vector [0, 0.1, -2])
+  |  iVec == v1 = (vector [0.0, -0.1,-2])
+  |  otherwise  = (vector [0.0, 0.15, -2])
   where
     iVec = getVec $ getIntendedPos i 
     v1 = vector [0, 0.1, -2]
@@ -134,7 +134,7 @@ monkeyDo flyer = do
       obs@(pwr, pos') <- lift $ observe flyer
       let vel' = (getVec (pos' - pos)) |/| (wt * (fromIntegral iters))
       let intent' = hoverAt $ Position (getNextPos intent) undefined
-      put $ Brain modelV modelH intent' (pos',pwr)
+      put $ Brain modelV modelH intent (pos',pwr)
 
   lift $ milliSleep waitTime
 
