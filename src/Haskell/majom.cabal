@@ -24,7 +24,6 @@ Library
     Majom.Control.Monkey,
     Majom.Control.Monkey.Intent,
     Majom.Control.Monkey.HoverIntent,
-    Majom.Control.Monkey.SimpleHoverIntent,
     Majom.Control.PID,
 --    Majom.Control.MonocleMonkey,
     Majom.Control.Watcher,

@@ -14,12 +14,12 @@ data HoverIntent = HoverIntent { hoverPosition :: Position }
 
 -- Assuming unit mass...
 instance Intent HoverIntent where
-  getAccel intent v pos = 
-    ((vectorUnit (getVec dir)) |*| s) - v
+  getVel intent pos = 
+    ((vectorUnit (getVec dir)) |*| s) 
     where
       dir = q - pos
       dist = vectorSize (getVec dir)
-      stop = 1
+      stop = 0.2
       q = hoverPosition intent
       s = speedMax * (if dist > stop then 1.0 else (dist/stop))
   getHeading i pos = getVec $ (hoverPosition i) - pos
@@ -27,7 +27,7 @@ instance Intent HoverIntent where
 
 -- | The maximum speed.
 speedMax :: Double
-speedMax = 0.5
+speedMax = 1
 
 -- | Makes a hover intent.
 hoverAt :: Position -> HoverIntent
