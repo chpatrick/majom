@@ -1745,7 +1745,15 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename arduino_circuit.png
-	width 10cm
+	width 8cm
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename arduino_real.JPG
+	lyxscale 10
+	width 8cm
 
 \end_inset
 
