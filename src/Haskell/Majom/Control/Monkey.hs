@@ -34,8 +34,8 @@ execMonkeyBrainT :: MonkeyBrainT -> Brain -> IO Brain
 execMonkeyBrainT mk k = execStateT mk k
 
 -- | Brain that holds all the relevant data for the monkey brain.
-data Brain = Brain { --brainIntent :: LandIntent,
-                     brainIntent :: HoverIntent,
+data Brain = Brain { brainIntent :: LandIntent,
+                     --brainIntent :: HoverIntent,
                      brainLast :: (Position, Power) }
 
 desiredPos :: Vector
@@ -52,8 +52,8 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  let intent = hoverAt $ Position desiredPos undefined
-  --let intent = landOn $ Position (vector [4, 0, 4]) undefined
+  --let intent = hoverAt $ Position desiredPos undefined
+  let intent = landOn $ Position (vector [0.16, -0.5, -1.91]) undefined
 
   milliSleep waitTime
   (_, pos) <- observe flyer
@@ -90,7 +90,8 @@ monkeyDo flyer = do
 
       lift $ putStrLn $ prettyPos pos'
       let vel = getVec (pos' - pos) |/| wt
-      lift $ enactIntent intent flyer pos' vel
+      intent' <- lift $ enactIntent intent flyer pos' vel
+      put $ Brain intent' (pos', pwr)
 
     else do
       iters <- lift $ fmap length $ 

@@ -31,6 +31,7 @@ instance Intent HoverIntent where
     setFly flyer Pitch $ 63 - floor (15 * fwds)
     setFly flyer Throttle $ base + floor m
     setFly flyer Yaw $ getYaw (getHeading i pos) pos
+    return i
 
 getVel :: HoverIntent -> Position -> Velocity
 getVel intent pos = 
@@ -38,7 +39,7 @@ getVel intent pos =
   where
     dir = q - pos
     dist = vectorSize (getVec dir)
-    stop = 0.2
+    stop = 0.5
     q = hoverPosition intent
     s = speedMax * (if dist > stop then 1.0 else (dist/stop))
 

@@ -10,7 +10,7 @@ import Majom.Flyers.Flyable
 
 -- | Hover intent data structure, containing the position to hover
 -- at.
-data LandIntent = LandIntent { landPosition :: Position }
+data LandIntent = LandIntent { landPosition :: Position, hoverPosition :: Position }
 
 -- Assuming unit mass...
 instance Intent LandIntent where
@@ -18,13 +18,18 @@ instance Intent LandIntent where
     pid <- getController flyer
 
     let desiredPos = getVec $ landPosition i
-    if (vectorSize $ desiredPos - (getVec pos)) < 0.3
+    if (vectorSize $ desiredPos - (getVec pos)) < 0.2
       then do
         setFly flyer Pitch 63
         setFly flyer Throttle 0
         setFly flyer Yaw 63
+        return i
       else do
-        let err = (vectorY desiredPos) - (vectorY $ getVec pos)
+        let hoverPos = getVec $ hoverPosition i
+        let xz = vector [vectorX hoverPos, 0, vectorZ hoverPos]
+        let xzDist = vectorSize $ xz - (vector [vectorX (getVec pos), 0, vectorZ (getVec pos)])
+        let newHover = Position (xz + (vector [0, (vectorY (getVec pos)) - 0.01, 0])) undefined
+        let err = (vectorY hoverPos) - (vectorY $ getVec pos)
         let (pid', m) = getMV pid err
 
         putStrLn $ show (base + floor m)
@@ -35,6 +40,7 @@ instance Intent LandIntent where
         setFly flyer Pitch $ 63 - floor (15 * fwds)
         setFly flyer Throttle $ base + floor m
         setFly flyer Yaw $ getYaw (getHeading i pos) pos
+        if xzDist < 0.2 then return i { hoverPosition = newHover } else return i
 
 getVel :: LandIntent -> Position -> Velocity
 getVel intent pos = 
@@ -57,5 +63,5 @@ base :: Power
 base = 80
 
 landOn :: Position -> LandIntent
-landOn (Position v o) =
-  LandIntent $ Position (vector [vectorX v, vectorY v + 0.2, vectorZ v]) o
+landOn p@(Position v o) =
+  LandIntent p $ Position (vector [vectorX v, 0.2, vectorZ v]) o

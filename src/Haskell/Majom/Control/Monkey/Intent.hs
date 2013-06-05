@@ -11,7 +11,7 @@ import Majom.Flyers.Flyable
 -- | The intent class itself. Currently only returns an acceleration
 -- in some direction given a velocity and position.
 class Intent a where
-  enactIntent :: (Flyable b) => a -> b -> Position -> Velocity -> IO ()
+  enactIntent :: (Flyable b) => a -> b -> Position -> Velocity -> IO a
 
 getYaw :: Vector -> Position -> Int
 getYaw v pos =
