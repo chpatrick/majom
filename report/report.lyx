@@ -120,6 +120,17 @@ Introduction
 \end_layout
 
 \begin_layout Standard
+As modern technology increases in power and decreases in size, interest
+ in autonomous control of micro-aerial vehicles (MAV) has increased.
+ What was not always accessible to casual users and non-specialized researchers
+ has suddenly become a lot more accessible - small aerial radio controlled
+ vehicles are now cheaper and more capable than ever before.
+ Taking this to an almost extreme, in this project we endeavour to perform
+ indoor MAV autonomous piloting (in this particular case, a small RC helicopter)
+, using cheap widely available hardware and free, opensource software.
+\end_layout
+
+\begin_layout Standard
 The problem of automating remote-controlled helicopter flight is best described
  by the limiting factors - there is a room indoors, a small remote-controlled
  helicopter, a computer and a simple camera source capable of estimating
@@ -256,17 +267,17 @@ Kinect
 \end_layout
 
 \begin_layout Standard
-For the computer vision, we will use a Kinect sensor device, created by
+For the computer vision, we will use the Kinect sensor device, created by
  Microsoft, which provides both an RGB camera and a method for calculating
  depth of the image (through an infra-red camera).
  Additionally, there are several freely available open-source software kits
  for interacting with the Kinect on any platform.
  This simplifies the computer vision aspect somewhat, allowing the direct
- extraction of the 3D coordinates instead of more traditional means such
- as stereoscopic vision.
+ extraction of the 3D coordinates instead of through more traditional means
+ such as stereoscopic vision.
  Additionally, substantial experimentation has gone into using it for computer
  vision previous - providing a wealth of prior experience to better gauge
- the possibilities and limitations of using the Kinect as part of a vision
+ the possibilities and limitations of using the Kinect as part of the vision
  system.
 \end_layout
 
@@ -354,9 +365,8 @@ http://arduino.cc/en/Main/arduinoBoardUno
 
 \end_inset
 
- - it (vitally) provides 14 separate digital input/output pins and a USB
- connection, along with many other features that are outside the scope of
- this project.
+ - it provides 14 separate digital input/output pins and a USB connection,
+ along with many other features that are outside the scope of this project.
  It is powered directly from the computer through the provided USB cable.
  Additionally it provides a hard reset button on the board itself, which
  proved to be invaluable during the flight prototyping phase.
@@ -384,7 +394,7 @@ The Syma Remote Control Helicopter is a small indoors-flying helicopter,
  It is modelled to be easy to fly indoors, and to remain stable even in
  in-experienced hands.
  It does this by not having a traditional tail rotor - instead, it has an
- internal gyroscope that keeps it level, and rotation is accomplished by
+ internal gyroscope that keeps it steady, and rotation is accomplished by
  speeding up and slowing down the main rotors.
  The tail rotor is instead positioned facing upwards, and provides a tilting
  force to the tail, letting the helicopter fly forwards and backwards.
@@ -394,7 +404,7 @@ The Syma Remote Control Helicopter is a small indoors-flying helicopter,
  The details on the communication protocols of the helicopter are not freely
  available, but some third party sources have done their own analysis of
  the signals (using oscilloscopes for example), and this should prove to
- be sufficient.
+ be sufficient starting point.
  These are discussed later.
 \end_layout
 
@@ -403,7 +413,7 @@ Background
 \end_layout
 
 \begin_layout Standard
-The whole basis from this project is from a suggestion by Google engineer
+The idea of this project originates from a suggestion by Google X engineer
  Johnny Chung Lee, from his blog post 
 \begin_inset Quotes eld
 \end_inset
@@ -423,85 +433,57 @@ key "Syma"
  In his post, he talks about possible methods for setting up the control
  of a remote helicopter, as far as controlling it manually from a computer.
  He then conjectures the possibility of using a camera or similar device
- to control the helicopter, and getting it to hover.
- He leaves the detail of this up to the user, however!
+ to control the helicopter, and getting it to hover in place.
+ He goes no further than this, and leaves the idea as an open problem to
+ the reader.
+\end_layout
+
+\begin_layout Paragraph
+Ground work
 \end_layout
 
 \begin_layout Standard
-Armed with this inspiration for a starting point, I took to reading some
- detail for how I would set up the foundations of the project.
- This included browsing some other pages on using Arduino
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Arduino,Syma2"
-
+With the idea as a starting point, initial research was carried out on where
+ to begin.
+ The first place to start was with the communication method between the
+ computer and the helicopter - without this, the whole project could not
+ progress any further.
+ Additionally, the communication method needed to be robust and reliable,
+ so as to not make the remaining tasks any more difficult than they needed
+ to be.
+\begin_inset Newline newline
 \end_inset
 
-, IR control of the helicopter
+In his blog post, Lee discusses using a Teensy USB developement board 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "IR"
-
-\end_inset
-
- and circuit plans
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Syma2"
+key "teensyusb"
 
 \end_inset
 
 .
- There was a lot of trial and error involved with the building of the circuit,
- as I had done any electrical engineering for quite some time.
- Initially I built a simple LED circuit to get a feel for how the Arduino
- itself worked, and then once I was confident with that I built the main
- IR circuit.
- This proved to work well enough, however, there were some teething problems
- - the helicopter would jutter and work sporadically, as if it were not
- always receiving signal.
- The problem became better and worse as I changed the timing values for
- the IR signals, so it was evident that it was a problem with the signal
- timing.
- After doing some further reading on precise timing using the Arduino
+ However, Teensy USB boards are only made in the US, so other alternatives
+ were considered.
+ The foremost of these was the Arduino board, a popular microcontroller
+ available globally, and one was shortly obtained.
+\begin_inset Newline newline
+\end_inset
+
+With the help of some research on building circuits, using IR LEDs and using
+ the Arduino itself 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "Arduino port"
+key "Arduino,Arduino port,IR"
 
 \end_inset
 
-, and some trial and error, I found the value range that seemed to work
- best, or at least well enough for me.
- 
-\end_layout
+, the final working circuit was made.
+ This is discussed in more detail later on.
+\begin_inset Newline newline
+\end_inset
 
-\begin_layout Standard
-I took a small amount of time to consider the feasibility of Arduino for
- the task at hand - for instance, would it be possible to do the whole project
- on a Raspberry Pi (http://www.raspberrypi.org/)? Or would the Arduino be
- too restrictive for my requirements? I decided that as the main part of
- this project was based upon the restrictions of scenario, and execution,
- not processing power, it would be needlessly limiting to use a Raspberry
- Pi or other similar device instead of a computer.
- Additionally, a computer would have a much wider range of tools available
- to it, making the project simpler to execute.
- The Arduino could be used as a simple intermediate device, that takes the
- commands from the computer and sends them on to the helicopter, which does
- not require much computational power.
-\end_layout
-
-\begin_layout Standard
-With my initial goals in mind, I started to build the foundation for the
- project using the programming language Haskell.
- I decided to use Haskell because I knew that it has an extensive programming
- library available to it, has bindings to the OpenCV library (which I may
- or may not use), and I had previously done a group project to create an
- AI framework in Haskell, which seemed appropriate given the topic of this
- project.
- This foundation involved making the various interfaces for the different
- parts of the project (modules, classes etc.), and deciding what responsibilities
- would lie where.
- 
+With this completed, we carried out research on similar projects and ideas
+ that could provide benefit to our system.
 \end_layout
 
 \begin_layout Section
@@ -509,14 +491,25 @@ Prior work
 \end_layout
 
 \begin_layout Standard
-Whilst researching methods and learning materials for the project, I came
- across examples of similar work that other people have performed, namely
- using quadcopters.
+Similar examples of automated flying have been attempted many times, generally
+ using quadcopters instead of helicopters.
  Quadcopters (also known as quadrocopters) are small flying machines that
  have four individual propellers arranged in a square.
  Navigation is accomplished by powering the propellers at different speeds,
  causing the platform as a whole to tilt.
- Quadcopters are reknown for their stability and simple design.
+ Quadcopters are reknown for their stability and simple design, however
+ they are often more expensive as the control method is more complicated,
+ and they have more moving parts than our RC helicopter.
+ Nevertheless, these examples provided inspiration for many different parts
+ of the finished system.
+\begin_inset Newline newline
+\end_inset
+
+These prior works are not as useful in the traditional sense of background
+ material, that is, they do not neccessarily provide a foundation from which
+ we can work from.
+ To the contrary, they more serve as examples of similar problems and how
+ they have been solved.
 \end_layout
 
 \begin_layout Subsection
@@ -550,16 +543,15 @@ ts
 \end_inset
 
 .
- This project shares many similar points with mine - it is done using a
- low-cost flying device, without customised, high-precision location-data
- sources, uses (amongst other things) a monocular vision device, and works
+ Many parallels can be made with this project and ours - it is performed
+ using a low-cost flying device, without customised, high-precision location-dat
+a sources, uses (amongst other things) a monocular vision device, and works
  indoors in previously unknown environments.
- However, it is also different in many ways, not just in the fact that it
- is using a quadcopter instead of a helicopter - it also has access to other
- on-board camera sources and flight information (it also has a 3-axis gyroscope
- and accelerometer and an ultrasound altimeter).
- Despite these differences, I should still be able to get some useful informatio
-n from this project.
+ However, it is also varies in others, not just in the fact that it is using
+ a quadcopter instead of a helicopter - it also has access to other on-board
+ camera sources and flight information (having a 3-axis gyroscope, accelerometer
+ and an ultrasound altimeter).
+ 
 \end_layout
 
 \begin_layout Paragraph*
@@ -1733,11 +1725,11 @@ The circuit layout of the Arduino is quite simple - at its most basic level
  it provides a resistor and infra-red LED attached to the digital out pin.
  This is replicated several times to increase the range at which the helicopter
  can operate as well as reducing the likelihood of the signal being obscured.
- The circuit layout can be seen in Figure
+ The circuit layout can be seen in Figure 4.1.
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Caption
@@ -1745,14 +1737,6 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename arduino_circuit.png
-	width 8cm
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename arduino_real.JPG
-	lyxscale 10
 	width 8cm
 
 \end_inset
@@ -1768,6 +1752,41 @@ status open
 \begin_layout Plain Layout
 Circuit diagram of the circuit used to communicate with the helicopter.
  
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename arduino_real.JPG
+	lyxscale 10
+	width 8cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Photo of the final circuit and Arduino board.
 \end_layout
 
 \begin_layout Plain Layout
@@ -3722,6 +3741,16 @@ key "Thrift"
 
 Thrift.apache.org (2012) Apache Thrift.
  [online] Available at: http://thrift.apache.org/ [Accessed: 29 May 2013].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "teensyusb"
+
+\end_inset
+
+http://www.pjrc.com/teensy/
 \end_layout
 
 \begin_layout Standard
