@@ -15,6 +15,7 @@ import Majom.Control.GUI
 import Majom.Control.Monkey.Intent
 import Majom.Control.Monkey.HoverIntent
 import Majom.Control.Monkey.LandIntent
+import Majom.Control.Monkey.MultiIntent
 import Majom.Control.PID
 import Majom.Lang.LoopWhile
 import Majom.Flyers.Special.DuoCopter
@@ -34,8 +35,9 @@ execMonkeyBrainT :: MonkeyBrainT -> Brain -> IO Brain
 execMonkeyBrainT mk k = execStateT mk k
 
 -- | Brain that holds all the relevant data for the monkey brain.
-data Brain = Brain { brainIntent :: LandIntent,
+data Brain = Brain { --brainIntent :: LandIntent,
                      --brainIntent :: HoverIntent,
+                     brainIntent :: MultiIntent,
                      brainLast :: (Position, Power) }
 
 desiredPos :: Vector
@@ -52,8 +54,9 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  --let intent = hoverAt $ Position desiredPos undefined
-  let intent = landOn $ Position (vector [0.16, -0.5, -1.91]) undefined
+  let hIntent = hoverAt $ Position desiredPos undefined
+  let lIntent = landOn $ Position (vector [0.16, -0.5, -1.91]) undefined
+  let intent = withTiming 1000 $ doAll <&> hIntent <&> lIntent <&> hIntent
 
   milliSleep waitTime
   (_, pos) <- observe flyer
@@ -121,7 +124,3 @@ waitTime = 50
 -- | Wait time in seconds.
 wt :: Double
 wt = (fromIntegral waitTime) / 1000.0
-
--- | Sleeps the monkey for given milliseconds.
-milliSleep :: Int -> IO ()
-milliSleep = threadDelay . (*) 1000

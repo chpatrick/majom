@@ -2,6 +2,7 @@
 module Majom.Common where
 
 import qualified Data.Vector as V
+import Control.Concurrent
 
 instance (Num a, Num b) => Num (a,b) where
   (x1,x2) + (y1,y2) = (x1+y1,x2+y2)
@@ -160,3 +161,6 @@ sigFigs :: (RealFrac a) => Int -> a -> a
 sigFigs d n = (fromIntegral (round (n * p))) / p
   where 
     p = 10 ^ (d-1)
+
+milliSleep :: Int -> IO ()
+milliSleep = threadDelay . (*) 1000

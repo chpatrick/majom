@@ -79,6 +79,3 @@ waitTime = 50
 
 wt :: Double
 wt = (fromIntegral waitTime) / 1000.0
-
-milliSleep :: Int -> IO ()
-milliSleep = threadDelay . (*) 1000

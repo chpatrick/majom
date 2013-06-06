@@ -12,7 +12,7 @@ import Majom.Flyers.Flyable
 
 -- | Hover intent data structure, containing the position to hover
 -- at.
-data HoverIntent = HoverIntent { hoverPosition :: Position }
+data HoverIntent = HoverIntent { hoverPosition :: Position, hovering :: Bool }
 
 -- Assuming unit mass...
 instance Intent HoverIntent where
@@ -31,7 +31,10 @@ instance Intent HoverIntent where
     setFly flyer Pitch $ 63 - floor (15 * fwds)
     setFly flyer Throttle $ base + floor m
     setFly flyer Yaw $ getYaw (getHeading i pos) pos
-    return i
+
+    let dist = vectorSize $ desiredPos - (getVec pos)
+    return i { hovering = (dist < 0.2) }
+  success = hovering
 
 getVel :: HoverIntent -> Position -> Velocity
 getVel intent pos = 
@@ -55,4 +58,4 @@ base = 80
 
 -- | Makes a hover intent.
 hoverAt :: Position -> HoverIntent
-hoverAt = HoverIntent
+hoverAt p = HoverIntent p False

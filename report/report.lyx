@@ -566,22 +566,19 @@ SLAM (simultaneous localization and mapping) is a computer vision technique
  such as laser range scanners, monocular or stereo cameras, or RGB-D sensors
  (RGB camera plus a depth sensor eg.
  Kinect).
- It is used in the quadropter experiments to keep track of the quadropter
- relative to the camera.
-\end_layout
-
-\begin_layout Paragraph*
-Extended Kalman Filter
-\end_layout
-
-\begin_layout Standard
-In the experiments, they use an Extended Kalman Filter (EKF) to combine
- all of the available data into a single, reliable data point.
- In addition, the EKF is used to compensate for different time delays that
- occur in the system (for example, from data transmission delays, or from
- computationally expensive calculations).
- The EKF differs from the standard Kalman Filter in the fact that is nonlinear.
+ In the quadropter experiments, it is used to keep track of the quadropter
+ relative to the environment.
+ These SLAM systems are generally located on board the vehicle itself.
  
+\begin_inset Newline newline
+\end_inset
+
+SLAM will most likely not end up being a part of our system.
+ Instead, we will focus on getting the automated flight correct in a assumed-emp
+ty flying space.
+ However, it does pose an interesting idea for later developement - perhaps
+ the creation of a map of the surrounding environment, to be navigated by
+ the helicopter?
 \end_layout
 
 \begin_layout Paragraph*

@@ -1,5 +1,5 @@
 Name:           majom
-Version:        0.2
+Version:        1.0
 Description:    Haskell helicopter flying
 License:        GPL-3
 License-file:   LICENSE
@@ -7,24 +7,16 @@ Author:         Luke Tomlin
 Maintainer:     luke.tomlin@gmail.com
 Build-Type:     Simple
 Cabal-Version:  >=1.2
-extra-source-files:
-    Majom/Vision/Vision_Client.hs
-    Majom/Vision/Vision.hs
-    Majom/Vision/Vision_Types.hs
-
 
 Library
   Exposed-modules:
-    Majom.Analysis.AdLib,
-    Majom.Analysis.Kalman,
-    Majom.Analysis.LeastSquares,
-    Majom.Analysis.Model,
     Majom.Common,
     Majom.Control.GUI,
     Majom.Control.Monkey,
     Majom.Control.Monkey.Intent,
     Majom.Control.Monkey.HoverIntent,
     Majom.Control.Monkey.LandIntent,
+    Majom.Control.Monkey.MultiIntent,
     Majom.Control.PID,
     Majom.Control.Watcher,
     Majom.Flyers.Flyable,
@@ -33,7 +25,6 @@ Library
     Majom.Flyers.Special.DuoCopter,
     Majom.Lang.LoopWhile,
     Majom.Simulation.SimpleSim
-
  
   Extensions:
   Ghc-options: -O -threaded
