@@ -7,8 +7,6 @@ module Majom.Control.Monkey (
   runMonkeyWithHuman
   ) where
 
-import Majom.Analysis.Model
-import Majom.Analysis.Kalman
 import Majom.Common
 import Majom.Flyers.Flyable
 import Majom.Control.GUI

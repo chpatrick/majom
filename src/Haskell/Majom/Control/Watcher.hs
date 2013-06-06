@@ -5,8 +5,6 @@ module Majom.Control.Watcher (
   runWatcher,
   ) where
 
-import Majom.Analysis.Model
-import Majom.Analysis.Kalman
 import Majom.Common
 import Majom.Control.GUI
 import Majom.Flyers.Flyable
@@ -24,8 +22,7 @@ type WatcherBrainT = StateT Brain IO ()
 execWatcherBrainT :: WatcherBrainT -> Brain -> IO Brain
 execWatcherBrainT mk k = execStateT mk k
 
-data Brain = Brain  { brainModel :: Kalman,
-                      brainLast :: (Position, Velocity, Power) }
+data Brain = Brain  { brainLast :: (Position, Velocity, Power) }
 
 runWatcher :: (Flyable a) => a -> IO Brain
 runWatcher flyer = do
@@ -36,7 +33,7 @@ runWatcher flyer = do
   (_, pos) <- observe flyer
   milliSleep waitTime
   (pwr, pos') <- observe flyer
-  let initBrain = Brain createNewModel (pos', (getVec (pos' - pos)) |/| wt, pwr)
+  let initBrain = Brain (pos', (getVec (pos' - pos)) |/| wt, pwr)
   handle <- openFile "out.csv" WriteMode
   execWatcherBrainT (forever $ watch flyer handle) initBrain
 
