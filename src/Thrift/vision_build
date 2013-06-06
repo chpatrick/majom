@@ -1,7 +1,0 @@
-#!/bin/bash
-
-thrift --gen py -out ../Python/ vision.thrift
-thrift --gen hs -out ../Haskell/Majom/Vision/ vision.thrift
-sed -i 's/module Vision/module Majom.Vision.Vision/g' ../Haskell/Majom/Vision/*
-sed -i 's/import Vision/import Majom.Vision.Vision/g' ../Haskell/Majom/Vision/*
-sed -i 's/import qualified Vision/import qualified Majom.Vision.Vision/g' ../Haskell/Majom/Vision/*
