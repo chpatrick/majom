@@ -30,3 +30,4 @@ class Flyable a where
   setActive :: a -> Bool -> IO ()
   getController :: a -> IO PID
   setController :: a -> PID -> IO ()
+  lookAround :: a -> IO [Surface]

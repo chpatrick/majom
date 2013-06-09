@@ -92,6 +92,7 @@ instance Flyable Helicopter where
   setActive h b = atomically $ writeTVar (getActive h) b
   getController h = atomically $ readTVar (getPID h)
   setController h p = atomically $ writeTVar (getPID h) p
+  lookAround h = undefined
 
 -- | Drops monadic values we don't care about.
 dropValM :: (Monad m) => m a -> m ()

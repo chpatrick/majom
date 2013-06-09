@@ -79,10 +79,15 @@ instance Flyable VirtualHelicopter where
   setActive h b = atomically $ writeTVar (getActive h) b
   getController h = atomically $ readTVar (getPID h)
   setController h p = atomically $ writeTVar (getPID h) p 
+  lookAround h = undefined
 
 -- | Runs the flying simulation
 run h = do 
-  let settings = setFloor (Just (vector [0,0,0])) defaultSettings
+  let 
+    settings = 
+      setSurfaces (Just [Surface (vector [0, 0, 4]) (vector [0, 0, -1])]) $
+      setFloor (Just (vector [0,0,0])) 
+        defaultSettings
   --let settings = defaultSettings
   forceVar <- startSimulation settings (getPosition h) $ simpleObject $ Position (vector [0,0,0]) 0
   forever $ do

@@ -127,6 +127,12 @@ type Time = Double
 -- | Power from the controller
 type Power = Int
 
+data Surface = Surface { sPoint :: Vector, sNorm :: Vector }
+  deriving Show
+
+data Ray = Ray { rDir :: Vector, rStart :: Vector }
+  deriving Show
+
 -- | Gravity force constant
 gravity :: Force
 gravity = vector [0, (-9.8), 0]

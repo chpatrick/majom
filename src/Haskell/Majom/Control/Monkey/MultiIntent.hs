@@ -16,19 +16,20 @@ import Majom.Flyers.Flyable
 import Control.Concurrent
 
 data AnyIntent = forall a. Intent a => AnyIntent a
-data MultiIntent = MultiIntent { actions :: [AnyIntent], timings :: Int }
+data MultiIntent = MultiIntent { actions :: [AnyIntent], timings :: (Int, Int) }
 
 instance Intent MultiIntent where
   enactIntent m flyer pos vel
     | null as   = return m
-    | success $ head as = return m { actions = (tail as) }
+    | success $ head as = do
+        milliSleep t
+        return m { actions = (tail as) }
     | otherwise = do
         a <- enactIntent (head as) flyer pos vel
-        milliSleep t
         return m { actions = (a : (tail as)) }
     where
       as  = actions m
-      t   = timings m
+      (t, wt) = timings m
   success = null . actions
 
 instance Intent AnyIntent where
@@ -45,5 +46,5 @@ doAll = MultiIntent [] 0
 keepDoing :: MultiIntent -> MultiIntent
 keepDoing m = m { actions = (cycle $ actions m) }
 
-withTiming :: Int -> MultiIntent -> MultiIntent
+withTiming :: (Int, Int) -> MultiIntent -> MultiIntent
 withTiming t m = m { timings = t }

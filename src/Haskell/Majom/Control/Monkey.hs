@@ -39,7 +39,7 @@ data Brain = Brain { --brainIntent :: LandIntent,
                      brainLast :: (Position, Power) }
 
 desiredPos :: Vector
-desiredPos = vector [0, 0.1, -1.5]
+desiredPos = vector [0, 0.2, -1]
 
 -- | Starts the monkey (starts the flyer too)
 runMonkey :: (Flyable a) => a -> IO Brain
@@ -53,8 +53,8 @@ runMonkey flyer = do
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
   let hIntent = hoverAt $ Position desiredPos undefined
-  let lIntent = landOn $ Position (vector [0.16, -0.5, -1.91]) undefined
-  let intent = withTiming 1000 $ doAll <&> hIntent <&> lIntent <&> hIntent
+  let lIntent = landOn $ Position (vector [-0.1, -0.51, -1.65]) undefined
+  let intent = keepDoing $ withTiming (1000, waitTime)  $ doAll <&> hIntent <&> lIntent <&> hIntent
 
   milliSleep waitTime
   (_, pos) <- observe flyer
@@ -67,7 +67,7 @@ runMonkey' flyer = do
   (_, p') <- observe flyer
   milliSleep waitTime
   let initBrain = Brain intent (p', 0)
-  setFly flyer Pitch 48
+  setFly flyer Pitch 43
   execMonkeyBrainT (forever $ monkeyDo flyer) initBrain
 
 -- | Lets the human fly the flyer with the monkey, controlling a specific

@@ -26,12 +26,13 @@ instance Flyable DuoCopter where
   -}
   setFly (DuoCopter _ h) o v = setFly h o v
   setFlyMany (DuoCopter _ h) vs = setFlyMany h vs
-  fly (DuoCopter _ h) = fly h
-  observe (DuoCopter _ h) = observe h
-  isActive (DuoCopter _ h) = isActive h
-  setActive (DuoCopter _ h) = setActive h
-  getController (DuoCopter _ h) = getController h
-  setController (DuoCopter _ h) = setController h
+  fly DuoCopter{ getFlyable = h' } = fly h'
+  observe DuoCopter{ getFlyable = h' } = observe h'
+  isActive DuoCopter{ getFlyable = h' } = isActive h'
+  setActive DuoCopter{ getFlyable = h' } = setActive h'
+  getController DuoCopter{ getFlyable = h' } = getController h'
+  setController DuoCopter{ getFlyable = h' } = setController h' 
+  lookAround DuoCopter{ getFlyable = h' } = lookAround h'
 
 -- | Starts a duocopter instance, returning the corresponding 'mock copters'
 -- that will be given to the two controls.

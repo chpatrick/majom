@@ -9,6 +9,7 @@ module Majom.Simulation.SimpleSim (
   simpleObject,
   defaultSettings,
   setFloor,
+  setSurfaces,
   startSimulation
   ) where
 
@@ -36,16 +37,22 @@ updatePosition t fs (Object m p v) =
     acc = fs |*| (1/m)
 
 -- | Simulation specific settings that can be defined by the user.
-data SimulationSettings = Settings { simFloor :: Maybe Vector} 
+data SimulationSettings = Settings { 
+    simFloor :: Maybe Vector, 
+    simSurfaces :: Maybe [Surface] } 
   deriving Show
 
 -- | The default settings that will be used if none are specified.
 defaultSettings :: SimulationSettings
-defaultSettings = Settings Nothing
+defaultSettings = Settings Nothing Nothing
 
 -- | Sets the floor of the simulation to Just position or Nothing.
 setFloor :: Maybe Vector -> SimulationSettings -> SimulationSettings
 setFloor p s = s{simFloor = p}
+
+-- | Sets the surfaces in the simulation
+setSurfaces :: Maybe [Surface] -> SimulationSettings -> SimulationSettings
+setSurfaces ps s = s{simSurfaces = ps}
 
 -- | Starts a simulation thread, showing the simulation on a GUI
 startSimulation :: SimulationSettings -> TVar Position -> Object -> IO (TVar Force)

@@ -554,31 +554,20 @@ a sources, uses (amongst other things) a monocular vision device, and works
  
 \end_layout
 
-\begin_layout Paragraph*
-Monocular SLAM
+\begin_layout Paragraph
+PID Control
 \end_layout
 
 \begin_layout Standard
-SLAM (simultaneous localization and mapping) is a computer vision technique
- used to build up a map of an environment containing unknown factors, whilst
- at the same time keeping track of current location.
- Many different types of sensors can be used to solve SLAM-based problems,
- such as laser range scanners, monocular or stereo cameras, or RGB-D sensors
- (RGB camera plus a depth sensor eg.
- Kinect).
- In the quadropter experiments, it is used to keep track of the quadropter
- relative to the environment.
- These SLAM systems are generally located on board the vehicle itself.
- 
-\begin_inset Newline newline
-\end_inset
-
-SLAM will most likely not end up being a part of our system.
- Instead, we will focus on getting the automated flight correct in a assumed-emp
-ty flying space.
- However, it does pose an interesting idea for later developement - perhaps
- the creation of a map of the surrounding environment, to be navigated by
- the helicopter?
+One key method that they use for control in this project is the PID (proportiona
+l-integral-derivative) controller.
+ PID control was used to steer the quadrocopter towards a location.
+ They used a separate PID controller for each degree of freedom of the quadrocop
+ter, and experimentally calibrated each controller.
+ We can do something similar in our project - with only two major degrees
+ of freedom (the yaw is controlled by a gyroscope, so it is very predictable
+ in nature), it should also be substantially simpler.
+ We will look into PID control in more detail later on.
 \end_layout
 
 \begin_layout Paragraph*
@@ -592,15 +581,10 @@ In the quadropter experiments, they successfully demonstrated that accurate
  Using a combination of machine learning and visual systems from a monocular
  source, combined with onboard data, they managed to achieve an average
  positioning accuracy of 4.9cm whilst flying indoors.
- This is quite encouraging for my project - whilst I will not have access
- to onboard flying information, my location information does not need to
- be this accurate.
- The methods that they describe for using an EKF to measure the quadropter
- position at different observational times subject to control transmission
- delay should prove to be very useful for when I am also doing visual tracking,
- as I will be subject to many of the same problems that they faced.
- When I get to this point in my project, it will be worth doing extra research
- on the methods that they used, and how I can implement it.
+ This is quite an encouraging result - whilst we will not have access to
+ onboard flying information, our positional accuracy does not need to be
+ as precise.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -628,64 +612,37 @@ localize and navigate autonomously in previously unknown and GPS-denied
 
 .
  Much like the paper discussed above, he uses a SLAM system for positional
- estimates, and combines this with an Extended Kalman Filter to fuse all
- available data and to compensate for data delays.
- He talks in detail about SLAM and the EKF, which is the key part of this
- paper that interests me - absolute accuracy of movement are not a key aim
- of this project, just as it is not when the human pilot wishes to fly the
- remote control helicopter.
- However, the paper still raises many interesting points regarding how positiona
-l information is gathered, and how flight paths are calculated, which will
- come in useful when I reach the midpoint of my project.
+ estimates, combines this with an Extended Kalman Filter to fuse all available
+ data and to compensate for data delays, and a PID controller to then pefrom
+ actual control.
+ 
 \end_layout
 
-\begin_layout Subsection
-Odometry from RGB-D Cameras for Autonomous Quadrocopters
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Odometry quadropter"
+\begin_layout Paragraph*
+Monocular SLAM
+\end_layout
 
+\begin_layout Standard
+SLAM (simultaneous localization and mapping) is a computer vision technique
+ used to build up a map of an environment containing unknown factors, whilst
+ at the same time keeping track of current location.
+ Many different types of sensors can be used to solve SLAM-based problems,
+ such as laser range scanners, monocular or stereo cameras, or RGB-D sensors
+ (RGB camera plus a depth sensor eg.
+ Kinect).
+ In the quadropter experiments, it is used to keep track of the quadropter
+ relative to the environment.
+ These SLAM systems are generally located on board the vehicle itself.
+ 
+\begin_inset Newline newline
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-Again following on the themes of the previous two works, this paper focuses
- on the details of flying a quadropter - however, unlike the previous two
- pieces this one details quadropters where the camera source is an RGB-D
- camera located on board the quadropter itself.
- This is a more high-cost solution, but may still provide some insights
- towards control of the quadropter and flight itself.
-\end_layout
-
-\begin_layout Paragraph
-Least Squares
-\end_layout
-
-\begin_layout Standard
-The paper discusses the technique of least squares, that is used to estimate
- the parameter of a model that uses noisy observations.
- It also discusses the derivation of this technique, as well as the technique
- of weighted least squares, which is used to deal with outlier observations,
- that heavily affect the parameter estimates.
- Outliers will most likely be something that will occur when I take measurements
- in my project, so making the motion estimates robust is extremely important.
- These outliers are particularly bad in a standard least squares solution,
- because of the large side-effects caused by the quadratic error term in
- its formulation.
- 
-\end_layout
-
-\begin_layout Paragraph
-Remarks
-\end_layout
-
-\begin_layout Standard
-The methods described for least squares, and dealing with outliers by using
- variations thereof should prove to be useful for the learning part of the
- project.
- 
+SLAM will most likely not end up being a part of our system.
+ Instead, we will focus on getting the automated flight correct in a assumed-emp
+ty flying space.
+ However, it does pose an interesting idea for later developement - perhaps
+ the creation of a map of the surrounding environment, to be navigated by
+ the helicopter?
 \end_layout
 
 \begin_layout Subsection
@@ -701,15 +658,14 @@ key "Kinectfusion"
 \end_layout
 
 \begin_layout Standard
-The fundamental topics of this paper are somewhat different than mine, however
- I felt that it might provide some useful insight into some of the later
- stages of the project.
+Whilst the fundamental topics of this paper are somewhat different than
+ our project, it still covers many different areas of potential extension.
  The KinectFusion is a method for creating a 3D representation of a scene
  by using a Kinect, that uses depth values from multiple angles to create
  the model, in real-time.
  It might be possible to utilize some of the techniques used to create a
  partial construction of the environment by using a single location from
- the Kinect.
+ the Kinect, which can then later be used during flight.
 \end_layout
 
 \begin_layout Paragraph
@@ -731,19 +687,6 @@ The Kinect, whilst being a great tool for collecting depth data as well
 \end_layout
 
 \begin_layout Paragraph
-GPU Implementation
-\end_layout
-
-\begin_layout Standard
-The real-time camera tracking and reconstruction is performed using parallel
- execution on a GPU.
- If I wanted to use this technology directly, I may need to get specialised
- hardware.
- Alternatively, I may be able to implement a less-functional version using
- my current hardware.
-\end_layout
-
-\begin_layout Paragraph
 Remarks
 \end_layout
 
@@ -752,9 +695,11 @@ The KinectFusion offers many interesting thinking points.
  Partial scene reconstruction would certainly be useful for the later stages
  of this project, where it is important to be aware of the surroundings
  relative to the location of the helicopter.
- Additionally, it may be of interest to see if this might aid object tracking
- of the helicopter by building a 3D model of it prior to flight.
- 
+ For instance, it could be used to create a 'safe' flying environment, where
+ the system allows free flight for the user, but steps in if a collision
+ might occur.
+ This 'assisted flying' mechanism could especially be useful for beginner
+ pilots!
 \end_layout
 
 \begin_layout Subsection
@@ -769,11 +714,14 @@ key "Syma"
 \end_layout
 
 \begin_layout Standard
-This blog post was the original inspiration for this project, and lists
- a potential implementation method for the manual control of the helicopter
- from a computer.
+This blog post by Johnny Chung Lee was the original inspiration for this
+ project, and lists a potential implementation method for the manual control
+ of the helicopter from a computer.
  Additionally, it lists some rough measurements for the IR protocol, and
- it was from these measurements that I based my initial values on.
+ it was from these measurements that we based our initial control parameters
+ on.
+ After using an oscilloscope to measure the signal sent from the radio controlle
+r, he came up with the following approximate values:
 \end_layout
 
 \begin_layout Paragraph
@@ -838,6 +786,11 @@ The packet is completed with a stop bit ('1').
  off.
  These packets should be sent to the helicopter every 120ms.
  
+\begin_inset Newline newline
+\end_inset
+
+However, he goes on to report that his personal experiments with these values
+ results in stuttery performance.
 \end_layout
 
 \begin_layout Paragraph
@@ -845,15 +798,14 @@ Personal findings
 \end_layout
 
 \begin_layout Standard
-I implemented the above protocol myself using the Arduino board, and found
- that the helicopter did not respond as I would have liked.
+We implemented the above protocol myself using the Arduino board, and found
+ that the helicopter did not respond in an optimal fashion, just as Lee
+ previously discussed in the blog post.
  The helicopter would operate as ordered for a few packets, and then stop
  for a small amount of time, and then restart again.
- This might have been due to small differences in the protocol between my
- helicopter or his, or simply just a problem with his code.
- I figured that this was a problem with the individual timings of packets,
- so did some experiments and found that the following values worked best
- for me:
+ To remedy this, we performed some experiments with the timings, and found
+ that the following timings provided continuous performance with no stuttering
+ or lost signals:
 \end_layout
 
 \begin_layout Itemize
@@ -882,9 +834,9 @@ Compensating time for the individual port switches (basically compensating
 \end_layout
 
 \begin_layout Standard
-This resulted in stable, non-stuttering flight that worked from a large
- distance.
- 
+After duplicating this signal across multiple IR LEDs, this also allowed
+ for long-range control, well outside of the normal operating range for
+ the helicopter in an room indoors.
 \end_layout
 
 \begin_layout Paragraph
@@ -926,44 +878,26 @@ Pitch movement is gained by spinning the tail rotor.
 \end_layout
 
 \begin_layout Section
-Control models
+Control methods
 \end_layout
 
 \begin_layout Standard
-A key consideration I had to make was what method I would use to 'learn'
- the correspondence between resultant acceleration and input power to the
- helicopter.
- The mapping between these two would be extremely important in flying the
- helicopter later, as I would want the helicopter to be able to make judgements
- on the appropriate input for a desired acceleration, whilst also being
- able to augment this mapping with new observations.
- For the straight up/down case, where changing the input throttle results
- in a flat increase in propellor speed, and hence change in upwards velocity
- of the helicopter, I pulled out the key requirements:
-\end_layout
-
-\begin_layout Itemize
-It needs to be able to return a mapping between acceleration and power.
- 
-\end_layout
-
-\begin_layout Itemize
-It needs to be able to update itself when receiving a new input power and
- the observed output acceleration.
-\end_layout
-
-\begin_layout Itemize
-It needs to be able to create an initial model with very little input at
- all, that can rapidly re-evaluate itself using the above two methods.
-\end_layout
-
-\begin_layout Standard
-Some initial considerations were using least squares and various similar
- deriviations, temporal difference learning, or a kalman filter of sorts.
- At first I implemented a basic least squares algorithm, as it appeared
- to be the simplest of the three and would be easy to implement.
- Additionally, by implementing it I might be able to see any problems that
- could emerge if I were to do any other methods in the future.
+Once relevant data about the helicopter has been obtained, it is necessary
+ to actual control the helicopter in 3D space.
+ There are many different approaches to this, each with their own benefits
+ and drawbacks.
+ For instance, for the Throttle of the helicopter it will almost certainly
+ be necessary to have some sort of adaptive control.
+ This will be to combat the effect of reduced effective throttle as the
+ battery runs out in the helicopter (eg.
+ at full-charge, the helicopter will remain level at a Throttle of about
+ 70.
+ As the charge reduces below half, it will require upwards of 90-100 to
+ remain level).
+ In contrast, Yaw does not need any kind of adaptive control as it is controlled
+ on board the helicopter by a gyroscope, and can instead be operated in
+ a digital fashion.
+ We will look at some of these control methods here.
 \end_layout
 
 \begin_layout Subsection
@@ -1140,6 +1074,170 @@ The PID controller was used in the majority of the quadcopter papers, so
  in the vertical case, for instance, the input is the throttle and the output
  is the observed position, with the error being the difference between the
  required position and the current position.
+ We require this more complex controller because we do not know the given
+ 'neutral' Throttle required to remain stationary against the effect of
+ gravity.
+ In comparison, this is not true for our Yaw or Pitch controls, which we
+ know give a neutral position with the value 63.
+\end_layout
+
+\begin_layout Subsection
+Linear Control
+\end_layout
+
+\begin_layout Standard
+As the only opposing force to the motion of the helicopter is air resistance
+ itself, plus the helicopter's own rotor motion, it is desirable to have
+ some sort of pre-emptive slow down mechanism so as to not 'overshoot' the
+ intended position.
+ In the lecture notes Steering Behaviours
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ludic"
+
+\end_inset
+
+, the 'Arrive' steering behaviour is discussed - it linearly decreases the
+ desired speed based on distance between the desired position and the current
+ position.
+ This decrease in speed can be achieved by simple air-resistance drifting
+ (requires a longer distance) or by applying a counter force (shorter distance).
+\begin_inset Newline newline
+\end_inset
+
+If 
+\begin_inset Formula $p$
+\end_inset
+
+ is the current position, and 
+\begin_inset Formula $q$
+\end_inset
+
+ is the desired position, then
+\begin_inset Formula 
+\[
+d_{off}=Target\, distance=|q-p|
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+ideal\, speed\,\sigma=\begin{cases}
+s_{max} & d_{off}>d_{stop}\\
+s_{max}\cdot\frac{d_{off}}{d_{stop}} & otherwise
+\end{cases}
+\]
+
+\end_inset
+
+Then, with desired velocity 
+\begin_inset Formula $u=\sigma\cdot unit(q-p)$
+\end_inset
+
+, the final desired change in velocity (taking into account the current
+ velocity) is
+\begin_inset Formula 
+\[
+Arrive(q)=u-v
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Suitability
+\end_layout
+
+\begin_layout Standard
+It is already known that a neutral Pitch (Pitch = 63), ignoring air currents
+ in the room, will not move the helicopter forwards or backwards, so as
+ long as the forward Pitch is cut off sufficiently early.
+ Additionally we are capable of providing reverse thrust as required simply
+ by altering the Pitch in the opposite direction.
+ As such, the 'Arrive' behaviour is suitable for movement in the 
+\begin_inset Formula $x-z$
+\end_inset
+
+ plane.
+\end_layout
+
+\begin_layout Subsection
+Digital Control
+\end_layout
+
+\begin_layout Standard
+When the movement mechanism is known to be 'digital' in nature, in that
+ it is possible to start and stop movment at a single moment, it should
+ be sufficient to have an extremely simple 'digital' control mechanism as
+ well.
+ In pseudo-code, we could represent this as
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+currentDirection = observe
+\end_layout
+
+\begin_layout Plain Layout
+
+diff = currentDirection - desiredDirection
+\end_layout
+
+\begin_layout Plain Layout
+
+if diff > 0:
+\end_layout
+
+\begin_layout Plain Layout
+
+	setMotor LEFT
+\end_layout
+
+\begin_layout Plain Layout
+
+elif diff < 0:
+\end_layout
+
+\begin_layout Plain Layout
+
+	setMotor RIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+else:
+\end_layout
+
+\begin_layout Plain Layout
+
+	setMotor STOP
+\end_layout
+
+\end_inset
+
+Depending on the situation or accuracy required, we could alter the speed
+ of the movement, whilst still retaining the ability to stop at a whim.
+\end_layout
+
+\begin_layout Paragraph
+Suitability
+\end_layout
+
+\begin_layout Standard
+For our helicopter system, this kind of digital control is most appropriate
+ for the Yaw of the helicopter.
+ Setting the Yaw value to 63 will immediately halt any clockwise/anticlockwise
+ motion.
+ Subsequently, if we wish to reorient the helicopter, it is sufficient to
+ apply some steady left/right Yaw (eg.
+ 43 or 83 for left/right respectively), wait for the orientation to be as
+ desired, then apply Yaw = 63 again.
 \end_layout
 
 \begin_layout Section
@@ -1147,21 +1245,28 @@ Vision
 \end_layout
 
 \begin_layout Standard
-As has been mentioned earlier, I have decided to use a Kinect camera as
- my vision input source.
- The Kinect is not just an RGB camera - it is also a fairly accurate depth
- sensor, and this extra dimension of input could potentially make many of
- the problems that I am trying to solve easier.
- Upon receiving the Kinect from my supervisor, I set about getting it up
- and running with the Ubuntu operating system that I work on, searching
- for libraries and tools for it.
- In addition to this, it was important that I would be able to get the Kinect
- working in Haskell without too much problem, otherwise I would have to
- write a tool for this as well.
- Additionally, there are several packages that support the Kinect for use
- in Haskell.
- However, most of these are incomplete, so I might not use them for my final
- implementation of the vision package.
+As has been mentioned earlier, we will use a Kinect camera as our vision
+ input source.
+ The Kinect is not just an RGB camera - it is also a depth sensor, and this
+ extra dimension of input could potentially simplify many of the problems
+ that we are solving.
+ 
+\end_layout
+
+\begin_layout Subsection
+Kinect 
+\end_layout
+
+\begin_layout Itemize
+Calibration
+\end_layout
+
+\begin_layout Itemize
+Camera parameters
+\end_layout
+
+\begin_layout Itemize
+Converting from depth to RGB camera (using params)
 \end_layout
 
 \begin_layout Subsection
@@ -1264,7 +1369,19 @@ key "SimpleCV book"
 \end_layout
 
 \begin_layout Subsection
-SIFT Descriptors
+SimpleCV
+\end_layout
+
+\begin_layout Itemize
+Connection with OpenCV (freenect)
+\end_layout
+
+\begin_layout Itemize
+Additional features
+\end_layout
+
+\begin_layout Itemize
+Easily expanded/altered
 \end_layout
 
 \begin_layout Section
@@ -3081,41 +3198,13 @@ Another, simpler, method of orientation analysis attempted was inferrence.
 Rough results
 \end_layout
 
-\begin_layout Section
-Assembly
-\end_layout
-
-\begin_layout Itemize
-Problems integrating the two languages
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Approaches used, tested, thrown out
-\end_layout
-
-\begin_layout Itemize
-Thrift
-\end_layout
-
-\begin_layout Itemize
-HTTP server instead (why, what it fulfills)
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Initial observations
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Show noise with/without filters
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Improvements, filters etc.
- 
+\begin_layout Standard
+Given a suitable constant forward velocity, the orientation inferrence method
+ gave positive results for a simple steering mechanism.
+ It suffered somewhat when the helicopter was not operating under ideal
+ conditions (such as backdraft from walls causing the helicopter to move
+ backwards), however given the simplicity of the system and the hoped operating
+ conditions of the helicopter, it still proved to be an attractive method.
 \end_layout
 
 \begin_layout Section
@@ -3214,6 +3303,10 @@ Additional Features
 
 \begin_layout Subsection
 Landing and Taking Off
+\end_layout
+
+\begin_layout Subsection
+Assisted flying
 \end_layout
 
 \begin_layout Chapter
@@ -3748,6 +3841,22 @@ key "teensyusb"
 \end_inset
 
 http://www.pjrc.com/teensy/
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "ludic"
+
+\end_inset
+
+Colton, S.
+ and Pease, A.
+ 2011.
+ Lecture 9: Steering Behaviours.
+ [e-book] pp.15 - 16.
+ Available through: Ludic Computing, Department of Computing [Accessed:
+ 09/06/2013].
 \end_layout
 
 \begin_layout Standard
