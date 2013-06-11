@@ -52,9 +52,18 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
+  milliSleep 5000
+  surfaces <- lookAround flyer
+  --putStrLn $ show (filter sSpecial surfaces)
   let hIntent = hoverAt $ Position desiredPos undefined
   let lIntent = landOn $ Position (vector [-0.1, -0.51, -1.65]) undefined
-  let intent = keepDoing $ withTiming (1000, waitTime)  $ doAll <&> hIntent <&> lIntent <&> hIntent
+  --let intent = keepDoing $ withTiming (1000, waitTime)  $ doAll <&> hIntent <&> lIntent <&> hIntent
+  let 
+    intent = doAll 
+      <&> hIntent
+      <&> (if (length $ filter sSpecial surfaces) > 0
+        then (landOn $ Position (sPoint $ head $ filter sSpecial surfaces) undefined)
+        else lIntent)
 
   milliSleep waitTime
   (_, pos) <- observe flyer
@@ -85,6 +94,8 @@ monkeyDo :: (Flyable a) => a -> MonkeyBrainT
 monkeyDo flyer = do
   obs@(pwr', pos') <- lift $ observe flyer
   active <- lift $ isActive flyer
+
+  surfaces <- lift $ fmap (filter (not . sSpecial)) $ lookAround flyer
   if active 
     then do
       (Brain intent (pos, pwr)) <- get
@@ -93,6 +104,10 @@ monkeyDo flyer = do
       let vel = getVec (pos' - pos) |/| wt
       intent' <- lift $ enactIntent intent flyer pos' vel
       put $ Brain intent' (pos', pwr)
+
+      --if or $ map (onIntersection pos' vel) surfaces 
+      --  then (lift $ putStrLn "uh oh") 
+      --  else (lift $ putStrLn "we're fine")
 
     else do
       iters <- lift $ fmap length $ 
@@ -104,6 +119,20 @@ monkeyDo flyer = do
       put $ Brain intent (pos',pwr)
 
   lift $ milliSleep waitTime
+
+onIntersection :: Position -> Velocity -> Surface -> Bool
+onIntersection p v s 
+  | vectorSize v == 0 = False
+  | vecDot l n == 0   = False
+  | d < 0             = False
+  | d <= 1            = True
+  | otherwise         = False
+  where
+    l   = vectorUnit v
+    l0  = getVec p
+    p0  = sPoint s
+    n   = sNorm s
+    d   = (vecDot (p0 - l0) n) / (vecDot l n)
 
 takeWhileIO :: (a -> Bool) -> [IO a] -> IO [a]
 takeWhileIO _ [] = return []

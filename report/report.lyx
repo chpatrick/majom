@@ -65,7 +65,7 @@
 \begin_body
 
 \begin_layout Title
-Report
+Computer Vision Control of a Remote Control Helicopter
 \end_layout
 
 \begin_layout Author
@@ -1964,7 +1964,10 @@ Measurements A packet consists of a header, the main order packet, and a
 \end_inset
 
 The main packet itself is 32 individual bits.
- 
+ Each bit is split into two halves, with each half corresponding to a different
+ signal.
+ This allows two different helicopters to be flown in the same room without
+ clobbering each others signals.
 \end_layout
 
 \begin_deeper
@@ -3402,76 +3405,866 @@ Qualitative analysis of the system
 
 \begin_layout Standard
 To evaluate the limitations of the system, several tests were set up.
- These tests were designed to quantitavely see the exact capabilities and
- limiations of the system.
- Qualities tested (split into traits) were:
+ These tests were designed to quantitavely analyse the exact capabilities
+ of the system.
+ Each section analyses one particular trait of the system.
 \end_layout
 
 \begin_layout Paragraph
+Test conditions
+\end_layout
+
+\begin_layout Standard
+Each of these tests was performed in an 'ideal operating environment', which
+ we have classified as a medium sized room with no moving objects, and an
+ uncluttered airspace.
+ Later revisions of the system may allow the addition of objects to the
+ scenario, but for the foundation level of the project we assume that the
+ airspace is object free.
+\end_layout
+
+\begin_layout Subsection
 Position detection (vision)
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Standard
+In this section we measure the ability of the vision system to detect the
+ helicopter and its position.
+\end_layout
+
+\begin_layout Subsubsection
 Range of detection
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Subsubsection
 Robustness of detection
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Subsubsection
 Accuracy of detection
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Subsubsection
 Limitations
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsection
 Orientation detection (vision)
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Standard
+In this section we measure the ability of the vision system to determine
+ the current orientation of the helicopter.
+\end_layout
+
+\begin_layout Subsubsection
 Accuracy of detection
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Subsubsection
 Limitations
 \end_layout
 
+\begin_layout Standard
+The current orientation detection mechanism (orientation inferrence) relies
+ on the helicopter having a forward velocity.
+ Without a forward velocity, or prior knolwedge about the helicopter, the
+ mechanism is unable to detect the orientation.
+\end_layout
+
+\begin_layout Subsection
+Flight (control)
+\end_layout
+
+\begin_layout Standard
+In this section we measure the ability of the control system to gain stable
+ flight, and to hover at a predetermined point.
+\end_layout
+
+\begin_layout Subsubsection
+Throttle adaption
+\end_layout
+
+\begin_layout Standard
+As a rough starting point, the helicopter begins with a starting assumed
+ 'stable' Throttle of 80.
+ This is the throttle at which the helicopter perfectly retains height,
+ working against gravity.
+ As battery power fluctuates, the stable Throttle also changes.
+ As such, the current control system adapts based on observations.
+ The time taken to adapt will depend on two factors - the distance between
+ the actual stable throttle and the assumed stable Throttle of 80, and the
+ size of the cumulative error between the desired position and the current
+ position (a property of the PID control system).
+\begin_inset Newline newline
+\end_inset
+
+Because of the fluctuating nature of the stable Throttle, it is very difficult
+ to exactly measure the rate at which the system Throttle approaches the
+ stable Throttle.
+ However, it can be formulated using the equation for PID control:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+Throttle=K_{p}e(t)+K_{i}\int_{0}^{t}e(x)dx+K_{d}\frac{d}{dt}e(t)
+\]
+
+\end_inset
+
+If the current Throttle is represented by 
+\begin_inset Formula $T_{1}$
+\end_inset
+
+, and the stable Throttle by 
+\begin_inset Formula $T_{2}$
+\end_inset
+
+, then the 'distance' between the two is (assuming that 
+\begin_inset Formula $T_{2}>T_{1}$
+\end_inset
+
+)
+\begin_inset Formula 
+\[
+T_{2}-T_{1}=T_{2}-K_{p}e(t)-K_{i}\int_{0}^{t}e(x)dx-K_{d}\frac{d}{dt}e(t)
+\]
+
+\end_inset
+
+Assuming that the current flight is stable (that is, it isn't oscillating),
+ then 
+\begin_inset Formula $\frac{d}{dt}e(t)=0$
+\end_inset
+
+.
+ Additionally, as 
+\begin_inset Formula $e(t)\rightarrow0$
+\end_inset
+
+, 
+\begin_inset Formula $K_{p}e(t)\rightarrow0$
+\end_inset
+
+, so the only term that affects our approach from 
+\begin_inset Formula $T_{1}$
+\end_inset
+
+ to 
+\begin_inset Formula $T_{2}$
+\end_inset
+
+ is 
+\begin_inset Formula $K_{i}\int_{0}^{t}e(x)dx$
+\end_inset
+
+, the accumulated sum of all errors.
+ The further that the helicopter is from the desired position, the larger
+ this term is, so the faster it will approach 
+\begin_inset Formula $T_{2}$
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Paragraph
+Remarks
+\end_layout
+
+\begin_layout Subsubsection
+Hovering
+\end_layout
+
+\begin_layout Standard
+It is possible to record the positions of the helicopter throughout a flight
+ using the vision system, and to plot the resulting flight path on a 3D
+ graph.
+ This gives a good visual interpretation of exactly how the helicopter approache
+s a stable flight position.
+ On three seperate flights, launching by hand from the same position each
+ time, we achieved these flight paths for the same hover position:
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+Whilst flight paths are useful for analysing the behaviour itself, it is
+ sometimes more useful to see the observed error over time of the helicopter
+ from its intended position.
+ Taking the absolute distance between the helicopter and the desired point
+ each time for the same three flights gives the following graphs:
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Remarks
+\end_layout
+
+\begin_layout Subsection
 System properties
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Standard
+In this section we measure the properties of the system itself.
+ This includes communication to the helicopter, limitations of the system
+ and response times.
+\end_layout
+
+\begin_layout Subsubsection
 Helicopter response times
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Subsubsection
 Multiple signals
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Standard
+The Syma Remote Control Helicopter is capable of responding to two separate
+ signals, so that two separate helicopters can be flown in the same environment
+ at the same time.
+ It accomplishes this by allocating twice as many bits as necessary for
+ flight - each half corresponds to a different signal.
+ In this way, it would be possible to control two helicopters separately
+ at the same time.
+ This was somewhat outside of the scope of this project.
+\end_layout
+
+\begin_layout Subsubsection
 Control range/robustness (Arduino)
 \end_layout
 
-\begin_layout Itemize
-Problems with the system
+\begin_layout Standard
+In comparison to more traditional signal mechanisms, the IR LED sacrifices
+ range for simplicity.
+ It is completely occluded by solid objects, however it does reflect well
+ off of objects and thus can reach areas that cannot be 'seen' directly
+ from the LED itself.
+ Here we perform some simple experiments to judge the effective range of
+ the Arduino communication, using distance and occlusion.
+ 
+\begin_inset Newline newline
+\end_inset
+
+In these experiments we classify signal failure as when the signal drops
+ - when the helicopter does not receive any signal, it automatically cuts
+ all power.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LEDs
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Distance to failure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Resilience to occlusion
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
+Remarks
+\end_layout
+
+\begin_layout Subsection
 Helicopter properties
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Standard
+In this section we analyse some specific properties of the helicopter itself,
+ so that we may better judge the effectiveness of our system.
+ 
+\end_layout
+
+\begin_layout Subsubsection
 Speeds of helicopter
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Standard
+It is important to understand the range of speeds attainable by the helicopter,
+ and at what control parameters they occur.
+ The helicopter is quite limited in its maximum pitch and throttle speeds,
+ which we believe is a design feature implemented to make the helicopter
+ simpler to fly for most users.
+ 
+\end_layout
+
+\begin_layout Paragraph
+Pitch (x/z axis motion)
+\end_layout
+
+\begin_layout Standard
+The following average speeds in the 
+\begin_inset Formula $x/z$
+\end_inset
+
+ world axis were recorded for 5 different pitches, with the same applied
+ throttle.
+ These were taken over X separate measurements.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Pitch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Speed
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Throttle (y axis motion)
+\end_layout
+
+\begin_layout Standard
+The following average speeds in the 
+\begin_inset Formula $y$
+\end_inset
+
+ world axis were recorded at 5 different throttles, starting from stationary.
+ These were taken over X separate measurements.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Throttle
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Speed
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+It is important to note the different
+\end_layout
+
+\begin_layout Subsubsection
 Flight time of helicopter
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Subsubsection
 Range of motion of helicopter
 \end_layout
 

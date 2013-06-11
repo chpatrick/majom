@@ -38,7 +38,7 @@ instance Intent AnyIntent where
   success (AnyIntent i) = success i
 
 (<&>) :: (Intent a) => MultiIntent -> a -> MultiIntent
-(<&>) m i = m { actions = ((AnyIntent i) : (actions m)) }
+(<&>) m i = m { actions = (actions m) ++ [AnyIntent i] }
 
 doAll :: MultiIntent
 doAll = MultiIntent [] 0

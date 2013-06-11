@@ -31,11 +31,12 @@ data VirtualHelicopter =
     getPosition :: TVar Position, 
     getCurrentOptions :: TVar OptionMap, 
     getActive :: TVar Bool,
-    getPID :: TVar PID}
+    getPID :: TVar PID,
+    getSurfaces :: TVar [Surface]}
 
 -- | Spawns a virtual helicopter at (0,0)
 spawnVirtualHelicopter :: IO VirtualHelicopter
-spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (Position (vector [0,0,0]) 0)) <*> (newTVar $ Map.fromList flyerInit) <*> (newTVar False) <*> (newTVar newPID)
+spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (Position (vector [0,0,0]) 0)) <*> (newTVar $ Map.fromList flyerInit) <*> (newTVar False) <*> (newTVar newPID) <*> (newTVar [])
 
 clamp :: Int -> Int
 clamp i
@@ -79,16 +80,19 @@ instance Flyable VirtualHelicopter where
   setActive h b = atomically $ writeTVar (getActive h) b
   getController h = atomically $ readTVar (getPID h)
   setController h p = atomically $ writeTVar (getPID h) p 
-  lookAround h = undefined
+  lookAround h = atomically $ readTVar (getSurfaces h)
 
 -- | Runs the flying simulation
 run h = do 
+  let surfaces = [Surface (vector [0, 0, 4]) (vector [0, 0, -1]) False,
+                  Surface (vector [1, 0, 1]) undefined True]
   let 
     settings = 
-      setSurfaces (Just [Surface (vector [0, 0, 4]) (vector [0, 0, -1])]) $
+      setSurfaces (Just surfaces) $
       setFloor (Just (vector [0,0,0])) 
         defaultSettings
   --let settings = defaultSettings
+  atomically $ writeTVar (getSurfaces h) surfaces
   forceVar <- startSimulation settings (getPosition h) $ simpleObject $ Position (vector [0,0,0]) 0
   forever $ do
     options <- atomically $ do
@@ -96,6 +100,7 @@ run h = do
       clearOptions optionsVal
       return options
     processOptions h forceVar options
+    
     milliSleep 50
   where
     optionsVal = getOptions h

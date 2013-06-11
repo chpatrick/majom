@@ -61,6 +61,13 @@ vectorY = (V.! 1)
 vectorZ :: Vector -> Double
 vectorZ = (V.! 2)
 
+vecDot :: Vector -> Vector -> Double
+vecDot v1 v2 =
+  V.sum (v1' * v2')
+  where
+    v1' = vectorUnit v1
+    v2' = vectorUnit v2
+
 getDirection :: Vector -> Int
 getDirection v
   | y == 0  = 0
@@ -127,7 +134,7 @@ type Time = Double
 -- | Power from the controller
 type Power = Int
 
-data Surface = Surface { sPoint :: Vector, sNorm :: Vector }
+data Surface = Surface { sPoint :: Vector, sNorm :: Vector, sSpecial :: Bool }
   deriving Show
 
 data Ray = Ray { rDir :: Vector, rStart :: Vector }
