@@ -4257,15 +4257,56 @@ Speed
 \begin_inset Newline newline
 \end_inset
 
-It is important to note the different
+It is important to note that the helicopter reacts differently to changes
+ in throttle at different heights.
+ When the helicopter is close to the ground, smaller levels of throttle
+ will create equivalent upwards thrust as higher levels at higher altitudes.
+ This can cause problems with helicopter navigation at ground level, as
+ it creates its own interfering air currents.
+ This can be negated somewhat by performing as much of the navigation as
+ possible at higher altitudes, and then for lower altitudes relying on quick
+ descents and takeoffs that minimise travel time.
 \end_layout
 
 \begin_layout Subsubsection
 Flight time of helicopter
 \end_layout
 
-\begin_layout Subsubsection
-Range of motion of helicopter
+\begin_layout Standard
+Over the flight time of the helicopter, it gradually loses battery power.
+ After a certain critical point of battery level, the helicopter will be
+ unable to generate any upwards thrust at all, and will stop functioning
+ entirely.
+ In this experiment, we measured the 'stable' throttle value from fully
+ charged until failure, and recorded the time of failure.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+Average stable throttle over time from fully charged (3 experiments).
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section

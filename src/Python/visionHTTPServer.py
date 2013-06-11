@@ -8,7 +8,7 @@ class VisionServer(SimpleHTTPServer.SimpleHTTPRequestHandler):
   history = []
   lastO = 0
   def do_GET(self):
-    global base, filt
+    global base, filt, rec
     self.send_response(200)
     #pos = differizer(base)
     pos = diffdiff2(base, filt, history=self.history)
@@ -24,6 +24,8 @@ class VisionServer(SimpleHTTPServer.SimpleHTTPRequestHandler):
         self.history.pop()
 
     print "FOO", pos
+    if rec != None:
+      rec.append(pos)
     self.send_header("POS:" + pos, "text/html")
     self.end_headers()
 
@@ -33,6 +35,7 @@ cam = Kinect()
 #base = cam.getImage()
 base = freenect.sync_get_depth()[0].copy()
 filt = adapt(base,10000)
+rec = None
 
 print "Starting server..."
 
@@ -44,7 +47,9 @@ if len(sys.argv) > 1 and sys.argv[1] == 'test':
       (x,y,z,o,v) = pos
       history.insert(0,(x,z))
       print "{},{},{},{}".format(x,y,z,v)
-
+elif len(sys.argv) > 1 and sys.argv[1] == "rec":
+  global rec
+  rec = []
 else:
   try:
     server.serve_forever()
@@ -53,3 +58,8 @@ else:
     print "Bye :("
     server.socket.close()
     server.shutdown()
+    global rec
+    if rec != None:
+      out = open("rec_out.txt",'w')
+      for p in rec:
+        out.write(p)
