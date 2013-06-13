@@ -39,9 +39,9 @@ data Brain = Brain { --brainIntent :: LandIntent,
                      brainLast :: (Position, Power) }
 
 desiredPos :: Vector
-desiredPos = vector [0, 0.2, -1]
+desiredPos = vector [0, 0.2, -1.7]
 
--- | Starts the monkey (starts the flyer too)
+-- | Starts the monkey (starts te flyer too)
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
   forkIO $ fly flyer
@@ -58,13 +58,15 @@ runMonkey' flyer = do
   let hIntent = hoverAt $ Position desiredPos undefined
   let lIntent = landOn $ Position (vector [-0.1, -0.51, -1.65]) undefined
   --let intent = keepDoing $ withTiming (1000, waitTime)  $ doAll <&> hIntent <&> lIntent <&> hIntent
+  {-
   let 
     intent = doAll 
       <&> hIntent
       <&> (if (length $ filter sSpecial surfaces) > 0
         then (landOn $ Position (sPoint $ head $ filter sSpecial surfaces) undefined)
         else lIntent)
-
+  -}
+  let intent = keepDoing $ doAll <&> hIntent
   milliSleep waitTime
   (_, pos) <- observe flyer
 
@@ -100,7 +102,7 @@ monkeyDo flyer = do
     then do
       (Brain intent (pos, pwr)) <- get
 
-      lift $ putStrLn $ prettyPos pos'
+      --lift $ putStrLn $ prettyPos pos'
       let vel = getVec (pos' - pos) |/| wt
       intent' <- lift $ enactIntent intent flyer pos' vel
       put $ Brain intent' (pos', pwr)

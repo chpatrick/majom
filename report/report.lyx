@@ -3216,7 +3216,7 @@ Control
 
 \begin_layout Standard
 Accurate detection was only one of the requirements that needed to be fulfilled
- - armed with positi4onal data, it was now important to decide how to control
+ - armed with positional data, it was now important to decide how to control
  the helicopter itself.
  Fortunately, the design of the helicopter itself allows for conceptual
  simple controls for a human controller, and as such it is (relatively)
@@ -3272,44 +3272,413 @@ Based on these observations, it is possible to construct several different
 Control methods
 \end_layout
 
-\begin_layout Itemize
-How helicopter will be controlled
-\end_layout
+\begin_layout Standard
+Due to the differences of control for movement in the 
+\begin_inset Formula $y-axis$
+\end_inset
 
-\begin_layout Itemize
-Started considering how a human does it
-\end_layout
+, 
+\begin_inset Formula $x/z-axis,$
+\end_inset
 
-\begin_layout Itemize
-PID
+ and orientation, we decided to use two different control methods for each
+ of these (PID, Linear Control and Digital Control respectively), as explained
+ above in Section 2.2 Control Methods.
+ 
 \end_layout
 
 \begin_layout Paragraph
 Intentions
 \end_layout
 
+\begin_layout Standard
+The specifics of each of these controls is defined in an Intent.
+ An Intent is a desire to do something, and each Intent classifies a different
+ flight behaviour, whether it be flying, landing or hovering.
+ Because of the flexibility of interpretation of this, the corresponding
+ definition in our code is quite simple:
+\begin_inset listings
+lstparams "language=Haskell"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+class Intent a where
+\end_layout
+
+\begin_layout Plain Layout
+
+	enactIntent :: (Flyable b) => a -> b -> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		Position -> Velocity -> IO a
+\end_layout
+
+\begin_layout Plain Layout
+
+	success :: a -> Bool
+\end_layout
+
+\end_inset
+
+where 
+\begin_inset listings
+lstparams "language=Haskell"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+enactIntent
+\end_layout
+
+\end_inset
+
+ defines exactly what the intent does, given the Flyable, its current position,
+ and velocity, and 
+\begin_inset listings
+lstparams "language=Haskell"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+success
+\end_layout
+
+\end_inset
+
+ determines if the Intent has successfully been carried out or not.
+ 
+\begin_inset listings
+lstparams "language=Haskell"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+success
+\end_layout
+
+\end_inset
+
+ is of course subject to the individual Intent's definition, so is also
+ defined inside the Intent.
+\end_layout
+
 \begin_layout Paragraph
 Enacting Intentions
 \end_layout
 
-\begin_layout Itemize
-Simple point and drive
+\begin_layout Standard
+What happens inside an Intent is completely up to that individual Intent.
+ The only restrictions are that it must reside within the IO monad, but
+ as people familiar with Haskell will know, this is not much of a restriction.
+ 
+\begin_inset Newline newline
+\end_inset
+
+For more complicated Intents involving multiple actions, we created a MultiInten
+t.
+ A MultiIntent comprises many individual Intents, and is capable of enacting
+ them in order once or as many times as required.
+ This allows for complicated flight instructions to be built up using smaller,
+ more basic flight instructions.
+ For instance, if the user wishes to create a MultiIntent comprised of hovering
+ at a certain position, landing, then taking off and return at that position,
+ s/he can write 
+\begin_inset listings
+lstparams "language=Haskell"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+let 
 \end_layout
 
-\begin_layout Itemize
-Combinations
+\begin_layout Plain Layout
+
+	intent = 
+\end_layout
+
+\begin_layout Plain Layout
+
+		doAll <&> hoverIntent <&> landIntent <&> hoverIntent
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
 Additional Features
 \end_layout
 
+\begin_layout Standard
+In addition to having a flight control and vision system for the helicopter,
+ we also implemented several other 'proof of concept' features to show what
+ is possible.
+ These features are not fully finished, but are working prototypes so can
+ still be demonstrated.
+\end_layout
+
 \begin_layout Subsection
 Landing and Taking Off
 \end_layout
 
+\begin_layout Standard
+Whilst flight and navigation are well and good, sometimes it is desirable
+ to stop flying the helicopter - and for this to happen in a graceful fashion,
+ the helicopter must land.
+ Furthermore, if the helicopter has landed, and the pilot does not wish
+ to have to pick up the helicopter, then the helicopter must be capable
+ of taking off again!
+\begin_inset Newline newline
+\end_inset
+
+There are several problems that make landing and taking off more complicated
+ than general flight.
+ For one, the helicopter operates differently aerodynamically at low altitudes,
+ (ie.
+ similar throttle values will give higher actual thrust).
+ Additionally, the helicopter 'interferes' with itself by creating air currents
+ that buffet it and can send it off course.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Fortunately, the model helicopter is capable of withstanding larger (relative)
+ impacts than a real helicopter, and as such different landing methods can
+ be employed to ensure that landing is successful.
+ In our case, we employed a gradual descent method, where desired altitude
+ is only decreased when the helicopter is over the landing point.
+ Once a certain cut off point is reached - in our case 30cm - the helicopter
+ cuts power altogether, landing rather ungraciously, but successfully nonetheles
+ss, in the landing zone.
+\begin_inset Newline newline
+\end_inset
+
+Our landing algorithm operated quite successfully, with accurate landing
+ results and few failed landings (a failed landing being one from which
+ the helicopter is unable to then take off from).
+ Below are some examples of the results:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Landing
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Landing Error
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Successful?
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Assisted flying
+\end_layout
+
+\begin_layout Standard
+Another interesting addition involves a slight change of theme - assisted
+ flying, rather than fully automated.
+ This involves the AI 'watching' the human fly, and providing assistance
+ as needed.
+ In our particular case, we decided to go for an approach that would aim
+ to prevent crashing into walls.
+\end_layout
+
+\begin_layout Paragraph
+Pre-flight analysis
+\end_layout
+
+\begin_layout Standard
+To be able to properly judge whether or not the helicopter is going to fly
+ into a wall, first the walls must be detected.
+ Luckily with the Kinect, this is simpler than it would be with a standard
+ RGB camera.
+ By analysing the 3D point cloud generated by the Kinect (in a similar fashion
+ to that of KinectFusion 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kinectfusion"
+
+\end_inset
+
+), and then attempting to reconstruct large, flat, vertical planes, it was
+ possible to obtain a good abstract representation of the walls in the scene.
+ 
+\begin_inset Newline newline
+\end_inset
+
+With the abstract knowledge of wall-like surfaces in the scene, using a
+ similar approach to ray-tracing in computer graphics, we extrapolate the
+ current velocity from the current position of the helicopter into the immediate
+ future, and if the helicopter is likely to intersect with the wall within
+ some distance (in our experiments we went with 1m) immediate backwards
+ pitch is applied, effectively braking the helicopter and bringing it back
+ out away from the wall.
+\begin_inset Formula 
+\[
+Photos\, of\, it\, working
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
@@ -3458,7 +3827,7 @@ Here we measure from how far away the system can detect the helicopter,
 \begin_inset Text
 
 \begin_layout Plain Layout
-Distance
+Average Distance
 \end_layout
 
 \end_inset
@@ -3478,7 +3847,7 @@ Detection %
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+1.0923
 \end_layout
 
 \end_inset
@@ -3487,7 +3856,7 @@ Detection %
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+95.32
 \end_layout
 
 \end_inset
@@ -3498,7 +3867,7 @@ Detection %
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+1.7170
 \end_layout
 
 \end_inset
@@ -3507,7 +3876,7 @@ Detection %
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+91.44
 \end_layout
 
 \end_inset
@@ -3518,7 +3887,7 @@ Detection %
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+2.1942
 \end_layout
 
 \end_inset
@@ -3527,7 +3896,7 @@ Detection %
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+84.44
 \end_layout
 
 \end_inset
@@ -3538,6 +3907,14 @@ Detection %
 \end_inset
 
 
+\begin_inset Newline newline
+\end_inset
+
+Detection rate decreases as the distance increases.
+ This is due to the decreasing size of the helicopter as perceived by the
+ camera - at large distances, the low resolution of the depth camera starts
+ to become a problem, and it becomes difficult to perceive the helicopter
+ amongst general background noise.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3550,106 +3927,9 @@ Here we measure how robust the detection method is, by testing the ability
  We measure the orientation as degree deviation from facing directly into
  the camera (so 0 is directly facing, and 90 is facing to the right or left).
  Because of symmetry, we only need to measure from 0 to 90 degrees.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Orientation (degrees)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Detection %
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-45
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-90
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
+\begin_inset Newline newline
 \end_inset
 
-
-\end_layout
-
-\begin_layout Paragraph
-Remarks
-\end_layout
-
-\begin_layout Standard
 To improve detection, and thus speed up development of the rest of the project,
  we took to applying small paper 'wings' to the helicopter.
  This functioned by increasing the cross-sectional area of the helicopter,
@@ -3703,7 +3983,7 @@ Detection %
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+81.92
 \end_layout
 
 \end_inset
@@ -3723,7 +4003,7 @@ Detection %
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+87.36
 \end_layout
 
 \end_inset
@@ -3743,7 +4023,7 @@ Detection %
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+95.31
 \end_layout
 
 \end_inset
@@ -3754,6 +4034,12 @@ Detection %
 \end_inset
 
 
+\begin_inset Newline newline
+\end_inset
+
+As the helicopter faces the camera more, the cross-sectional area of the
+ helicopter visible to the camera decreases.
+ This creates a corresponding decrease in detected frames.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3810,7 +4096,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+60cm
 \end_layout
 
 \end_inset
@@ -3819,7 +4105,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+59cm
 \end_layout
 
 \end_inset
@@ -3828,7 +4114,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+-1cm
 \end_layout
 
 \end_inset
@@ -3839,7 +4125,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+90cm
 \end_layout
 
 \end_inset
@@ -3848,7 +4134,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+87cm
 \end_layout
 
 \end_inset
@@ -3857,7 +4143,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+-3cm
 \end_layout
 
 \end_inset
@@ -3868,7 +4154,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+120cm
 \end_layout
 
 \end_inset
@@ -3877,7 +4163,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+122cm
 \end_layout
 
 \end_inset
@@ -3886,7 +4172,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
++2cm
 \end_layout
 
 \end_inset
@@ -3897,7 +4183,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+150cm
 \end_layout
 
 \end_inset
@@ -3906,7 +4192,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+152cm
 \end_layout
 
 \end_inset
@@ -3915,7 +4201,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
++2cm
 \end_layout
 
 \end_inset
@@ -3926,7 +4212,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+180cm
 \end_layout
 
 \end_inset
@@ -3935,7 +4221,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+182cm
 \end_layout
 
 \end_inset
@@ -3944,7 +4230,7 @@ Error
 \begin_inset Text
 
 \begin_layout Plain Layout
-
++2cm
 \end_layout
 
 \end_inset
@@ -3955,6 +4241,13 @@ Error
 \end_inset
 
 
+\begin_inset Newline newline
+\end_inset
+
+The Kinect definitely provides a suitably accurate estimate of the actual
+ position of the helicopter.
+ 2-3cm of error is not an issue for our aims, and is certainly more accurate
+ than most human estimates would be!
 \end_layout
 
 \begin_layout Subsection
@@ -4096,8 +4389,8 @@ It is possible to record the positions of the helicopter throughout a flight
  graph.
  This gives a good visual interpretation of exactly how the helicopter approache
 s a stable flight position.
- On three seperate flights, launching by hand from the same position each
- time, we achieved these flight paths for the same hover position:
+ On a typical launching by hand, we achieved these flight paths for the
+ hover position (0, 0.2, -1.7), relative to the camera:
 \begin_inset Float figure
 wide false
 sideways false
@@ -4107,6 +4400,12 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
+\begin_inset Graphics
+	filename hover_graph1.png
+	width 15cm
+
+\end_inset
+
 
 \end_layout
 
@@ -4116,55 +4415,8 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
+It is possible to see the path of the helicopter from initial release to
+ crashing after the battery became too low.
 \end_layout
 
 \end_inset
@@ -4173,7 +4425,7 @@ Whilst flight paths are useful for analysing the behaviour itself, it is
  sometimes more useful to see the observed error over time of the helicopter
  from its intended position.
  Taking the absolute distance between the helicopter and the desired point
- each time for the same three flights gives the following graphs:
+ each time for the same flight gives the following graph:
 \begin_inset Float figure
 wide false
 sideways false
@@ -4183,28 +4435,9 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-
-\end_layout
+\begin_inset Graphics
+	filename hover_graph_err1.png
+	width 15cm
 
 \end_inset
 
@@ -4213,31 +4446,53 @@ status open
 
 \end_inset
 
-
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-
+The flight error over time.
+ Note the oscillatory nature of the errors, as the helicopter comes to a
+ rest at the hover position, then drifts off course because of small air
+ currents.
+ 
 \end_layout
 
 \end_inset
 
 
-\end_layout
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Paragraph
 Remarks
+\end_layout
+
+\begin_layout Standard
+The graph in 5.2 indicates a few things:
+\end_layout
+
+\begin_layout Itemize
+The oscillations vary between 0.1m and 0.5m.
+ Notice that they never quite hit 0m - that is, the helicopter is never
+ recorded as being exactly on the hover position.
+ This is not as bad as it sounds, however, as such accuracy would also be
+ commonly achieved if a person were to fly the helicopter! 
+\end_layout
+
+\begin_layout Itemize
+The oscillations are very frequent - this indicates that the helicopter
+ is repeatedly overshooting/missing its target and readjusting.
+ As the helicopter is flying predominantly forwards, some further deviation
+ from the target point is required before a full turn-around can occur.
+ This could be corrected further by implementing backwards motion also,
+ reducing the turning necessary (for instance, rather than turning 180 degrees
+ to go backwards, the helicopter could simply apply reverse pitch).
+\end_layout
+
+\begin_layout Itemize
+There are occasional large spikes.
+ This is most likely due to unwanted air current interference with the helicopte
+r.
+ Unfortunately, these are generated by the helicopter itself, so there is
+ not much that can be done.
+ When these air currents occur, the helicopter is blown out further from
+ its normal oscillatory loop, and thus must overcompensate to come back
+ to hovering position.
 \end_layout
 
 \begin_layout Subsection
@@ -4252,6 +4507,16 @@ In this section we measure the properties of the system itself.
 
 \begin_layout Subsubsection
 Helicopter response times
+\end_layout
+
+\begin_layout Standard
+Signals sent from the system are received with no effective lag.
+ Commands are sent via serial cable straight to the Arduino board, which
+ relays these straight to the helicopter.
+ Assuming near instant transport via IR and via serial cable, there should
+ be no significant delay between an order being issued and it being received
+ by the helicopter.
+ Indeed, this was found to be these case throughout all of these experiments.
 \end_layout
 
 \begin_layout Subsubsection
@@ -4341,7 +4606,7 @@ Resilience to occlusion
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+150cm
 \end_layout
 
 \end_inset
@@ -4350,7 +4615,7 @@ Resilience to occlusion
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Small objects (10-15cm across)
 \end_layout
 
 \end_inset
@@ -4370,7 +4635,7 @@ Resilience to occlusion
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+232cm
 \end_layout
 
 \end_inset
@@ -4379,7 +4644,8 @@ Resilience to occlusion
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Large objects (100cm+ eg.
+ people)
 \end_layout
 
 \end_inset
@@ -4399,7 +4665,7 @@ Resilience to occlusion
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+300cm+ (outside of room bounds)
 \end_layout
 
 \end_inset
@@ -4408,7 +4674,7 @@ Resilience to occlusion
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Very large objects (sofas)
 \end_layout
 
 \end_inset
@@ -4428,7 +4694,7 @@ Resilience to occlusion
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+300cm+ (outside of room bounds)
 \end_layout
 
 \end_inset
@@ -4437,7 +4703,7 @@ Resilience to occlusion
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Walls, complete coverage
 \end_layout
 
 \end_inset
@@ -4452,6 +4718,13 @@ Resilience to occlusion
 
 \begin_layout Paragraph
 Remarks
+\end_layout
+
+\begin_layout Standard
+More LEDs being used resulted in an increase in both range and resilience
+ to occlusion.
+ It was found that 3 gave satisfactory performance, but for the sake of
+ reliability we decided to use 4.
 \end_layout
 
 \begin_layout Subsection
@@ -4827,12 +5100,170 @@ Average stable throttle over time from fully charged (3 experiments).
 Achievements
 \end_layout
 
+\begin_layout Standard
+Here we shall summarise the exact achievements of this project.
+\end_layout
+
+\begin_layout Paragraph
+System-level
+\end_layout
+
+\begin_layout Standard
+Over the course of this project we have created a system for automatically
+ flying a small RC helicopter in an indoors environment using cheap, readily
+ accessible apparatus.
+ This involved working around the various deficiencies of non-tailormade
+ hardware, such as poor accuracy, speed or suitability.
+\begin_inset Newline newline
+\end_inset
+
+The system is capable of automatically piloting to a predetermined point
+ (or set of points) within a fair degree of accuracy.
+ Additionally, it is able to perform (in a slightly limited sense) landing,
+ taking off, and has 'pilot assist' capabilities.
+ These are more proof-of-concept, however, and could be elaborated on at
+ a later date.
+\end_layout
+
+\begin_layout Itemize
+Picture of the helicopter in flight
+\end_layout
+
+\begin_layout Paragraph
+Software-level
+\end_layout
+
+\begin_layout Standard
+On a software level, we have created a modular, extendable helicopter control
+ framework.
+ It provides tools for creating many different flight behaviours, such as
+ hovering, path following, or landing/taking off.
+ 
+\begin_inset Newline newline
+\end_inset
+
+To augment this framework, we have created a strong prototyping and simulation
+ toolset, allowing the user to pilot the helicopter in a simulation prior
+ to actual flight.
+ In this simulation, surfaces and floors can be defined as wished, as well
+ as alternative helicopter dynamics (such as heavier helicopters, or helicopters
+ that react differently to different inputs).
+ The visualisation for this simulation is simple, but effective enough to
+ fulfill its requirements.
+\end_layout
+
+\begin_layout Itemize
+Picture of the simulations
+\end_layout
+
 \begin_layout Section
 Strengths and weaknesses of the system
 \end_layout
 
+\begin_layout Paragraph
+Strengths
+\end_layout
+
+\begin_layout Itemize
+Accurate position detection
+\begin_inset Newline newline
+\end_inset
+
+The position of the helicopter is detected well within operating bounds.
+ 
+\end_layout
+
+\begin_layout Itemize
+Works well in almost any static indoor environment
+\begin_inset Newline newline
+\end_inset
+
+The system is constructed with little prior assumptions on the indoor environmen
+t, besides that it must be static in nature.
+ This means that it should work in any indoor room.
+ Of course, there are levels of 'working', but for the mostpart the helicopter
+ performs as expected.
+\end_layout
+
+\begin_layout Itemize
+Robust communication mechanism with helicopter
+\begin_inset Newline newline
+\end_inset
+
+In a room, the helicopter should be able to receive signal from the computer
+ with little or no interruptions.
+ It is resilient to occlusion, and performs well over a wide variety of
+ distances.
+\end_layout
+
+\begin_layout Itemize
+Simple, extendable AI controller
+\begin_inset Newline newline
+\end_inset
+
+The system is easily modified and extended with additional behaviours.
+\end_layout
+
+\begin_layout Paragraph
+Weaknesses
+\end_layout
+
+\begin_layout Itemize
+Does not currently deal with multiple moving objects
+\begin_inset Newline newline
+\end_inset
+
+The current system assumes a static scene besides the helicopter.
+ This means that under the current state of the system, it would be unable
+ to fly two helicopters at once, for example.
+ However, there is certainly capabilities for this to be implemented, aided
+ by the modularity of the design.
+\end_layout
+
+\begin_layout Itemize
+Better object tracking
+\begin_inset Newline newline
+\end_inset
+
+The system currently has no object permanence - if it cannot see where the
+ helicopter is, it cannot infer where it will be next.
+ This would be a good next step in improving the vision/control for the
+ helicopter, as it would allow the helicopter to fly around objects or furniture.
+\end_layout
+
+\begin_layout Itemize
+Stronger helicopter detection required
+\begin_inset Newline newline
+\end_inset
+
+The depth camera on the Kinect is unfortunately too low of a resolution
+ to accurately detect the helicopter at medium distances without some form
+ of extra cross-sectional area added to the helicopter.
+ This is due to the small size of the helicopter, and its skeletal, non-flat
+ structure.
+ In the future it could be possible to improve this by augmenting the depth
+ camera with the RGB camera, having the two 'help each other out' if one
+ cannot detect the helicopter in any particular frame.
+ This would go hand-in-hand with the object tracking, allowing the helicopter
+ to be followed through bad frames.
+\end_layout
+
 \begin_layout Section
 Comparison to existing technology
+\end_layout
+
+\begin_layout Standard
+As has been mentioned in the Prior Work section of this report, there are
+ several other examples of autonomous, indoor flight of MAV (micro-aerial
+ vehicles).
+\end_layout
+
+\begin_layout Itemize
+More costly, higher accuracy/capabilities
+\end_layout
+
+\begin_layout Itemize
+Refer to other quadcopter control experiments.
 \end_layout
 
 \begin_layout Chapter
@@ -4843,8 +5274,79 @@ Conclusions
 Learning results of this project
 \end_layout
 
+\begin_layout Standard
+Much of this project involved new territory for me.
+ A lot of my prior experience at Imperial has been in theoretical territory,
+ generally developing software or programs that do not stray beyond a single
+ computer.
+ This project broke a lot of those bounds, incorporating many different
+ areas of computer science - from computer vision, to control methods, to
+ hardware.
+ On top of this, they all had to be joined into one cohesive whole, which
+ was a challenge in itself.
+\begin_inset Newline newline
+\end_inset
+
+With hindsight of how the project progressed, I would probably approach
+ some areas of it slightly differently:
+\end_layout
+
+\begin_layout Paragraph
+Haskell
+\end_layout
+
+\begin_layout Standard
+Haskell has many different applications in software engineering, and is
+ capable of many different programming feats.
+ However, I believe that given my relative inexperience with practical Haskell,
+ it may have been prudent to instead choose a more classic object-oriented
+ language for such a practical task, such as C++ or Java.
+ I believe that a strongly typed system was the right idea for such a large
+ system, but I think that a lot of time was spent on wrestling with the
+ language that could instead have been spent on actual development.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Nonetheless, given infinite resources and time, I would still choose to
+ do the project in Haskell! It is only with the constrictions of rapid prototypi
+ng and my relative inexperience that I would choose another language instead.
+\end_layout
+
+\begin_layout Paragraph
+System Requirements
+\end_layout
+
+\begin_layout Standard
+In retrospect, I feel that it would have been wiser to have spent more time
+ planning the exact requirements for each part of the system before actual
+ implementation.
+ I began prototyping and iterating development of the system at a very early
+ stage, without much prior thought about what my exact requirements were,
+ and I think this impacted some of my progress later on in the project where
+ I had to overhaul large parts of the system to implement some of the required
+ design features.
+\end_layout
+
+\begin_layout Paragraph
+Practical Experiments
+\end_layout
+
+\begin_layout Standard
+Whilst I was able to develop an effective simulation environment for testing
+ different control behaviours, I think that it would have been wiser to
+ have begun actual practical testing at an earlier stage to attain a better
+ idea of where the problems would lie earlier on.
+ 
+\end_layout
+
 \begin_layout Section
 Future work
+\end_layout
+
+\begin_layout Standard
+In this section we shall discuss some future work that could be done to
+ extend the current system with more functionality.
 \end_layout
 
 \begin_layout Paragraph*
@@ -4853,6 +5355,14 @@ Multiple Helicopters
 
 \begin_layout Paragraph
 Use in Moving Environments
+\end_layout
+
+\begin_layout Paragraph
+Landing Surface Detection
+\end_layout
+
+\begin_layout Paragraph
+Advanced Maneuvers
 \end_layout
 
 \begin_layout Bibliography

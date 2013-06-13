@@ -28,7 +28,7 @@ instance Intent HoverIntent where
     let fwds = vectorSize $ getVel i pos
 
     setController flyer pid'
-    setFly flyer Pitch $ 63 - floor (15 * fwds)
+    setFly flyer Pitch $ 63 - floor (20 * fwds)
     setFly flyer Throttle $ base + floor m
     setFly flyer Yaw $ getYaw (getHeading i pos) pos
 

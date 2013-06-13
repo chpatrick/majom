@@ -16,9 +16,9 @@ class Intent a where
 
 getYaw :: Vector -> Position -> Int
 getYaw v pos =
-  if abs (degDiff o o') > 10 
+  if abs (degDiff o o') > 20
     then 
-        floor $ 63 + (signum (degDiff o o'))*20
+        floor $ 63 + (if abs (degDiff o o') < 40 then (signum (degDiff o o'))*20 else (signum (degDiff o o'))*30)
     else 63
   where
     vec = vectorUnit v

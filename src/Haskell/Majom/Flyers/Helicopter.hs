@@ -42,7 +42,7 @@ get = getPosition `fmap` getResponse
 
 -- | A real helicopter!
 data Helicopter = Helicopter { getCurrentOptions :: TVar OptionMap,
-  getActive :: TVar Bool, getPID :: TVar PID}
+  getActive :: TVar Bool, getPID :: TVar PID, getSurfaces :: TVar [Surface]}
 
 -- | Starts an instance of the helicopter communication protocol.
 startHelicopter :: IO Helicopter
@@ -51,7 +51,10 @@ startHelicopter = do
   s <- openSerial port defaultSerialSettings { 
         flowControl = Software }
   forkIO $ forever $ heliThread s var
-  atomically $ Helicopter var <$> (newTVar False) <*> (newTVar (newPID))
+
+  --TODO Get surface information from python server
+
+  atomically $ Helicopter var <$> (newTVar False) <*> (newTVar (newPID)) <*> (newTVar [])
 
 -- | Message passing time in milliseconds
 stepTime :: Int
@@ -64,16 +67,6 @@ heliThread s var = do
   threadDelay (stepTime * 1000)
   where
     foo (o, v) = flip send (pack [fromIntegral $ fromEnum o, fromIntegral v]) s
-
-{-TODO-- | Monitors a stack of helicopter instructions, then merges and sends 
- --- them at predefined intervals. 
- --- heliThread :: TVar [(Option, Int)] -> IO ()
- --- heliThread s = do
- --    -- check if s has elems
- --    --   merge and send s
- --    -- wait X ms
- --    -- repeat
--} 
 
 instance Flyable Helicopter where
   setFly h o v = dropValM $ set h o v
@@ -92,7 +85,7 @@ instance Flyable Helicopter where
   setActive h b = atomically $ writeTVar (getActive h) b
   getController h = atomically $ readTVar (getPID h)
   setController h p = atomically $ writeTVar (getPID h) p
-  lookAround h = undefined
+  lookAround h = atomically $ readTVar (getSurfaces h)
 
 -- | Drops monadic values we don't care about.
 dropValM :: (Monad m) => m a -> m ()

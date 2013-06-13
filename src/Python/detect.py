@@ -179,7 +179,7 @@ def diffdiff2(b, filt=None, imgBase=None, history=[]):
       #heli.sideBySide(extHeli).show()
       #return (heli,extHeli)
       #img.sideBySide(heli).show()
-      history = history[:10]
+      history = history[:5]
       d = 0
       if len(history) > 1:
         vels = getVels(history)

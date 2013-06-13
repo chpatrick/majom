@@ -10,7 +10,6 @@ Cabal-Version:  >=1.2
 
 Library
   Exposed-modules:
-    Majom.Analysis.Collision,
     Majom.Common,
     Majom.Control.GUI,
     Majom.Control.Monkey,
