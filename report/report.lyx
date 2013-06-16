@@ -45,7 +45,7 @@
 \end_index
 \leftmargin 4cm
 \topmargin 3cm
-\rightmargin 4cm
+\rightmargin 3cm
 \bottommargin 4cm
 \secnumdepth 3
 \tocdepth 3
@@ -502,9 +502,44 @@ Similar examples of automated flying have been attempted many times, generally
  and they have more moving parts than our RC helicopter.
  Nevertheless, these examples provided inspiration for many different parts
  of the finished system.
-\begin_inset Newline newline
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename quadcopter.png
+	lyxscale 10
+	width 7cm
+
 \end_inset
 
+
+\end_layout
+
+\end_inset
+
+A traditional quadcopter.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 These prior works are not as useful in the traditional sense of background
  material, that is, they do not neccessarily provide a foundation from which
  we can work from.
@@ -1289,6 +1324,13 @@ ng 3D scenes that involves viewing the scene from two different angles,
  depth perception.
  Depth from Focus uses change in 'blurriness' of the image for a fixed focus
  as a gauge for depth.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "how kinect works"
+
+\end_inset
+
+
 \begin_inset Newline newline
 \end_inset
 
@@ -1445,17 +1487,49 @@ Standard Transactional Memory
 
 \begin_layout Standard
 Haskell comes packaged with a powerful method of concurrency, under the
- guise of the STM monad.
- The STM monad allows...
+ guise of STM.
  
-\begin_inset Newline newline
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.haskell.org
+\end_layout
+
 \end_inset
 
-STM works by...
-\begin_inset Newline newline
+ describes it nicely as:
+\end_layout
+
+\begin_layout Standard
+\align center
+Software Transactional Memory, or STM, is an abstraction for concurrent
+ communication.
+ The main benefits of STM are composability and modularity.
+ That is, using STM you can write concurrent abstractions that can be easily
+ composed with any other abstraction built using STM, without exposing the
+ details of how your abstraction ensures safety.
+ This is typically not the case with other forms of concurrent communication,
+ such as locks or MVars.
+ 
+\end_layout
+
+\begin_layout Standard
+We use STM in this project as it provides a simple and effective method
+ for sharing variables in a safe and concurrent manner.
+ More information can be obtained on STM at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.haskell.org/haskellwiki/Software_transactional_memory
+\end_layout
+
 \end_inset
 
-STM is more useful in this case because...
+.
 \end_layout
 
 \begin_layout Paragraph
@@ -1466,11 +1540,20 @@ Cabal package management
 Whilst creating a large project, it is unavoidable that many other modules
  will be imported along the way (unless one wishes to write everything themselve
 s from scratch).
- The default package manager for Haskell, Cabal, manages all of this...
-\begin_inset Newline newline
+ The default package manager for Haskell, Cabal, manages all of this for
+ us in a simple to set up manner.
+ More information can be found at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.haskell.org/cabal/
+\end_layout
+
 \end_inset
 
-Cabal was picked instead of other package managers such as...
+.
 \end_layout
 
 \begin_layout Paragraph
@@ -3443,6 +3526,14 @@ Based on these observations, it is possible to construct several different
 \end_layout
 
 \begin_layout Subsection
+The Monkey
+\end_layout
+
+\begin_layout Standard
+Our autonomous flight control, affectionately labelled the Monkey.
+\end_layout
+
+\begin_layout Subsection
 Control methods
 \end_layout
 
@@ -5276,14 +5367,48 @@ Comparison to existing technology
 As has been mentioned in the Prior Work section of this report, there are
  several other examples of autonomous, indoor flight of MAV (micro-aerial
  vehicles).
-\end_layout
+ These have been realised in a variety of ways , from using stationary camera
+ arrays set up in labs
+\begin_inset CommandInset citation
+LatexCommand cite
+key "swarm quadcopters"
 
-\begin_layout Itemize
-More costly, higher accuracy/capabilities
-\end_layout
+\end_inset
 
-\begin_layout Itemize
-Refer to other quadcopter control experiments.
+, to equipping them with laser rangefinders 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "laser MAV"
+
+\end_inset
+
+, to using onboard RGB-D systems 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Odometry quadropter"
+
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+Each of these different methods has its own merits and flaws.
+ For instance, using onboard RGB-D systems for SLAM is extremely computationally
+ expensive (and too heavy for most MAVs), yet it allows for navigation with
+ no prior knowledge of the area.
+ Stationary camera arrays allow for highly precise movement of many different
+ MAVs at once, but are stuck to a lab environment and are very expensive.
+ Laser-based systems allow for aggressive flying maneouvers, but require
+ a pre-computed map of the environment.
+\begin_inset Newline newline
+\end_inset
+
+The caveat to all of these is that they are each using specialised and often
+ expensive equipment.
+ The aim of this project, in contrast (as has already been highlighted in
+ this report), was to make a system for indoor flying using off-the-shelf,
+ low-cost goods.
 \end_layout
 
 \begin_layout Chapter
@@ -5367,22 +5492,77 @@ Future work
 \begin_layout Standard
 In this section we shall discuss some future work that could be done to
  extend the current system with more functionality.
+ Most of these revolve around improving the vision system, as with perfect
+ information on the whereabouts of the helicopter many new things are possible.
 \end_layout
 
 \begin_layout Paragraph*
 Multiple Helicopters
 \end_layout
 
+\begin_layout Standard
+With improvements to the vision system and small adjustments to the control
+ system, it is theoretically possible to control two separate helicopters
+ in the same environment.
+ This could allow for advanced simultaneous flight maneouvers, and make
+ for some impressive demonstrations.
+ The main requirement for this would be the ability to separately track
+ the two helicopters simultaneously in the scene, without mixing them up.
+\end_layout
+
 \begin_layout Paragraph
 Use in Moving Environments
+\end_layout
+
+\begin_layout Standard
+Once again applying to the vision system, and in a similar vein to the above
+ part on multiple helicopters, allowing the helicopter to be tracked in
+ a moving environment would open up a wealth of new opportunities.
+ These could include having moving objects in the scene (such as other helicopte
+rs, or people), or even allowing the camera itself to move and follow the
+ helicopter over a wider area.
+\begin_inset Newline newline
+\end_inset
+
+With the ability to track the helicopter, many other interactive opportunities
+ are opened.
+ These include interacting with humans, such as following a particular person
+ or landing into someones hand, or simply navigating a busy hallway.
 \end_layout
 
 \begin_layout Paragraph
 Landing Surface Detection
 \end_layout
 
+\begin_layout Standard
+With greater access to computational hardware, it would be possible to employ
+ some SLAM methods in the system.
+ This would be used to construct environment maps of the flying area, which
+ can be used for navigation.
+ 
+\begin_inset Newline newline
+\end_inset
+
+One interesting extension to this would be environment 'interpretation',
+ in particular locating 'landable' surfaces such as tables and floors.
+ 
+\end_layout
+
 \begin_layout Paragraph
 Advanced Maneuvers
+\end_layout
+
+\begin_layout Standard
+Following on from the SLAM possibilities mentioned above, greater understanding
+ of the environment would allow for advanced maneuvers, such as moving around,
+ through or next to objects.
+ 
+\begin_inset Newline newline
+\end_inset
+
+This kind of flight would also require a greater control of the helicopter,
+ so it is likely that quicker and more accurate means of orientation detection
+ would also have to be developed.
 \end_layout
 
 \begin_layout Bibliography
@@ -5737,6 +5917,50 @@ Colton, S.
  09/06/2013].
 \end_layout
 
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "how kinect works"
+
+\end_inset
+
+Maccormick, J.
+ 2010.
+ How does the Kinect work?.
+ [e-book] Available through: http://users.dickinson.edu/~jmac/selected-talks/
+ http://users.dickinson.edu/~jmac/selected-talks/kinect.pdf.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "swarm quadcopters"
+
+\end_inset
+
+Kushleyev, A., Mellinger, D.
+ and Kumar, V.
+ 2012.
+ Towards A Swarm of Agile Micro Quadrotors.
+ [e-book] Available through: http://www.roboticsproceedings.org http://www.robotics
+proceedings.org/rss08/p28.pdf.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "laser MAV"
+
+\end_inset
+
+Spectrum.ieee.org.
+ 1881.
+ Laser-Equipped MAV Demonstrates Aggressive Autonomous Flight - IEEE Spectrum.
+ [online] Available at: http://spectrum.ieee.org/automaton/robotics/artificial-int
+elligence/laserequipped-mav-demonstrates-aggressive-autonomous-flight [Accessed:
+ 16 Jun 2013].
+\end_layout
+
 \begin_layout Standard
 \start_of_appendix
 \begin_inset Newpage pagebreak
@@ -5750,11 +5974,147 @@ Appendix
 \end_layout
 
 \begin_layout Section*
-User Guide
+Links To Software Used In This Project
 \end_layout
 
 \begin_layout Itemize
-How to use the helicopter flight system
+SimpleCV - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.simplecv.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Arduino - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://arduino.cc/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Freenect - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://openkinect.org/wiki/Main_Page
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Haskell - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.haskell.org/haskellwiki/Haskell
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Python - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.python.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+User Guide
+\end_layout
+
+\begin_layout Standard
+Here we will give a small guide on how to use the autonomous flight system.
+ At its most basic level, the system can be used in 3 different ways.
+\end_layout
+
+\begin_layout Paragraph
+Manual Flight
+\end_layout
+
+\begin_layout Paragraph
+Semi-Autonomous Flight
+\end_layout
+
+\begin_layout Paragraph
+Autonomous Flight
+\end_layout
+
+\begin_layout Subsubsection*
+Choosing your flight method
+\end_layout
+
+\begin_layout Itemize
+Picking the flyers/control
+\end_layout
+
+\begin_layout Subsubsection*
+Setting up the vision server
+\end_layout
+
+\begin_layout Itemize
+Running the python server
+\end_layout
+
+\begin_layout Subsubsection*
+Running it all
+\end_layout
+
+\begin_layout Itemize
+Compiling and running
+\end_layout
+
+\begin_layout Subsection*
+Customising the Monkey
+\end_layout
+
+\begin_layout Paragraph
+Adding behaviours
+\end_layout
+
+\begin_layout Itemize
+Using the multiintent
+\end_layout
+
+\begin_layout Subsubsection*
+Developing new behaviours
+\end_layout
+
+\begin_layout Itemize
+Requirements for a new behaviour, tools available
 \end_layout
 
 \end_body
