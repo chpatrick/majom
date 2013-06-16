@@ -56,7 +56,7 @@ runMonkey' flyer = do
   surfaces <- lookAround flyer
   --putStrLn $ show (filter sSpecial surfaces)
   let hIntent = hoverAt $ Position desiredPos undefined
-  let lIntent = landOn $ Position (vector [-0.1, -0.51, -1.65]) undefined
+  let lIntent = landOn $ Position (vector [0, -0.45, -1.63]) undefined
   --let intent = keepDoing $ withTiming (1000, waitTime)  $ doAll <&> hIntent <&> lIntent <&> hIntent
   {-
   let 
@@ -66,7 +66,7 @@ runMonkey' flyer = do
         then (landOn $ Position (sPoint $ head $ filter sSpecial surfaces) undefined)
         else lIntent)
   -}
-  let intent = keepDoing $ doAll <&> hIntent
+  let intent = keepDoing $ withTiming (1000, waitTime) $ doAll <&> lIntent <&> hIntent
   milliSleep waitTime
   (_, pos) <- observe flyer
 

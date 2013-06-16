@@ -1257,16 +1257,74 @@ As has been mentioned earlier, we will use a Kinect camera as our vision
 Kinect 
 \end_layout
 
-\begin_layout Itemize
-Calibration
+\begin_layout Standard
+To reconstruct an object in 3D space using the Kinect, we have to go through
+ several different stages.
+ The very first step involves using the Freenect library of software, plus
+ the depth camera.
 \end_layout
 
-\begin_layout Itemize
-Camera parameters
+\begin_layout Paragraph
+Depth Camera
 \end_layout
 
-\begin_layout Itemize
-Converting from depth to RGB camera (using params)
+\begin_layout Standard
+The depth camera on the Kinect is infact an infrared projector and receiver.
+ To reconstruct the space in 3D, it uses a technique called Structured Light.
+ This involves shining a known pattern of light into the scene (in the case
+ of the Kinect, this is a speckled light pattern), and then analysing the
+ deformation of this light pattern as recorded by the IR camera.
+ 
+\begin_inset Newline newline
+\end_inset
+
+To further improve accuracy, the Kinect combines this with two other methods
+ - Stereoscopic Vision, and Depth from Focus.
+ Stereoscopic vision is a widely used Computer Vision technique for reconstructi
+ng 3D scenes that involves viewing the scene from two different angles,
+ and using the difference in perspective to recreate the scene.
+ In the case of the Kinect, this is achieved by projecting the known pattern
+ at a slight angle to the adjacent receiver.
+ This is one of the ways that humans and other two-eyed creatures achieve
+ depth perception.
+ Depth from Focus uses change in 'blurriness' of the image for a fixed focus
+ as a gauge for depth.
+\begin_inset Newline newline
+\end_inset
+
+The combination of these three techniques gives an accurate estimate for
+ position in the 3D scene.
+\begin_inset Newline newline
+\end_inset
+
+All of this is achieved by the Freenect library using the command 
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+freenect.get_sync_depth()
+\end_layout
+
+\end_inset
+
+, which returns a 2D array of depth values in the scene.
+ Having obtained the world coordinates of the object relative to the Kinect,
+ it was then possible to reproject these points back to the RGB camera image
+ again by using the individual parameter values of the camera itself.
+ These values are conveniently provided in the Freenect library at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/amiller/libfreenect-goodies/blob/master/calibkinect.py
+\end_layout
+
+\end_inset
+
+, but can be obtained by performing a simple calibration procedure.
 \end_layout
 
 \begin_layout Subsection
@@ -1366,22 +1424,6 @@ key "SimpleCV book"
 \end_inset
 
 , which lists many different examples and techniques to get me started.
-\end_layout
-
-\begin_layout Subsection
-SimpleCV
-\end_layout
-
-\begin_layout Itemize
-Connection with OpenCV (freenect)
-\end_layout
-
-\begin_layout Itemize
-Additional features
-\end_layout
-
-\begin_layout Itemize
-Easily expanded/altered
 \end_layout
 
 \begin_layout Section
@@ -2271,14 +2313,27 @@ service Vision {
 
 where the struct is the data structure, and observe is the cross-language
  function call.
+\begin_inset Newline newline
+\end_inset
+
+However, in practise this proved to not be a good solution, as it was simply
+ too slow.
+ Our system required the ability to make tens of requests to the vision
+ server per second, and Thrift was creating a large bottle neck that taking
+ upwards of 0.1 seconds to transmit even one call.
+ Not wanting to spend too long trying to fix something that might not even
+ work properly, we decided to look to other, simpler methods.
+\end_layout
+
+\begin_layout Subsubsection
+HTTP 
 \end_layout
 
 \begin_layout Standard
-Communication between vision and monkey module (http server)
-\end_layout
-
-\begin_layout Standard
-Communication between monkey and simulation module
+After failing to get Thrift to work properly, we decided to go for the simplest
+ method we could think of - hosting a SimpleHTTPServer in Python, and making
+ HTTP requests to the server from Haskell this way.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -2486,16 +2541,34 @@ This proved to be a simple yet effective manner for co-ordinating the two
 Simulation
 \end_layout
 
-\begin_layout Itemize
-VirtualHelicopter
-\end_layout
+\begin_layout Standard
+In addition to the normal Helicopter Flyable, we also developed a VirtualHelicop
+ter Flyable.
+ The aim of this Flyable was to mimic all of the important parts of a helicopter
+ in a simulated environment, that is transparent to the control method (in
+ that it functions identically to the normal Helicopter Flyable).
+\begin_inset Newline newline
+\end_inset
 
-\begin_layout Itemize
-Control variations
-\end_layout
+We developed this in two parts - a simulation environment that mimics a
+ basics physics simulator, that allows arbitrary mass objects to have forces
+ attached to them, which then simulates the effects of these forces on the
+ objects, and a wrapper on top of this simulator that relays control commands
+ and observations to and from the simulation back to the controller.
+ 
+\begin_inset Newline newline
+\end_inset
 
-\begin_layout Itemize
-Accuracy of the simulation
+We deliberately developed the VirtualHelicopter in such a way that its various
+ properties can be changed easily, such as how it reacts to different command
+ inputs or how the environment in which it exists is set up (such as adding
+ floors and walls that it can interact with).
+\begin_inset Newline newline
+\end_inset
+
+The simulator proved to be satisfactory for testing control behaviours and
+ different flight methods (such as just human, human + monkey, just monkey
+ etc.).
 \end_layout
 
 \begin_layout Section
@@ -2725,23 +2798,38 @@ parameters Another naive method used was just to 'guess' where the helicopter
 It seemed that short of using the depth camera purely to locate the helicopter,
  it would be very difficult to recreate the helicopter in three dimensions
  using the RGB camera.
- So that is exactly what we tried to do next (Section 5.3.4).
+ So that is exactly what we tried to do next (Section 4.3.4).
 \end_layout
 
 \begin_layout Subsubsection
 Prototyping results
 \end_layout
 
-\begin_layout Itemize
-Stable lighting problems
+\begin_layout Standard
+On top of the projection problems, we found several other problems with
+ our naive RGB detection method.
 \end_layout
 
 \begin_layout Itemize
-Shadows
+Stable lighting - the method was very sensitive to changes in lighting condition
+s, and required a very stable lighting environment to function properly.
+ Small changes, such as a cloud covering the sun, would cause the segmentation
+ algorithm to perform very poorly.
 \end_layout
 
 \begin_layout Itemize
-Similar colours
+Shadows - one method of fixing the above stable lighting problem was to
+ employ only fixed indoor lighting.
+ However, in the small indoor rooms we were using, these lights caused harsh
+ shadows to be projected by the helicopter.
+ These shadows were a further distraction to the vision system, causing
+ positional inaccuracies to occur.
+\end_layout
+
+\begin_layout Standard
+When the situations were ideal, the segmentation algorithm worked very well
+ - however, the situtation were often not ideal, and were even less likely
+ to be so in a practical setting.
 \end_layout
 
 \begin_layout Subsection
@@ -2839,6 +2927,102 @@ This is a fairly obvious difference - the RGB camera operates purely over
 
 \begin_layout Subsubsection
 Prototyping results
+\end_layout
+
+\begin_layout Standard
+We found that there were instant performance increases when using the depth
+ camera instead of the RGB camera to perform position detection.
+ The latent noise of system was significantly reduced, giving little or
+ no 'jitter' to the position of a stationary object, and the rate of detection
+ was also increased.
+\begin_inset Newline newline
+\end_inset
+
+One problem we did find was that 'shadows' cast by the depth camera (as
+ seen in Figure 4.3) were themselves very noisy.
+ As such, no one capture of the shadows cast would be able to effectively
+ remove them from subsequent frames.
+ To remedy this, we devised an adaptive set up method which is performed
+ before any flying begins.
+ Frames are taken of a stationary scene, and differences between adjacent
+ frames are placed into an array.
+ In all frames following, areas that are different are masked up to a certain
+ threshold.
+ If that area is different once more, the threshold is increased until it
+ is no longer different.
+ This is repeated until the total noise in the scene is below some error
+ margin, at which point we classify the new scene and mask as 'noiseless'
+ and continue with the flight.
+ The scene before and after can be seen below:
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename without_filter.png
+	width 15cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Noise in the scene before adaptive masking.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename with_filter.png
+	width 15cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Noise in the scene after adaptive masking.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+This adaptive masking process resulted in some reduction of detection in
+ the noisy areas, but not enough to cause any significant problems in flights.
 \end_layout
 
 \begin_layout Subsection
@@ -3154,16 +3338,6 @@ New horizontal decomposition, with helicopter blades removed.
 \end_inset
 
 
-\end_layout
-
-\begin_layout Paragraph
-Sift descriptor
-\end_layout
-
-\begin_layout Standard
-After discussing the above findings with the supervisor, it was decided
- that it might be beneficial to try an alternate approach, using a 'Sift
- Descriptor'.
 \end_layout
 
 \begin_layout Subsection
@@ -3519,7 +3693,7 @@ Successful?
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+2cm
 \end_layout
 
 \end_inset
@@ -3528,7 +3702,7 @@ Successful?
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Yes
 \end_layout
 
 \end_inset
@@ -3548,7 +3722,7 @@ Successful?
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+5cm
 \end_layout
 
 \end_inset
@@ -3557,7 +3731,7 @@ Successful?
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Yes
 \end_layout
 
 \end_inset
@@ -3577,7 +3751,7 @@ Successful?
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+3cm
 \end_layout
 
 \end_inset
@@ -3586,7 +3760,7 @@ Successful?
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Yes
 \end_layout
 
 \end_inset
@@ -3606,7 +3780,7 @@ Successful?
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+2cm
 \end_layout
 
 \end_inset
@@ -3615,13 +3789,84 @@ Successful?
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Yes
 \end_layout
 
 \end_inset
 </cell>
 </row>
 </lyxtabular>
+
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Below we have plotted two flight paths of the landing behaviour to further
+ demonstrate how it works.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename land_graph1.png
+	width 15cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Flight path for landing behaviour (1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename land_graph2.png
+	width 15cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Flight path for landing behaviour (2).
+ Note how the helicopter lands once, but is outside of the acceptable landing,
+ so takes off and lands once more in a more acceptable position.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
 
 \end_inset
 
@@ -3817,6 +4062,10 @@ Here we measure from how far away the system can detect the helicopter,
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="2">
 <features tabularvalignment="middle">
@@ -3907,9 +4156,9 @@ Detection %
 \end_inset
 
 
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
+\begin_layout Standard
 Detection rate decreases as the distance increases.
  This is due to the decreasing size of the helicopter as perceived by the
  camera - at large distances, the low resolution of the depth camera starts
@@ -3944,6 +4193,7 @@ With the addition of the 'wings', the following detection percentages were
 \end_layout
 
 \begin_layout Standard
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="2">
 <features tabularvalignment="middle">
@@ -4034,12 +4284,47 @@ Detection %
 \end_inset
 
 
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
+\begin_layout Standard
 As the helicopter faces the camera more, the cross-sectional area of the
  helicopter visible to the camera decreases.
  This creates a corresponding decrease in detected frames.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename heli_tissue.JPG
+	lyxscale 10
+	width 10cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Adding tissue to the helicopter to increase cross-sectional area.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -4056,6 +4341,7 @@ Here we measure the actual accuracy of the Kinect itself.
 \end_layout
 
 \begin_layout Standard
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features tabularvalignment="middle">
@@ -4241,9 +4527,9 @@ Error
 \end_inset
 
 
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
+\begin_layout Standard
 The Kinect definitely provides a suitably accurate estimate of the actual
  position of the helicopter.
  2-3cm of error is not an issue for our aims, and is certainly more accurate
@@ -4417,6 +4703,8 @@ status open
 \begin_layout Plain Layout
 It is possible to see the path of the helicopter from initial release to
  crashing after the battery became too low.
+ The straight line in the top left corner is the error caused by the helicopter
+ releaser being in the path of the camera.
 \end_layout
 
 \end_inset
@@ -4557,6 +4845,7 @@ In these experiments we classify signal failure as when the signal drops
 \end_layout
 
 \begin_layout Standard
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="3">
 <features tabularvalignment="middle">
@@ -4747,305 +5036,8 @@ It is important to understand the range of speeds attainable by the helicopter,
  The helicopter is quite limited in its maximum pitch and throttle speeds,
  which we believe is a design feature implemented to make the helicopter
  simpler to fly for most users.
- 
-\end_layout
-
-\begin_layout Paragraph
-Pitch (x/z axis motion)
-\end_layout
-
-\begin_layout Standard
-The following average speeds in the 
-\begin_inset Formula $x/z$
-\end_inset
-
- world axis were recorded for 5 different pitches, with the same applied
- throttle.
- These were taken over X separate measurements.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Pitch
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Speed
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Paragraph
-Throttle (y axis motion)
-\end_layout
-
-\begin_layout Standard
-The following average speeds in the 
-\begin_inset Formula $y$
-\end_inset
-
- world axis were recorded at 5 different throttles, starting from stationary.
- These were taken over X separate measurements.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Throttle
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Speed
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-It is important to note that the helicopter reacts differently to changes
- in throttle at different heights.
+ It is also important to note that the helicopter reacts differently to
+ changes in throttle at different heights.
  When the helicopter is close to the ground, smaller levels of throttle
  will create equivalent upwards thrust as higher levels at higher altitudes.
  This can cause problems with helicopter navigation at ground level, as
@@ -5079,12 +5071,20 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
+\begin_inset Graphics
+	filename hover_throttle.png
+	width 15cm
+
+\end_inset
+
 
 \end_layout
 
 \end_inset
 
-Average stable throttle over time from fully charged (3 experiments).
+Average stable throttle over time from fully charged.
+ The slight oscillatory nature is due to the oscillatory nature of the PID
+ controller.
 \end_layout
 
 \begin_layout Plain Layout
@@ -5093,7 +5093,12 @@ Average stable throttle over time from fully charged (3 experiments).
 
 \end_inset
 
-
+Once the throttle reaches 127, the helicopter is incapable of achieving
+ any more upwards thrust (as 127 is the maximum sendable Throttle value),
+ and thus it slowly descends to the ground.
+ The curve appears to be very close to linear in nature, with perhaps a
+ subtle S-curve shape.
+ 
 \end_layout
 
 \begin_layout Section
@@ -5125,8 +5130,16 @@ The system is capable of automatically piloting to a predetermined point
  a later date.
 \end_layout
 
-\begin_layout Itemize
-Picture of the helicopter in flight
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename hovering.JPG
+	lyxscale 10
+	width 15cm
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
@@ -5152,8 +5165,15 @@ To augment this framework, we have created a strong prototyping and simulation
  fulfill its requirements.
 \end_layout
 
-\begin_layout Itemize
-Picture of the simulations
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename presentTop.png
+	width 10cm
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section

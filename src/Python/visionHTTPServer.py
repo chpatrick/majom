@@ -54,7 +54,8 @@ if len(sys.argv) > 1 and sys.argv[1] == 'test':
         if rec != None:
           rec.append((pos,time.time()-startTime))
       else:
-        rec.append(((0.0,0.1,0.0,0.0,1), time.time()-startTime))
+        if rec != None:
+          rec.append(((0.0,0.1,0.0,0.0,1), time.time()-startTime))
   except:
     if rec != None:
       out = open("rec_out.txt",'w')

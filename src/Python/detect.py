@@ -51,6 +51,7 @@ def adapt(b, limit=1000):
   filt = np.zeros((len(b),len(b[0])))
   r = np.array([limit+1])
   count = 0
+  loc = None
   while r.sum() > limit or count < 10:
     d = freenect.sync_get_depth()[0]
     m = (b == 2047) & (d == 2047)
