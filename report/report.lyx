@@ -88,9 +88,9 @@ This project details the development and results of a system that autonomously
  flies a small remote-control helicopter in an unknown environment.
  The only measurement data is obtained from a standard Kinect Camera, and
  this data is used to make assumptions on the flight properties of the helicopte
-r, it's surroundings, and then fly the helicopter accordingly.
+r and its surroundings, and then fly the helicopter accordingly.
  This is an exercise in performing a task that requires a high degree of
- prior knowledge and information, using cheap and (comparitively) simple
+ prior knowledge and information, using cheap and (comparatively) simple
  hardware.
 \begin_inset Newline newline
 \end_inset
@@ -103,7 +103,8 @@ Acknowledgements
 \end_layout
 
 \begin_layout Standard
-Thanks to the help I got from my tutor, Andrew Davison.
+I would like to thank my tutor, Andrew Davison, for his help with ideas
+ for the project and for his help with the project itself.
 \end_layout
 
 \begin_layout Standard
@@ -125,9 +126,9 @@ As modern technology increases in power and decreases in size, interest
  What was not always accessible to casual users and non-specialized researchers
  has suddenly become a lot more accessible - small aerial radio controlled
  vehicles are now cheaper and more capable than ever before.
- Taking this to an almost extreme, in this project we endeavour to perform
+ Taking this to an almost extreme, in this project we endeavor to perform
  indoor MAV autonomous piloting (in this particular case, a small RC helicopter)
-, using cheap widely available hardware and free, opensource software.
+, using cheap widely available hardware and free, open source software.
 \end_layout
 
 \begin_layout Standard
@@ -135,16 +136,20 @@ The problem of automating remote-controlled helicopter flight is best described
  by the limiting factors - there is a room indoors, a small remote-controlled
  helicopter, a computer and a simple camera source capable of estimating
  depth to some degree of accuracy (also known as an RGB-D camera).
- All of the individual parts are off the shelf, general products that are
- purchaseable by the general public at low-cost.
- This is good, and bad - whilst they may be afforadable and accessible,
- they are not tailored for this specific problem and as such are prone to
- errors and noise.
+ All of the individual parts are off the shelf products that are purchasable
+ by the general public at low-cost.
+ This is good, and bad - whilst they may be affordable and accessible, they
+ are not tailored for this specific problem and as such are prone to errors
+ and noise.
  The challenge of this project arises from these inaccuracies; pinpointing
  them and working around them.
  This is an interesting problem of some merit, as any system devised under
- these conditions should be easily replicated by anyone without the requirement
- of any specialised equipment.
+ these conditions should be easily replicated by anyone, without the requirement
+ of any 
+\lang british
+specialised
+\lang english
+ equipment.
 \end_layout
 
 \begin_layout Standard
@@ -173,8 +178,11 @@ The aim of this report is to document the iterative process of the project,
  finished system as a whole, its construction and its capabilities.
  In this chapter, we will give a brief overview of the technology used as
  well as the general outlook for the project itself.
- In Chapter 2, we discuss other similar projects and analyse what we can
- use as inspiration for our research and prototyping.
+ In Chapter 2, we discuss other similar projects and 
+\lang british
+analyse
+\lang english
+ what we can use as inspiration for our research and prototyping.
  Chapter 3 describes the final structure of the system, with each modules
  development being discussed in Chapter 4.
  A comprehensive testing of the system's basic properties and its effectiveness
@@ -188,7 +196,7 @@ Deconstruction
 \end_layout
 
 \begin_layout Standard
-The structure of the automation system can be easily understood by separating
+The structure of the automation system can be easily understood by isolating
  the individual requirements of the system itself.
  Once it has been abstracted into separate problems, these can be researched
  and worked on in a modular fashion, creating tools and sub-systems with
@@ -219,7 +227,7 @@ ve before the system can even begin to function.
  These include segmentation of the image to locate the helicopter, tracking,
  spacial analysis and analysis of the helicopter itself (to get the current
  orientation, for instance).
- These cover a range of difficulties, and cover a range of 'features' for
+ These cover a range of difficulties, and cover a range of features for
  the system, from simple hovering to fully automated flight.
 \end_layout
 
@@ -235,8 +243,12 @@ The program that flies the helicopter is wholly separate from the vision,
  properties of the helicopter, is to be able to issue commands intelligently
  to the helicopter and pilot it.
  Additionally, there should be a well-defined, expressive, and expandable
- method for defining piloting behaviour, such as hovering in place, flying
- to a specific point, or following a predefined path.
+ method for defining piloting 
+\lang british
+behaviour
+\lang english
+, such as hovering in place, flying to a specific point, or following a
+ predefined path.
 \end_layout
 
 \begin_layout Section
@@ -282,15 +294,15 @@ For the computer vision, we will use the Kinect sensor device, created by
 \end_layout
 
 \begin_layout Subsection
-OpenCV
+Open CV
 \end_layout
 
 \begin_layout Standard
-OpenCV (Open Source Computer Vision Library) is a library of programming
+Open CV (Open Source Computer Vision Library) is a library of programming
  functions that can be used to perform image analysis from the Kinect.
  It is free to use, and has many different implementations in many different
  programming languages.
- The specific version of OpenCV used in this project uses the Python bindings
+ The specific version of Open CV used in this project uses the Python bindings
  in a library called SimpleCV, which provides some additional functions
  in addition to those normally supplied.
  These will be covered in more detail later on.
@@ -333,7 +345,7 @@ http://arduino.cc
 
 \end_inset
 
- is an open-source microcontroller, which lets the user work with a simple
+ is an open-source micro controller, which lets the user work with a simple
  programming language (C-like) to control how the outputs work.
  It also comes with a Processing-based IDE for programming in, that handles
  a lot of the communications between the board and the computer out of the
@@ -391,8 +403,8 @@ Syma Remote Control Helicopter
 \begin_layout Standard
 The Syma Remote Control Helicopter is a small indoors-flying helicopter,
  that is controlled by an IR signal sent from a remote control.
- It is modelled to be easy to fly indoors, and to remain stable even in
- in-experienced hands.
+ It is modeled to be easy to fly indoors, and to remain stable even in in-experi
+enced hands.
  It does this by not having a traditional tail rotor - instead, it has an
  internal gyroscope that keeps it steady, and rotation is accomplished by
  speeding up and slowing down the main rotors.
@@ -454,7 +466,7 @@ With the idea as a starting point, initial research was carried out on where
 \begin_inset Newline newline
 \end_inset
 
-In his blog post, Lee discusses using a Teensy USB developement board 
+In his blog post, Lee discusses using a Teensy USB development board 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "teensyusb"
@@ -464,7 +476,7 @@ key "teensyusb"
 .
  However, Teensy USB boards are only made in the US, so other alternatives
  were considered.
- The foremost of these was the Arduino board, a popular microcontroller
+ The foremost of these was the Arduino board, a popular micro controller
  available globally, and one was shortly obtained.
 \begin_inset Newline newline
 \end_inset
@@ -497,9 +509,9 @@ Similar examples of automated flying have been attempted many times, generally
  have four individual propellers arranged in a square.
  Navigation is accomplished by powering the propellers at different speeds,
  causing the platform as a whole to tilt.
- Quadcopters are reknown for their stability and simple design, however
- they are often more expensive as the control method is more complicated,
- and they have more moving parts than our RC helicopter.
+ Quadcopters are renown for their stability and simple design, however they
+ are often more expensive as the control method is more complicated, and
+ they have more moving parts than our RC helicopter.
  Nevertheless, these examples provided inspiration for many different parts
  of the finished system.
 \begin_inset Float figure
@@ -541,7 +553,7 @@ A traditional quadcopter.
 
 \begin_layout Standard
 These prior works are not as useful in the traditional sense of background
- material, that is, they do not neccessarily provide a foundation from which
+ material, that is, they do not necessarily provide a foundation from which
  we can work from.
  To the contrary, they more serve as examples of similar problems and how
  they have been solved.
@@ -579,9 +591,12 @@ ts
 
 .
  Many parallels can be made with this project and ours - it is performed
- using a low-cost flying device, without customised, high-precision location-dat
-a sources, uses (amongst other things) a monocular vision device, and works
- indoors in previously unknown environments.
+ using a low-cost flying device, without 
+\lang british
+customised
+\lang english
+, high-precision location-data sources, uses (amongst other things) a monocular
+ vision device, and works indoors in previously unknown environments.
  However, it is also varies in others, not just in the fact that it is using
  a quadcopter instead of a helicopter - it also has access to other on-board
  camera sources and flight information (having a 3-axis gyroscope, accelerometer
@@ -614,10 +629,10 @@ In the quadropter experiments, they successfully demonstrated that accurate
  and robust visual navigation is feasible using a simple, low-cost hardware,
  in a variety of environments.
  Using a combination of machine learning and visual systems from a monocular
- source, combined with onboard data, they managed to achieve an average
+ source, combined with on board data, they managed to achieve an average
  positioning accuracy of 4.9cm whilst flying indoors.
  This is quite an encouraging result - whilst we will not have access to
- onboard flying information, our positional accuracy does not need to be
+ on board flying information, our positional accuracy does not need to be
  as precise.
  
 \end_layout
@@ -641,14 +656,14 @@ er to
 
 localize and navigate autonomously in previously unknown and GPS-denied
  environments...
- using a monocular camera onboard the quadrocopter
+ using a monocular camera on board the quadrocopter
 \begin_inset Quotes erd
 \end_inset
 
 .
  Much like the paper discussed above, he uses a SLAM system for positional
  estimates, combines this with an Extended Kalman Filter to fuse all available
- data and to compensate for data delays, and a PID controller to then pefrom
+ data and to compensate for data delays, and a PID controller to then perform
  actual control.
  
 \end_layout
@@ -675,7 +690,7 @@ SLAM (simultaneous localization and mapping) is a computer vision technique
 SLAM will most likely not end up being a part of our system.
  Instead, we will focus on getting the automated flight correct in a assumed-emp
 ty flying space.
- However, it does pose an interesting idea for later developement - perhaps
+ However, it does pose an interesting idea for later development - perhaps
  the creation of a map of the surrounding environment, to be navigated by
  the helicopter?
 \end_layout
@@ -716,8 +731,8 @@ The Kinect, whilst being a great tool for collecting depth data as well
  The interactive reconstruction system that is KinectFusion aims to solve
  these, by combining different viewpoints of the scene into on single 3D
  representation.
- The Kinect is moved around the scene as a handheld scanner, recreating
- the model in realtime.
+ The Kinect is moved around the scene as a hand-held scanner, recreating
+ the model in real-time.
  
 \end_layout
 
@@ -883,8 +898,12 @@ The helicopter itself consists of three different rotors (two on the main
  rotor, and one on the tail), and a gyroscope.
  The two sets of blades on the main rotor rotate in different directions,
  the top blades rotating clockwise and the lower ones rotation counter-clockwise.
- This has the effect of cancelling out their torque when they move at the
- same speed, keeping the helicopter from rotating in one particular direction.
+ This has the effect of 
+\lang british
+cancelling
+\lang english
+ out their torque when they move at the same speed, keeping the helicopter
+ from rotating in one particular direction.
  The ratio that these blades move to each other can be altered in small
  amounts for fine tuning.
  As discussed above, the rear rotor is positioned in an upright position,
@@ -971,7 +990,7 @@ and
 \end_inset
 
  for proportional, integral and derivative respectively), and some combination
- of the previous and current error in the sytem (the error being the difference
+ of the previous and current error in the system (the error being the difference
  between the current state and the desired state).
  These are described in more detail below.
 \end_layout
@@ -1080,7 +1099,11 @@ Each of the parameters reflects a different property of the control loop
  that needs to be addressed.
  The proportional parameter reflects the response to error - small values
  will not have a significant effect on the input, however large errors can
- cause unwanted oscillatory behaviour.
+ cause unwanted oscillatory 
+\lang british
+behaviour
+\lang english
+.
  The integral parameter deal with accumulated error - it is in this way
  that it can compensate for 'droop' in the system, where there is a control
  bias that needs to be accounted for.
@@ -1123,18 +1146,28 @@ Linear Control
 \begin_layout Standard
 As the only opposing force to the motion of the helicopter is air resistance
  itself, plus the helicopter's own rotor motion, it is desirable to have
- some sort of pre-emptive slow down mechanism so as to not 'overshoot' the
- intended position.
- In the lecture notes Steering Behaviours
+ some sort of 
+\lang british
+pre-emptive
+\lang english
+ slow down mechanism so as to not 'overshoot' the intended position.
+ In the lecture notes Steering 
+\lang british
+Behaviours
+\lang english
+
 \begin_inset CommandInset citation
 LatexCommand cite
 key "ludic"
 
 \end_inset
 
-, the 'Arrive' steering behaviour is discussed - it linearly decreases the
- desired speed based on distance between the desired position and the current
- position.
+, the 'Arrive' steering 
+\lang british
+behaviour
+\lang english
+ is discussed - it linearly decreases the desired speed based on distance
+ between the desired position and the current position.
  This decrease in speed can be achieved by simple air-resistance drifting
  (requires a longer distance) or by applying a counter force (shorter distance).
 \begin_inset Newline newline
@@ -1193,7 +1226,11 @@ It is already known that a neutral Pitch (Pitch = 63), ignoring air currents
  long as the forward Pitch is cut off sufficiently early.
  Additionally we are capable of providing reverse thrust as required simply
  by altering the Pitch in the opposite direction.
- As such, the 'Arrive' behaviour is suitable for movement in the 
+ As such, the 'Arrive' 
+\lang british
+behaviour
+\lang english
+ is suitable for movement in the 
 \begin_inset Formula $x-z$
 \end_inset
 
@@ -1206,7 +1243,7 @@ Digital Control
 
 \begin_layout Standard
 When the movement mechanism is known to be 'digital' in nature, in that
- it is possible to start and stop movment at a single moment, it should
+ it is possible to start and stop movement at a single moment, it should
  be sufficient to have an extremely simple 'digital' control mechanism as
  well.
  In pseudo-code, we could represent this as
@@ -1304,11 +1341,14 @@ Depth Camera
 \end_layout
 
 \begin_layout Standard
-The depth camera on the Kinect is infact an infrared projector and receiver.
+The depth camera on the Kinect is in fact an infrared projector and receiver.
  To reconstruct the space in 3D, it uses a technique called Structured Light.
  This involves shining a known pattern of light into the scene (in the case
- of the Kinect, this is a speckled light pattern), and then analysing the
- deformation of this light pattern as recorded by the IR camera.
+ of the Kinect, this is a speckled light pattern), and then 
+\lang british
+analysing
+\lang english
+ the deformation of this light pattern as recorded by the IR camera.
  
 \begin_inset Newline newline
 \end_inset
@@ -1353,8 +1393,8 @@ freenect.get_sync_depth()
 
 , which returns a 2D array of depth values in the scene.
  Having obtained the world coordinates of the object relative to the Kinect,
- it was then possible to reproject these points back to the RGB camera image
- again by using the individual parameter values of the camera itself.
+ it was then possible to re-project these points back to the RGB camera
+ image again by using the individual parameter values of the camera itself.
  These values are conveniently provided in the Freenect library at 
 \begin_inset Flex URL
 status collapsed
@@ -1370,11 +1410,11 @@ https://github.com/amiller/libfreenect-goodies/blob/master/calibkinect.py
 \end_layout
 
 \begin_layout Subsection
-OpenCV
+Open CV
 \end_layout
 
 \begin_layout Standard
-For my initial research on OpenCV, I began reading some tutorials and online
+For my initial research on Open CV, I began reading some tutorials and online
  documentation
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -1382,7 +1422,8 @@ key "OpenCV book"
 
 \end_inset
 
-, as well as looking at existing examples in the Haskell wrapper for OpenCV
+, as well as looking at existing examples in the Haskell wrapper for Open
+ CV
 \begin_inset CommandInset citation
 LatexCommand cite
 key "OpenCV examples"
@@ -1391,8 +1432,8 @@ key "OpenCV examples"
 
 .
  I aimed to follow the general learning flow from the book (implemented
- in C++), but to do it myself in Haskell, thus hopefully learning both OpenCV
- and the wrapper itself.
+ in C++), but to do it myself in Haskell, thus hopefully learning both Open
+ CV and the wrapper itself.
  My first aim after doing some basic exercises was to get basic shape recognitio
 n working on a plain white background (eg.
  my wall).
@@ -1403,9 +1444,9 @@ n working on a plain white background (eg.
 Unfortunately, after spending some time trying to get the Haskell wrappers
  to work, I came to the conclusion that the effort required to get the libraries
  up and running in Haskell was not worth the gain.
- Instead, I decided to use one of the better supported languages for OpenCV
- - Python or C++.
- Both of these have very thorough support for the OpenCV library, letting
+ Instead, I decided to use one of the better supported languages for Open
+ CV - Python or C++.
+ Both of these have very thorough support for the Open CV library, letting
  me avoid the problem of language-wrestling entirely.
  Python in particular is incredibly simple, not just in language terms but
  in library support - I discovered the open source framework SimpleCV (http://si
@@ -1444,7 +1485,7 @@ while True:
 
 \end_inset
 
-Due to the modularity of the vision part of the project, it should be comparitiv
+Due to the modularity of the vision part of the project, it should be comparativ
 ely simple to add a foreign function call to the Haskell code, and then
  implement the whole vision package in a different language.
  
@@ -1477,7 +1518,10 @@ The language Haskell was used for the bulk of the coding because of a variety
  of tools that it brings to the project.
  These include simple concurrency through the use of STMs, a robust package
  management system and a powerful interpreter for testing individual modules.
- In this section we will go over each of these different areas and analyse
+ In this section we will go over each of these different areas and 
+\lang british
+analyse
+\lang english
  what they offer to this project.
 \end_layout
 
@@ -1594,7 +1638,7 @@ System Architecture
 The helicopter control system is built from several different modules that
  interact with each other in a set manner.
  The modular structure is beneficial as it allows easy separation of responsibil
-ities within the system, and also allows 'swapping' of certain modules with
+ities within the system, and also allows swapping of certain modules with
  similar roles but different methods.
  The majority of the vision system is written in Python, the Arduino in
  (obviously) Arduino, and the control system in Haskell.
@@ -1644,7 +1688,11 @@ status open
 
 \end_inset
 
-Simulations and control are all centralised to the Haskell 
+Simulations and control are all 
+\lang british
+centralised
+\lang english
+ to the Haskell 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1720,7 +1768,7 @@ Flyable
 
 \begin_layout Standard
 A Flyable is a Type Class that must be able to receive orders, have an active/in
-active status, and most importantly must be observeable.
+active status, and most importantly must be observable.
  Concrete Types can become instances of the Flyable, such as the actual
  Helicopter itself (with observations coming from the Vision module), or
  a VirtualHelicopter (with observations coming directly from the simulator
@@ -1775,6 +1823,29 @@ One of the key aims for the development of this project was to be able to
  roles to specific areas, and ensuring that the abstract version would in
  fact work.
  
+\begin_inset Newline newline
+\end_inset
+
+Throughout this section we will be referring to the 
+\begin_inset Quotes eld
+\end_inset
+
+Monkey
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The Monkey is the autonomous control system, written in Haskell.
+ It is named as a reference to the phrase 
+\begin_inset Quotes eld
+\end_inset
+
+monkey see, monkey do
+\begin_inset Quotes erd
+\end_inset
+
+, which itself refers to the AI mimicking how a human would fly the helicopter.
+ 
 \end_layout
 
 \begin_layout Section
@@ -1828,8 +1899,11 @@ In addition to having some set milestones, it was important to have a good
  skeletal structure for each module, especially so for the controller.
  This involved setting up contracts in the form of Type Classes for different
  parts of the controller, that each new test module would need to fulfill.
- This helped to realise the requirements for each module, and made testing
- much easier.
+ This helped to 
+\lang british
+realise
+\lang english
+ the requirements for each module, and made testing much easier.
  For instance, the Flyable Type Class, which describes a 
 \begin_inset Quotes eld
 \end_inset
@@ -1843,7 +1917,7 @@ Flyable
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Haskell,numbers=left,tabsize=2"
+lstparams "language=Haskell,tabsize=2"
 inline false
 status open
 
@@ -2124,7 +2198,7 @@ The last 8 bits (24-32) are the Correction.
 The structure of the packet can be easily seen from the Arduino code itself
  -
 \begin_inset listings
-lstparams "numbers=left,tabsize=2"
+lstparams "tabsize=2"
 inline false
 status open
 
@@ -2301,7 +2375,7 @@ Support the sending of a tuple/list of doubles, somewhere around the range
 \begin_inset Formula $z$
 \end_inset
 
- and postional information from the vision system to the control system.
+ and positional information from the vision system to the control system.
 \end_layout
 
 \begin_layout Itemize
@@ -2399,8 +2473,11 @@ where the struct is the data structure, and observe is the cross-language
 \begin_inset Newline newline
 \end_inset
 
-However, in practise this proved to not be a good solution, as it was simply
- too slow.
+However, in 
+\lang british
+practise
+\lang english
+ this proved to not be a good solution, as it was simply too slow.
  Our system required the ability to make tens of requests to the vision
  server per second, and Thrift was creating a large bottle neck that taking
  upwards of 0.1 seconds to transmit even one call.
@@ -2416,7 +2493,7 @@ HTTP
 After failing to get Thrift to work properly, we decided to go for the simplest
  method we could think of - hosting a SimpleHTTPServer in Python, and making
  HTTP requests to the server from Haskell this way.
- 
+ The specifics of this are covered in the Appendix.
 \end_layout
 
 \begin_layout Subsection
@@ -2469,8 +2546,11 @@ Duocopter
 \end_inset
 
 For example, initially it was useful to let the Monkey control the Throttle
- of the helicopter, whilst stabilising and steering were controlled by a
- human operator through the GUI.
+ of the helicopter, whilst 
+\lang british
+stabilising
+\lang english
+ and steering were controlled by a human operator through the GUI.
  The Duocopter would throw away any instruction received from the Monkey
  that was not a Throttle instruction, and likewise for non-Throttle instructions
  from the human.
@@ -2492,8 +2572,11 @@ see what the controller sees
 \begin_inset Quotes erd
 \end_inset
 
-, that is to have a method of visualising the data that is received by the
- Monkey when it tries to observe the helicopter.
+, that is to have a method of 
+\lang british
+visualising
+\lang english
+ the data that is received by the Monkey when it tries to observe the helicopter.
  Original concepts for this revolved around outputting an image of the current
  observed position of the helicopter every iteration, and then making an
  animation out of the produced images.
@@ -2518,7 +2601,7 @@ key "Pygame"
  module (which is already used in the SimpleCV module used for vision),
  creating a window of a specific size was as simple as 
 \begin_inset listings
-lstparams "language=Python,numbers=left,tabsize=2"
+lstparams "language=Python,tabsize=2"
 inline false
 status open
 
@@ -2616,8 +2699,11 @@ stdin/stdout
 
 This proved to be a simple yet effective manner for co-ordinating the two
  programs, with no need to worry about complicated cross-language tools
- or synchronisation problems, as all of the threading is handled by the
- Bash shell itself.
+ or 
+\lang british
+synchronisation
+\lang english
+ problems, as all of the threading is handled by the Bash shell itself.
 \end_layout
 
 \begin_layout Paragraph
@@ -2649,9 +2735,12 @@ We deliberately developed the VirtualHelicopter in such a way that its various
 \begin_inset Newline newline
 \end_inset
 
-The simulator proved to be satisfactory for testing control behaviours and
- different flight methods (such as just human, human + monkey, just monkey
- etc.).
+The simulator proved to be satisfactory for testing control 
+\lang british
+behaviours
+\lang english
+ and different flight methods (such as just human, human + monkey, just
+ monkey etc.).
 \end_layout
 
 \begin_layout Section
@@ -2713,19 +2802,19 @@ The first consideration was to use Haskell, as the main control system is
  However, after further research it was discovered that vision libraries
  for Haskell are slim, and not particularly well supported.
  Most of the libraries are cross-language, partial implementations of the
- C++ OpenCV libraries.
+ C++ Open CV libraries.
  Due to their partial and experimental nature, and previous inexperience
- with OpenCV, it was deemed too risky to attempt to proceed with the vision
+ with Open CV, it was deemed too risky to attempt to proceed with the vision
  module in Haskell.
 \begin_inset Newline newline
 \end_inset
 
-The second consideration was using C++ and OpenCV.
+The second consideration was using C++ and Open CV.
  This was an obvious consideration, as huge amounts of computer vision research
- is done in OpenCV and C++, with the language/library pair being considered
+ is done in Open CV and C++, with the language/library pair being considered
  the 'main' computer vision method.
  However, this approach was not entirely without flaw - inexperience with
- both C++ and vision in general made this quite daunting.
+ both C++ and vision in general made this seem quite daunting.
  Whilst a good choice if no other alternative are found, it seemed that
  a further search for a simpler language/implementation might prove to be
  beneficial.
@@ -2733,9 +2822,9 @@ The second consideration was using C++ and OpenCV.
 \end_inset
 
 The last consideration was the SimpleCV library, which is written in Python.
- The SimpleCV uses the Python implementation of OpenCV, but provides a large
- amount of 'simple' methods and data structures that hide the more complex
- data structures below.
+ The SimpleCV uses the Python implementation of Open CV, but provides a
+ large amount of 'simple' methods and data structures that hide the more
+ complex data structures below.
  Additionally, it is well supported with many tutorials and examples.
  This seemed to fulfill the most requirements without many downsides, so
  development began using that.
@@ -2801,8 +2890,11 @@ status open
 
 \end_inset
 
-Figure showing the appearance of 'depth-shadows', visualised as white areas
- in the image.
+Figure showing the appearance of 'depth-shadows', 
+\lang british
+visualised
+\lang english
+ as white areas in the image.
  The Kinect device is incapable of obtaining depth information these areas.
  These shadows are a by-product of the depth-detection method, and unfortunately
  cannot be avoided using the Kinect 'as-is'.
@@ -2911,7 +3003,7 @@ Shadows - one method of fixing the above stable lighting problem was to
 
 \begin_layout Standard
 When the situations were ideal, the segmentation algorithm worked very well
- - however, the situtation were often not ideal, and were even less likely
+ - however, the situation were often not ideal, and were even less likely
  to be so in a practical setting.
 \end_layout
 
@@ -2922,9 +3014,13 @@ D Vision
 \begin_layout Standard
 Having tested out the RGB camera methods, the next idea was to try to recreate
  the best parts of the RGB detection using just the depth camera, whilst
- trying to minimise the downsides of the depth camera itself (as mentioned
- earlier, one of the main problems was excessive noise in depth images caused
- by 'depth-shadowing').
+ trying to 
+\lang british
+minimise
+\lang english
+ the downsides of the depth camera itself (as mentioned earlier, one of
+ the main problems was excessive noise in depth images caused by 'depth-shadowin
+g').
  
 \end_layout
 
@@ -2978,8 +3074,12 @@ The RGB camera operates with 3 dimensions of values (as the name suggests)
  The depth camera, by contrast, only takes values from 0-2047, with 2047
  being the error value.
  Whilst this may seem that the detail provided is significantly less, in
- practise this does not affect the ability of the camera to detect the helicopte
-r to any noticeable degree.
+ 
+\lang british
+practise
+\lang english
+ this does not affect the ability of the camera to detect the helicopter
+ to any noticeable degree.
 \end_layout
 
 \begin_layout Paragraph
@@ -3296,7 +3396,7 @@ One suggested method of orientation analysis was to decompose the silhouette
  of the helicopter into height along the y-axis.
  The basis of this was that the front of the helicopter has more 'stuff'
  to it - it is taller and rounder than the tail of the helicopter, which
- is comparitively small.
+ is comparatively small.
  Thus the decomposition would result in a graph that is taller at one end
  and shorter at the other, and the distance between these two features would
  discern the orientation of the helicopter.
@@ -3346,9 +3446,9 @@ seen for the two helicopter blades and the main body of the helicopter.
 To attempt to remedy this, a simple method was devised to remove the helicopter
  blades from the scene.
  The helicopter always has two large shadows, one for each helicopter blade.
- By looking at the horizontal scanlines, rather than the vertical scanlines
- (Figure 5.5) it is possible to see that these are clearly identifiable as
- the first two 'large' peaks.
+ By looking at the horizontal scan lines, rather than the vertical scan
+ lines (Figure 5.5) it is possible to see that these are clearly identifiable
+ as the first two 'large' peaks.
 \begin_inset Float figure
 wide false
 sideways false
@@ -3380,7 +3480,7 @@ Vertical decomposition of the helicopter signal.
 
 \end_inset
 
-By cropping the portion of the image that holds these two peaks, (achived
+By cropping the portion of the image that holds these two peaks, (achieved
  by searching linearly from the left until two 'large' peaks are met.
  The exact definition of large is relative to the rest of the signal) it
  is possible to remove the blades from the image entirely, providing the
@@ -3420,15 +3520,16 @@ New horizontal decomposition, with helicopter blades removed.
 
 \end_inset
 
-
+Before delving too far into this complicated method, we decided to look
+ for simpler approaches as well.
 \end_layout
 
 \begin_layout Subsection
-Orientation Inferrence
+Orientation Inference
 \end_layout
 
 \begin_layout Standard
-Another, simpler, method of orientation analysis attempted was inferrence.
+Another, simpler, method of orientation analysis attempted was inference.
  This worked on the underlying assumption that as the helicopter is incapable
  of 'strafing' motion (that is motion to the left or right whilst facing
  forwards), provided there is some forwards pitch the helicopter will move
@@ -3459,10 +3560,10 @@ Rough results
 \end_layout
 
 \begin_layout Standard
-Given a suitable constant forward velocity, the orientation inferrence method
+Given a suitable constant forward velocity, the orientation inference method
  gave positive results for a simple steering mechanism.
  It suffered somewhat when the helicopter was not operating under ideal
- conditions (such as backdraft from walls causing the helicopter to move
+ conditions (such as back draft from walls causing the helicopter to move
  backwards), however given the simplicity of the system and the hoped operating
  conditions of the helicopter, it still proved to be an attractive method.
 \end_layout
@@ -3525,12 +3626,16 @@ Based on these observations, it is possible to construct several different
  control methods.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Paragraph
 The Monkey
 \end_layout
 
 \begin_layout Standard
-Our autonomous flight control, affectionately labelled the Monkey.
+Our autonomous flight control, affectionately labeled the Monkey, is the
+ controller that handles autonomous flight.
+ It coordinates the different flying behaviours and control methods that
+ enable it to fly the helicopter.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -3559,7 +3664,11 @@ Intentions
 \begin_layout Standard
 The specifics of each of these controls is defined in an Intent.
  An Intent is a desire to do something, and each Intent classifies a different
- flight behaviour, whether it be flying, landing or hovering.
+ flight 
+\lang british
+behaviour
+\lang english
+, whether it be flying, landing or hovering.
  Because of the flexibility of interpretation of this, the corresponding
  definition in our code is quite simple:
 \begin_inset listings
@@ -3724,7 +3833,7 @@ Fortunately, the model helicopter is capable of withstanding larger (relative)
  is only decreased when the helicopter is over the landing point.
  Once a certain cut off point is reached - in our case 30cm - the helicopter
  cuts power altogether, landing rather ungraciously, but successfully nonetheles
-ss, in the landing zone.
+s, in the landing zone.
 \begin_inset Newline newline
 \end_inset
 
@@ -3735,6 +3844,7 @@ Our landing algorithm operated quite successfully, with accurate landing
 \end_layout
 
 \begin_layout Standard
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="3">
 <features tabularvalignment="middle">
@@ -3891,11 +4001,14 @@ Yes
 \end_inset
 
 
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
-Below we have plotted two flight paths of the landing behaviour to further
- demonstrate how it works.
+\begin_layout Standard
+Below we have plotted two flight paths of the landing 
+\lang british
+behaviour
+\lang english
+ to further demonstrate how it works.
 \begin_inset Float figure
 wide false
 sideways false
@@ -4110,7 +4223,7 @@ Qualitative System Analysis
 
 \begin_layout Standard
 To evaluate the limitations of the system, several tests were set up.
- These tests were designed to quantitavely analyse the exact capabilities
+ These tests were designed to quantitatively analyse the exact capabilities
  of the system.
  Each section analyses one particular trait of the system.
 \end_layout
@@ -4641,7 +4754,7 @@ Accuracy of detection
 \end_layout
 
 \begin_layout Standard
-The orientation inferrence method inherently has some delay to detecting
+The orientation inference method inherently has some delay to detecting
  the current orientation, as the velocity of the helicopter matches the
  orientation of the helicopter.
  This is particularly apparent at higher speeds, as changes in direction
@@ -4654,9 +4767,9 @@ Limitations
 \end_layout
 
 \begin_layout Standard
-The current orientation detection mechanism (orientation inferrence) relies
+The current orientation detection mechanism (orientation inference) relies
  on the helicopter having a forward velocity.
- Without a forward velocity, or prior knolwedge about the helicopter, the
+ Without a forward velocity, or prior knowledge about the helicopter, the
  mechanism is unable to detect the orientation.
 \end_layout
 
@@ -5292,7 +5405,7 @@ Works well in almost any static indoor environment
 The system is constructed with little prior assumptions on the indoor environmen
 t, besides that it must be static in nature.
  This means that it should work in any indoor room.
- Of course, there are levels of 'working', but for the mostpart the helicopter
+ Of course, there are levels of 'working', but for the most-part the helicopter
  performs as expected.
 \end_layout
 
@@ -5375,14 +5488,14 @@ key "swarm quadcopters"
 
 \end_inset
 
-, to equipping them with laser rangefinders 
+, to equipping them with laser range finders 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "laser MAV"
 
 \end_inset
 
-, to using onboard RGB-D systems 
+, to using on board RGB-D systems 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Odometry quadropter"
@@ -5394,12 +5507,12 @@ key "Odometry quadropter"
 \end_inset
 
 Each of these different methods has its own merits and flaws.
- For instance, using onboard RGB-D systems for SLAM is extremely computationally
- expensive (and too heavy for most MAVs), yet it allows for navigation with
- no prior knowledge of the area.
+ For instance, using on board RGB-D systems for SLAM is extremely computationall
+y expensive (and too heavy for most MAVs), yet it allows for navigation
+ with no prior knowledge of the area.
  Stationary camera arrays allow for highly precise movement of many different
  MAVs at once, but are stuck to a lab environment and are very expensive.
- Laser-based systems allow for aggressive flying maneouvers, but require
+ Laser-based systems allow for aggressive flying maneuvers, but require
  a pre-computed map of the environment.
 \begin_inset Newline newline
 \end_inset
@@ -5504,8 +5617,8 @@ Multiple Helicopters
 With improvements to the vision system and small adjustments to the control
  system, it is theoretically possible to control two separate helicopters
  in the same environment.
- This could allow for advanced simultaneous flight maneouvers, and make
- for some impressive demonstrations.
+ This could allow for advanced simultaneous flight maneuvers, and make for
+ some impressive demonstrations.
  The main requirement for this would be the ability to separately track
  the two helicopters simultaneously in the scene, without mixing them up.
 \end_layout
@@ -5699,7 +5812,7 @@ key "OpenCV book"
 BRADSKI, G.
  R., & KAEHLER, A.
  (2008).
- Learning OpenCV: computer vision with the OpenCV library.
+ Learning Open CV: computer vision with the Open CV library.
  Sebastopol, CA, O'Reilly.
 \end_layout
 
@@ -6065,56 +6178,709 @@ Here we will give a small guide on how to use the autonomous flight system.
 Manual Flight
 \end_layout
 
+\begin_layout Standard
+This is flying just as if you were using the original remote control.
+ Different orders can be sent by using keypresses, described below.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Control
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Key(s)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Pitch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Up-arrow (forwards) / Down-arrow (backwards)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yaw
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left-arrow (left) / Right-arrow (right)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Throttle (small incr.)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+h 
+\begin_inset Formula $\uparrow$
+\end_inset
+
+, g 
+\begin_inset Formula $\downarrow$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Throttle (large incr.)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+f 
+\begin_inset Formula $\uparrow$
+\end_inset
+
+, d 
+\begin_inset Formula $\downarrow$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Correction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+a 
+\begin_inset Formula $\leftarrow$
+\end_inset
+
+, s 
+\begin_inset Formula $\rightarrow$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Halt-all
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Quit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Esc
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Paragraph
 Semi-Autonomous Flight
+\end_layout
+
+\begin_layout Standard
+Flying as with manual flight, except the system watches your flight and
+ prevents collision into walls.
+ Controls are exactly the same as with manual flight.
 \end_layout
 
 \begin_layout Paragraph
 Autonomous Flight
 \end_layout
 
+\begin_layout Standard
+Letting the system fly the helicopter as specified by you.
+ Initial flight is hand-released so as to allow the system to calibrate
+ to the current battery level of the helicopter.
+ Currently available behaviours are hovering and landing, and multiple sequences
+ of these.
+\end_layout
+
 \begin_layout Subsubsection*
 Choosing your flight method
 \end_layout
 
-\begin_layout Itemize
-Picking the flyers/control
+\begin_layout Standard
+The flight and control method are both defined inside 
+\begin_inset Formula $main.hs$
+\end_inset
+
+, the Haskell main file.
+ Several different flight and control methods are already defined here,
+ and you can uncomment any 
+\series bold
+one 
+\series default
+of them to run it.
+ There are two flight methods, and three control methods:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="1">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Control Methods
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GUI (manual)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Watcher (semi-auto)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Monkey (auto)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="1">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flight Methods
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VirtualHelicopter
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Helicopter
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each control method is specified by a different run command, and then passed
+ a flyer method.
+ These are defined as:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Control Method
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Run command
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GUI
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+runGUI
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Watcher
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+runWatcher
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Monkey
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+runMonkey
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flight Method
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Start command
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VirtualHelicopter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+spawnVirtualHelicopter
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Helicopter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+startHelicopter
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+These are linked together using Haskell's 
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+=<<
+\end_layout
+
+\end_inset
+
+ function.
+ So for example, to fly a virtual helicopter manually using the GUI, one
+ would use 
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+runGUI =<< spawnVirtualHelicopter
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection*
 Setting up the vision server
 \end_layout
 
-\begin_layout Itemize
-Running the python server
+\begin_layout Standard
+For autonomous and semi-autonomous flight with the helicopter, a vision
+ server must be provided for the system for positional acquisition.
+ This is an HTTP server located on 
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+localhost:8080
+\end_layout
+
+\end_inset
+
+, that must respond to an HTTP GET request with the reply
+\begin_inset Formula 
+\[
+POS:(x,y,z,o,v)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $x,y,z$
+\end_inset
+
+ is the 3D position of the helicopter, 
+\begin_inset Formula $o$
+\end_inset
+
+ is the current orientation of the helicopter (relative to the camera) and
+ 
+\begin_inset Formula $v$
+\end_inset
+
+ is the 'truth' value of that recording (0 if the position was successfully
+ recorded, 1 otherwise).
+\begin_inset Newline newline
+\end_inset
+
+The current vision server resides in 
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+visionHTTPServer.py
+\end_layout
+
+\end_inset
+
+, and can be run using the command 
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+python visionHTTPServer.py
+\end_layout
+
+\end_inset
+
+.
+ The server will require approximately 1 minute to set up, and will print
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Server started
+\begin_inset Quotes erd
+\end_inset
+
+ when it is ready.
 \end_layout
 
 \begin_layout Subsubsection*
 Running it all
 \end_layout
 
-\begin_layout Itemize
-Compiling and running
+\begin_layout Standard
+Once the vision server is running and you have specified your flyer and
+ control method, run 
+\begin_inset listings
+inline true
+status open
+
+\begin_layout Plain Layout
+
+cabal build; ./run
 \end_layout
 
-\begin_layout Subsection*
-Customising the Monkey
-\end_layout
+\end_inset
 
-\begin_layout Paragraph
-Adding behaviours
-\end_layout
-
-\begin_layout Itemize
-Using the multiintent
-\end_layout
-
-\begin_layout Subsubsection*
-Developing new behaviours
-\end_layout
-
-\begin_layout Itemize
-Requirements for a new behaviour, tools available
+ to compile and run the system.
 \end_layout
 
 \end_body
