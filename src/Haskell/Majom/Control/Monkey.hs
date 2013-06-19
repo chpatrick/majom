@@ -52,11 +52,19 @@ runMonkey flyer = do
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
-  milliSleep 5000
-  surfaces <- lookAround flyer
+  putStrLn "Please place the helicopter where you wish the landing position to be"
+  takeWhileIO not $
+    repeat (fmap (== '\n') getChar)
+  (_,landPos) <- observe flyer
+  -- Do Stuff
+  putStrLn "Please clear the flying area!"
+  takeWhileIO not $
+    repeat (fmap (== '\n') getChar)
+  putStrLn "Let's gooooo!"
+  milliSleep 1000
   --putStrLn $ show (filter sSpecial surfaces)
   let hIntent = hoverAt $ Position desiredPos undefined
-  let lIntent = landOn $ Position (vector [0, -0.45, -1.63]) undefined
+  let lIntent = landOn $ landPos
   --let intent = keepDoing $ withTiming (1000, waitTime)  $ doAll <&> hIntent <&> lIntent <&> hIntent
   {-
   let 
@@ -97,23 +105,18 @@ monkeyDo flyer = do
   obs@(pwr', pos') <- lift $ observe flyer
   active <- lift $ isActive flyer
 
-  surfaces <- lift $ fmap (filter (not . sSpecial)) $ lookAround flyer
   if active 
     then do
       (Brain intent (pos, pwr)) <- get
 
-      --lift $ putStrLn $ prettyPos pos'
+      lift $ putStrLn $ prettyPos pos'
       let vel = getVec (pos' - pos) |/| wt
       intent' <- lift $ enactIntent intent flyer pos' vel
       put $ Brain intent' (pos', pwr)
 
-      --if or $ map (onIntersection pos' vel) surfaces 
-      --  then (lift $ putStrLn "uh oh") 
-      --  else (lift $ putStrLn "we're fine")
-
     else do
       iters <- lift $ fmap length $ 
-        takeWhileIO (not . id) $
+        takeWhileIO not $
           repeat (milliSleep waitTime >> observe flyer >> isActive flyer)
       (Brain intent (pos,  _)) <- get
       obs@(pwr, pos') <- lift $ observe flyer
@@ -121,20 +124,6 @@ monkeyDo flyer = do
       put $ Brain intent (pos',pwr)
 
   lift $ milliSleep waitTime
-
-onIntersection :: Position -> Velocity -> Surface -> Bool
-onIntersection p v s 
-  | vectorSize v == 0 = False
-  | vecDot l n == 0   = False
-  | d < 0             = False
-  | d <= 1            = True
-  | otherwise         = False
-  where
-    l   = vectorUnit v
-    l0  = getVec p
-    p0  = sPoint s
-    n   = sNorm s
-    d   = (vecDot (p0 - l0) n) / (vecDot l n)
 
 takeWhileIO :: (a -> Bool) -> [IO a] -> IO [a]
 takeWhileIO _ [] = return []

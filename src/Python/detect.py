@@ -121,7 +121,7 @@ def approxEq(a,b):
 
 def diffdiff2(b, filt=None, imgBase=None, history=[]):
   print 0
-  d = freenect.sync_get_depth()[0]
+  d = freenect.sync_get_depth()[0].copy()
   print 0.1
   img = cam.getImage()
   print 0.2

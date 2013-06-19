@@ -22,57 +22,52 @@ type WatcherBrainT = StateT Brain IO ()
 execWatcherBrainT :: WatcherBrainT -> Brain -> IO Brain
 execWatcherBrainT mk k = execStateT mk k
 
-data Brain = Brain  { brainLast :: (Position, Velocity, Power) }
+data Brain = Brain  { brainLast :: Position }
 
 runWatcher :: (Flyable a) => a -> IO Brain
 runWatcher flyer = do
   let (f1, f2) = startDuoCopter flyer [Yaw,Pitch,Throttle,Correction]
   forkIO $ runGUI f1
   putStrLn "I am a watcher"
-  
+  getChar 
   (_, pos) <- observe flyer
-  milliSleep waitTime
-  (pwr, pos') <- observe flyer
-  let initBrain = Brain (pos', (getVec (pos' - pos)) |/| wt, pwr)
-  handle <- openFile "out.csv" WriteMode
-  execWatcherBrainT (forever $ watch flyer handle) initBrain
+  let initBrain = Brain pos
+  putStrLn "Go!"
+  execWatcherBrainT (forever $ watch flyer) initBrain
 
-watch :: (Flyable a) => a -> Handle -> WatcherBrainT 
-watch flyer output = do
-  {-
-  active <- lift $ isActive flyer
-  if active then do
-      (Brain model (pos, vel, pwr)) <- get
-      obs@(pwr', pos') <- lift $ observe flyer
-      let vel' = (getVec (pos' - pos)) |/| wt
-      if (pwr' == pwr) then 
-        do 
-          let acc  = (vel' - vel) |/| wt
-          let model' = updateModel model (pwr, acc)
-          lift $ putStrLn $ (show pwr) ++ "," ++ (show (vectorY acc))
-          put (Brain model' (pos', vel', pwr'))
-        else 
-          put (Brain model (pos', vel', pwr'))
-      --lift $ putStrLn $ "New p est = " ++ (show (kMuHat model))
-      --lift $ hPutStrLn output $ (show pwr) -- ++ "," ++ (show $ vectorY acc)
-    
-      lift $ milliSleep waitTime
-    else do
-      --lift $ putStrLn "Flyer is no longer active."
-      (Brain model (pos, vel, pwr')) <- get
-      obs@(pwr, pos') <- lift $ observe flyer
-      put (Brain model (pos', (getVec (pos' - pos)) |/| wt, pwr'))
-      lift $ hFlush output
-      --lift $ hClose output
-      lift $ milliSleep waitTime
-      -}
-  (_, pos) <- lift $ observe flyer
-  lift $ putStrLn $ prettyPos pos
-  lift $ hFlush stdout
+watch :: (Flyable a) => a -> WatcherBrainT 
+watch flyer = do
+  (Brain pos) <- get
+  obs@(_, pos') <- lift $ observe flyer
+  surfaces <- lift $ fmap (filter (not . sSpecial)) $ lookAround flyer
+  let vel = getVec (pos' - pos) |/| wt
+
+  lift $ putStrLn $ show $ map (snd.(onIntersection pos' vel)) surfaces
+  if or $ map (fst.(onIntersection pos' vel)) surfaces 
+    then (lift $ setFly flyer Pitch 93) 
+    else (lift $ putStrLn "Phew!")
+
+  put (Brain pos')
+  lift $ putStrLn $ prettyPos pos'
   lift $ milliSleep waitTime
 
 waitTime :: Int
 waitTime = 50
+
+onIntersection :: Position -> Velocity -> Surface -> (Bool,Double)
+onIntersection p v s 
+  | vectorSize v' == 0 = (False,0)
+  | vecDot l n == 0    = (False,0)
+  | d < 0              = (False,d)
+  | d <= 0.5             = (True,d)
+  | otherwise          = (False,d)
+  where
+    v'  = vector [vectorX v, 0, vectorZ v]
+    l   = vectorUnit v'
+    l0  = getVec p
+    p0  = sPoint s
+    n   = sNorm s
+    d   = (vecDot (p0 - l0) n) / (vecDot l n)
 
 wt :: Double
 wt = (fromIntegral waitTime) / 1000.0

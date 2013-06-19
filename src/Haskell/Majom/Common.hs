@@ -63,10 +63,7 @@ vectorZ = (V.! 2)
 
 vecDot :: Vector -> Vector -> Double
 vecDot v1 v2 =
-  V.sum (v1' * v2')
-  where
-    v1' = vectorUnit v1
-    v2' = vectorUnit v2
+  V.sum (v1 * v2)
 
 getDirection :: Vector -> Int
 getDirection v
@@ -135,10 +132,7 @@ type Time = Double
 type Power = Int
 
 data Surface = Surface { sPoint :: Vector, sNorm :: Vector, sSpecial :: Bool }
-  deriving Show
-
-data Ray = Ray { rDir :: Vector, rStart :: Vector }
-  deriving Show
+  deriving (Show, Read)
 
 -- | Gravity force constant
 gravity :: Force

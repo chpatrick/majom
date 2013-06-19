@@ -36,7 +36,7 @@ data VirtualHelicopter =
 
 -- | Spawns a virtual helicopter at (0,0)
 spawnVirtualHelicopter :: IO VirtualHelicopter
-spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (Position (vector [0,0,0]) 0)) <*> (newTVar $ Map.fromList flyerInit) <*> (newTVar False) <*> (newTVar newPID) <*> (newTVar [])
+spawnVirtualHelicopter = atomically $ VirtualHelicopter <$> (newTVar []) <*> (newTVar (Position (vector [0,0,0]) 0)) <*> (newTVar $ Map.fromList flyerInit) <*> (newTVar True) <*> (newTVar newPID) <*> (newTVar [])
 
 clamp :: Int -> Int
 clamp i

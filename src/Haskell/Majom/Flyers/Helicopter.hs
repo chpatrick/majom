@@ -44,17 +44,37 @@ get = getPosition `fmap` getResponse
 data Helicopter = Helicopter { getCurrentOptions :: TVar OptionMap,
   getActive :: TVar Bool, getPID :: TVar PID, getSurfaces :: TVar [Surface]}
 
+getSurfs' :: String -> [Surface]
+getSurfs' s
+  | length m > 0 = map surfacify vs
+  | otherwise = []
+  where
+    surfacify (a,b) = Surface (vector b) (vectorUnit $ vector a) False
+    vs :: [([Double], [Double])]
+    vs = read $ head m
+    m = getAllTextMatches $ s =~ "[[].*[]]" :: [String]
+
+getSurfacesResponse :: IO String
+getSurfacesResponse = do
+  r <- HTTP.simpleHTTP (HTTP.getRequest "http://localhost:8081/")
+  return $ show r
+
+getSurfs :: IO [Surface]
+getSurfs = getSurfs' `fmap` getSurfacesResponse
+
 -- | Starts an instance of the helicopter communication protocol.
 startHelicopter :: IO Helicopter
 startHelicopter = do
+  --surfaces <- getSurfs
+  let surfaces = []
+  --putStrLn $ show surfaces
+  
   var <- (atomically $ newTVar Map.empty)
   s <- openSerial port defaultSerialSettings { 
         flowControl = Software }
   forkIO $ forever $ heliThread s var
 
-  --TODO Get surface information from python server
-
-  atomically $ Helicopter var <$> (newTVar False) <*> (newTVar (newPID)) <*> (newTVar [])
+  atomically $ Helicopter var <$> (newTVar False) <*> (newTVar (newPID)) <*> (newTVar surfaces)
 
 -- | Message passing time in milliseconds
 stepTime :: Int
@@ -73,6 +93,7 @@ instance Flyable Helicopter where
   setFlyMany h vs = dropValM $ setMany h vs
   fly h = return ()
   observe h = do
+    putStrLn "OBSERVE"
     (x,y,z,o,v) <- get
     let optVar = getCurrentOptions h
     pwr <- fmap (Map.! Throttle) $ atomically $ readTVar optVar
