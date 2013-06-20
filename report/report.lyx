@@ -84,8 +84,8 @@ Acknowledgements
 \end_layout
 
 \begin_layout Standard
-I would like to thank my tutor, Andrew Davison, for his help with ideas
- for the project and for his help with the project itself.
+I would like to thank my tutor, Andrew Davison, for his ideas on the project
+ and for his help with the project itself.
 \end_layout
 
 \begin_layout Standard
@@ -108,8 +108,9 @@ As modern technology increases in power and decreases in size, interest
  has suddenly become a lot more accessible - small aerial radio controlled
  vehicles are now cheaper and more capable than ever before.
  Taking this to an almost extreme, in this project we endeavor to perform
- indoor MAV autonomous piloting (in this particular case, a small RC helicopter)
-, using cheap widely available hardware and free, open source software.
+ indoor MAV autonomous piloting (in this particular case, with a small RC
+ helicopter), using cheap, widely available hardware and free, open source
+ software.
 \end_layout
 
 \begin_layout Standard
@@ -119,9 +120,9 @@ The problem of automating remote-controlled helicopter flight is best described
  depth to some degree of accuracy (also known as an RGB-D camera).
  All of the individual parts are off the shelf products that are purchasable
  by the general public at low-cost.
- This is good, and bad - whilst they may be affordable and accessible, they
- are not tailored for this specific problem and as such are prone to errors
- and noise.
+ This is a double-edged sword - whilst they may be affordable and accessible,
+ they are not tailored for this specific problem and as such are prone to
+ errors and noise.
  The challenge of this project arises from these inaccuracies; pinpointing
  them and working around them.
  This is an interesting problem of some merit, as any system devised under
@@ -139,7 +140,7 @@ The simple RGB-D camera that will be used in this project is the Kinect.
  of the points visible to the camera.
  This data can be viewed as a greyscale image (scaling the depth values
  from 0 to 255) or can be extrapolated into the 3D environment using the
- information about camera.
+ camera parameters.
  These readings are not always accurate, and may fluctuate in a seemingly
  motionless scene.
  In addition to the depth camera on board the Kinect, it has a simple RGB
@@ -178,7 +179,7 @@ Deconstruction
 
 \begin_layout Standard
 The structure of the automation system can be easily understood by isolating
- the individual requirements of the system itself.
+ the individual requirements.
  Once it has been abstracted into separate problems, these can be researched
  and worked on in a modular fashion, creating tools and sub-systems with
  more refined responsibilities.
@@ -208,8 +209,8 @@ ve before the system can even begin to function.
  These include segmentation of the image to locate the helicopter, tracking,
  spacial analysis and analysis of the helicopter itself (to get the current
  orientation, for instance).
- These cover a range of difficulties, and cover a range of features for
- the system, from simple hovering to fully automated flight.
+ These cover a range of difficulties, and are used in a range of features
+ for the system, from simple hovering to fully automated flight.
 \end_layout
 
 \begin_layout Paragraph
@@ -222,7 +223,7 @@ The program that flies the helicopter is wholly separate from the vision,
  the helicopter into a complete control method.
  The main requirement, given information about the current whereabouts and
  properties of the helicopter, is to be able to issue commands intelligently
- to the helicopter and pilot it.
+ to the helicopter and in doing so, pilot it.
  Additionally, there should be a well-defined, expressive, and expandable
  method for defining piloting 
 \lang british
@@ -266,12 +267,12 @@ For the computer vision, we will use the Kinect sensor device, created by
  Additionally, there are several freely available open-source software kits
  for interacting with the Kinect on any platform.
  This simplifies the computer vision aspect somewhat, allowing the direct
- extraction of the 3D coordinates instead of through more traditional means
+ extraction of the 3D coordinates instead of through more traditional means,
  such as stereoscopic vision.
  Additionally, substantial experimentation has gone into using it for computer
- vision previous - providing a wealth of prior experience to better gauge
- the possibilities and limitations of using the Kinect as part of the vision
- system.
+ vision - providing a wealth of prior experience to better gauge the possibiliti
+es and limitations of using the Kinect as part of the vision system for
+ this project.
 \end_layout
 
 \begin_layout Subsection
@@ -388,11 +389,11 @@ The Syma Remote Control Helicopter is a small indoors-flying helicopter,
 enced hands.
  It does this by not having a traditional tail rotor - instead, it has an
  internal gyroscope that keeps it steady, and rotation is accomplished by
- speeding up and slowing down the main rotors.
+ speeding up and slowing down the two main rotors.
  The tail rotor is instead positioned facing upwards, and provides a tilting
  force to the tail, letting the helicopter fly forwards and backwards.
  This makes the helicopter extremely stable, at the sacrifice of not being
- able to tilt left or right.
+ able to tilt left or right (strafe).
  Ultimately, this only serves to make it easier to fly.
  The details on the communication protocols of the helicopter are not freely
  available, but some third party sources have done their own analysis of
@@ -866,8 +867,8 @@ Compensating time for the individual port switches (basically compensating
 
 \begin_layout Standard
 After duplicating this signal across multiple IR LEDs, this also allowed
- for long-range control, well outside of the normal operating range for
- the helicopter in an room indoors.
+ for long-range control, in excess of the normal operating range for the
+ helicopter in an room indoors.
 \end_layout
 
 \begin_layout Paragraph
@@ -924,7 +925,7 @@ Once relevant data about the helicopter has been obtained, it is necessary
  For instance, for the Throttle of the helicopter it will almost certainly
  be necessary to have some sort of adaptive control.
  This will be to combat the effect of reduced effective throttle as the
- battery runs out in the helicopter (eg.
+ battery runs out inside the helicopter (eg.
  at full-charge, the helicopter will remain level at a Throttle of about
  70.
  As the charge reduces below half, it will require upwards of 90-100 to
@@ -1085,21 +1086,21 @@ Each of the parameters reflects a different property of the control loop
 behaviour
 \lang english
 .
- The integral parameter deal with accumulated error - it is in this way
+ The integral parameter deals with accumulated error - it is in this way
  that it can compensate for 'droop' in the system, where there is a control
  bias that needs to be accounted for.
  Small values will take a long time to compensate for these, but large values
- will overcompensate causing overshooting.
- The derivative term 'dampens' the approach, but will increase the time
- required to reach stability.
+ will overcompensate, causing overshooting.
+ The derivative term dampens the approach, but will increase the time required
+ to reach stability.
  
 \begin_inset Newline newline
 \end_inset
 
 Each of the costs and benefits of these terms needs to be weighted against
- the other, and this process is referred to as 'tuning' the controller.
+ the other, and this process is referred to as tuning the controller.
  There are a variety of methods for tuning the controller, from simple manual
- observation and adjustment to full automated methods.
+ observation and adjustment, to full automated methods.
 \end_layout
 
 \begin_layout Paragraph
@@ -1113,9 +1114,8 @@ The PID controller was used in the majority of the quadcopter papers, so
  in the vertical case, for instance, the input is the throttle and the output
  is the observed position, with the error being the difference between the
  required position and the current position.
- We require this more complex controller because we do not know the given
- 'neutral' Throttle required to remain stationary against the effect of
- gravity.
+ We require this more complex controller because we do not know the neutral
+ Throttle required to remain stationary against the effect of gravity.
  In comparison, this is not true for our Yaw or Pitch controls, which we
  know give a neutral position with the value 63.
 \end_layout
@@ -1131,7 +1131,7 @@ As the only opposing force to the motion of the helicopter is air resistance
 \lang british
 pre-emptive
 \lang english
- slow down mechanism so as to not 'overshoot' the intended position.
+ slow down mechanism so as to not overshoot the intended position.
  In the lecture notes Steering 
 \lang british
 Behaviours
@@ -1143,7 +1143,7 @@ key "ludic"
 
 \end_inset
 
-, the 'Arrive' steering 
+, the Arrive steering 
 \lang british
 behaviour
 \lang english
@@ -1207,7 +1207,7 @@ It is already known that a neutral Pitch (Pitch = 63), ignoring air currents
  long as the forward Pitch is cut off sufficiently early.
  Additionally we are capable of providing reverse thrust as required simply
  by altering the Pitch in the opposite direction.
- As such, the 'Arrive' 
+ As such, the Arrive 
 \lang british
 behaviour
 \lang english
@@ -1223,10 +1223,9 @@ Digital Control
 \end_layout
 
 \begin_layout Standard
-When the movement mechanism is known to be 'digital' in nature, in that
- it is possible to start and stop movement at a single moment, it should
- be sufficient to have an extremely simple 'digital' control mechanism as
- well.
+When the movement mechanism is known to be digital in nature, in that it
+ is possible to start and stop movement at a single moment, it should be
+ sufficient to have an extremely simple digital control mechanism as well.
  In pseudo-code, we could represent this as
 \begin_inset listings
 inline false
@@ -1341,9 +1340,9 @@ ng 3D scenes that involves viewing the scene from two different angles,
  and using the difference in perspective to recreate the scene.
  In the case of the Kinect, this is achieved by projecting the known pattern
  at a slight angle to the adjacent receiver.
- This is one of the ways that humans and other two-eyed creatures achieve
+ This is also one of the ways that humans and other two-eyed creatures achieve
  depth perception.
- Depth from Focus uses change in 'blurriness' of the image for a fixed focus
+ Depth from Focus uses change in blurriness of the image for a fixed focus
  as a gauge for depth.
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -1387,7 +1386,7 @@ https://github.com/amiller/libfreenect-goodies/blob/master/calibkinect.py
 
 \end_inset
 
-, but can be obtained by performing a simple calibration procedure.
+, but can also be obtained by performing a simple calibration procedure.
 \end_layout
 
 \begin_layout Subsection
@@ -1395,8 +1394,8 @@ Open CV
 \end_layout
 
 \begin_layout Standard
-For my initial research on Open CV, I began reading some tutorials and online
- documentation
+For out initial research on Open CV, we began reading some tutorials and
+ online documentation
 \begin_inset CommandInset citation
 LatexCommand cite
 key "OpenCV book"
@@ -1412,27 +1411,21 @@ key "OpenCV examples"
 \end_inset
 
 .
- I aimed to follow the general learning flow from the book (implemented
- in C++), but to do it myself in Haskell, thus hopefully learning both Open
- CV and the wrapper itself.
- My first aim after doing some basic exercises was to get basic shape recognitio
-n working on a plain white background (eg.
- my wall).
  
 \end_layout
 
 \begin_layout Standard
 Unfortunately, after spending some time trying to get the Haskell wrappers
- to work, I came to the conclusion that the effort required to get the libraries
- up and running in Haskell was not worth the gain.
- Instead, I decided to use one of the better supported languages for Open
+ to work, we came to the conclusion that the effort required to get the
+ libraries up and running in Haskell was not worth the gain.
+ Instead, we decided to use one of the better supported languages for Open
  CV - Python or C++.
- Both of these have very thorough support for the Open CV library, letting
- me avoid the problem of language-wrestling entirely.
+ Both of these have very thorough support for the Open CV library, avoiding
+ the problem of language-wrestling entirely.
  Python in particular is incredibly simple, not just in language terms but
- in library support - I discovered the open source framework SimpleCV (http://si
-mplecv.org/), which is a large collection of libraries written in Python
- with the aim of providing simplicity.
+ in library support - the open source framework SimpleCV (http://simplecv.org/)
+ is a large collection of libraries written in Python with the aim of providing
+ simplicity.
  This should come in especially useful during the early prototyping phases.
  For instance, getting the Kinect RGB image is as simple as:
 \begin_inset listings
@@ -1466,28 +1459,7 @@ while True:
 
 \end_inset
 
-Due to the modularity of the vision part of the project, it should be comparativ
-ely simple to add a foreign function call to the Haskell code, and then
- implement the whole vision package in a different language.
- 
-\end_layout
 
-\begin_layout Standard
-To make things even simpler, SimpleCV is also documented very well, with
- all of the documentation available online and inside an interpreter.
- Having access to an interpreter makes experimentation very easy, especially
- considering the fact that Python has first-class functions, letting me
- manipulate images and test out new image processing techniques into existing
- code very easily.
- In addition to the code documentation, I also have started reading the
- book Practical Computer Vision with SimpleCV 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "SimpleCV book"
-
-\end_inset
-
-, which lists many different examples and techniques to get me started.
 \end_layout
 
 \begin_layout Section
@@ -1783,13 +1755,13 @@ Arduino
 \end_layout
 
 \begin_layout Standard
-The Arduino board receives information on what 'orders' to send to the helicopte
-r via a serial cable.
+The Arduino board receives information on what orders to send to the helicopter
+ via a serial cable.
  It works in cycles, receiving all new orders, then consolidating them into
  a final order set before sending this to the helicopter.
  It is written in the Arduino language, a derivative of Processing.
  It is a high level language that obscures a lot of the lower level working
- of the board itself, and come pre-packaged with the Arduino board itself.
+ of the board itself, and come pre-packaged with the Arduino board.
 \end_layout
 
 \begin_layout Chapter
@@ -1800,7 +1772,7 @@ Execution
 One of the key aims for the development of this project was to be able to
  remain flexible, and to quickly prototype new ideas and methods to see
  which one worked best for a given task.
- To achieve this, a solid 'framework' needed to be planned, assigning specific
+ To achieve this, a solid framework needed to be planned, assigning specific
  roles to specific areas, and ensuring that the abstract version would in
  fact work.
  
@@ -2190,6 +2162,7 @@ void SendCode() {
 
 \begin_layout Plain Layout
 
+  //Header
 \end_layout
 
 \begin_layout Plain Layout
@@ -2209,6 +2182,11 @@ void SendCode() {
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\begin_layout Plain Layout
+
+  //Data
 \end_layout
 
 \begin_layout Plain Layout
@@ -2526,14 +2504,14 @@ Duocopter
 \begin_inset Newline newline
 \end_inset
 
-For example, initially it was useful to let the Monkey control the Throttle
- of the helicopter, whilst 
+For example, initially it was useful to let the Monkey control just the
+ Throttle of the helicopter, whilst 
 \lang british
 stabilising
 \lang english
  and steering were controlled by a human operator through the GUI.
  The Duocopter would throw away any instruction received from the Monkey
- that was not a Throttle instruction, and likewise for non-Throttle instructions
+ that was not a Throttle instruction, and likewise for Throttle instructions
  from the human.
  In this manner it was possible to test the Monkey Throttle control in a
  simplified environment without having to worry about the helicopter crashing!
@@ -2553,7 +2531,7 @@ see what the controller sees
 \begin_inset Quotes erd
 \end_inset
 
-, that is to have a method of 
+, that is, to have a method of 
 \lang british
 visualising
 \lang english
@@ -2701,10 +2679,9 @@ ter Flyable.
 \end_inset
 
 We developed this in two parts - a simulation environment that mimics a
- basics physics simulator, that allows arbitrary mass objects to have forces
- attached to them, which then simulates the effects of these forces on the
- objects, and a wrapper on top of this simulator that relays control commands
- and observations to and from the simulation back to the controller.
+ basics physics simulator, allowing arbitrary mass objects to have forces
+ applied to them, and a wrapper on top of this simulator that relays control
+ commands and observations to and from the simulation back to the controller.
  
 \begin_inset Newline newline
 \end_inset
@@ -2713,6 +2690,9 @@ We deliberately developed the VirtualHelicopter in such a way that its various
  properties can be changed easily, such as how it reacts to different command
  inputs or how the environment in which it exists is set up (such as adding
  floors and walls that it can interact with).
+ For example, we could change the stable throttle of the VirtualHelicopter
+ from mimicking the helicopter at fully battery (~70) to being nearly empty
+ (~100).
 \begin_inset Newline newline
 \end_inset
 
@@ -2756,7 +2736,7 @@ To be able to get a reasonable estimate for the 3D coordinates of the helicopter
 
 \begin_layout Enumerate
 To be able to estimate the orientation of the helicopter from some prior
- knowledge and the 'tracked' image of the helicopter.
+ knowledge and the tracked image of the helicopter.
 \end_layout
 
 \begin_layout Enumerate
@@ -2765,9 +2745,9 @@ To be able to do the above 2 things sufficiently quickly that the system
 \end_layout
 
 \begin_layout Enumerate
-The system should be sufficiently robust that 'unavoidable' interference
- (such as subtle lighting changes, shadows etc.) in the scene should not
- impair the tracking to any great degree.
+The system should be sufficiently robust that unavoidable interference (such
+ as subtle lighting changes, shadows etc.) in the scene should not impair
+ the tracking to any great degree.
 \end_layout
 
 \begin_layout Standard
@@ -2816,7 +2796,7 @@ Basic Software and Setup
 \end_layout
 
 \begin_layout Standard
-Before prototyping could begin, it was necessary to find pre-existing software
+Before prototyping could begin, it was necessary to find preexisting software
  packages that would perform a lot of the 'heavy lifting' of hardware management
  with the Kinect.
  Fortunately, all of this was well described by the SimpleCV documentation
@@ -2843,10 +2823,11 @@ RBG Vision
 \begin_layout Standard
 The first method that was tested for performing the position detection was
  based around using the RGB camera for initial detection, and using the
- depth camera to 'augment' the detection for accuracy and depth measurements.
+ depth camera to augment the detection for accuracy and depth measurements.
  The founding for this idea was that the RGB camera was less noisy than
  the depth camera, which was prone to casting depth 'shadows', areas where
  no depth information could be recovered.
+ Figure 4.3 demonstrates these problems.
 \begin_inset Float figure
 wide false
 sideways false
@@ -2895,7 +2876,7 @@ Groundwork
 \end_layout
 
 \begin_layout Standard
-Following the assumptions stated in 5.3.1, an idea to initially locate the
+Following the assumptions stated in 4.3.1, an idea to initially locate the
  helicopter was to take one image of the static scene without the helicopter
  present, and then to subtract this base image from the new images that
  were being taken.
@@ -2929,7 +2910,7 @@ search One method that was tried was locating the position of the helicopter
  approximately match that on the depth camera.
  Drawbacks of this method included additional overhead of doing image analysis
  twice, difficulty locating similar shapes in both cameras (as each camera
- had a different 'type' of error that it would pick up) and being somewhat
+ had a different type of error that it would pick up) and being somewhat
  overcomplicated.
 \end_layout
 
@@ -2942,7 +2923,7 @@ camera
 \begin_inset space ~
 \end_inset
 
-parameters Another naive method used was just to 'guess' where the helicopter
+parameters Another naive method used was just to guess where the helicopter
  would be in the depth camera from ad-hoc observations about relative positions
  in the depth and RGB images.
  This proved to not be accurate enough at all, and upon later reflection
@@ -2993,7 +2974,7 @@ D Vision
 \end_layout
 
 \begin_layout Standard
-Having tested out the RGB camera methods, the next idea was to try to recreate
+Having tested the RGB camera methods, the next idea was to try to recreate
  the best parts of the RGB detection using just the depth camera, whilst
  trying to 
 \lang british
@@ -3057,7 +3038,7 @@ The RGB camera operates with 3 dimensions of values (as the name suggests)
  Whilst this may seem that the detail provided is significantly less, in
  
 \lang british
-practise
+practise however,
 \lang english
  this does not affect the ability of the camera to detect the helicopter
  to any noticeable degree.
@@ -3097,13 +3078,13 @@ Prototyping results
 We found that there were instant performance increases when using the depth
  camera instead of the RGB camera to perform position detection.
  The latent noise of system was significantly reduced, giving little or
- no 'jitter' to the position of a stationary object, and the rate of detection
+ no jitter to the position of a stationary object, and the rate of detection
  was also increased.
 \begin_inset Newline newline
 \end_inset
 
-One problem we did find was that 'shadows' cast by the depth camera (as
- seen in Figure 4.3) were themselves very noisy.
+One problem we did find was that shadows cast by the depth camera (as seen
+ in Figure 4.3) were themselves very noisy.
  As such, no one capture of the shadows cast would be able to effectively
  remove them from subsequent frames.
  To remedy this, we devised an adaptive set up method which is performed
@@ -3259,7 +3240,7 @@ Naive extraction
 \begin_layout Standard
 As an initial stepping stone, a basic extraction method using image subtraction
  was used.
- This was a two-step process - given a 'base' image of the scene, without
+ This was a two-step process - given a base image of the scene, without
  the helicopter, and another with the helicopter in it:
 \end_layout
 
@@ -3428,8 +3409,8 @@ To attempt to remedy this, a simple method was devised to remove the helicopter
  blades from the scene.
  The helicopter always has two large shadows, one for each helicopter blade.
  By looking at the horizontal scan lines, rather than the vertical scan
- lines (Figure 5.5) it is possible to see that these are clearly identifiable
- as the first two 'large' peaks.
+ lines (Figure 4.8) it is possible to see that these are clearly identifiable
+ as the first two large peaks.
 \begin_inset Float figure
 wide false
 sideways false
@@ -3462,7 +3443,7 @@ Vertical decomposition of the helicopter signal.
 \end_inset
 
 By cropping the portion of the image that holds these two peaks, (achieved
- by searching linearly from the left until two 'large' peaks are met.
+ by searching linearly from the left until two large peaks are met.
  The exact definition of large is relative to the rest of the signal) it
  is possible to remove the blades from the image entirely, providing the
  clearer horizontal decomposition in Figure 5.6.
@@ -3512,9 +3493,9 @@ Orientation Inference
 \begin_layout Standard
 Another, simpler, method of orientation analysis attempted was inference.
  This worked on the underlying assumption that as the helicopter is incapable
- of 'strafing' motion (that is motion to the left or right whilst facing
- forwards), provided there is some forwards pitch the helicopter will move
- in the direction it is facing.
+ of strafing motion (that is motion to the left or right whilst facing forwards)
+, provided there is some forwards pitch the helicopter will move in the
+ direction it is facing.
  Taking an average of the 
 \begin_inset Formula $N$
 \end_inset
@@ -3801,7 +3782,7 @@ There are several problems that make landing and taking off more complicated
  For one, the helicopter operates differently aerodynamically at low altitudes,
  (ie.
  similar throttle values will give higher actual thrust).
- Additionally, the helicopter 'interferes' with itself by creating air currents
+ Additionally, the helicopter interferes with itself by creating air currents
  that buffet it and can send it off course.
  
 \begin_inset Newline newline
@@ -4065,8 +4046,8 @@ Assisted flying
 \begin_layout Standard
 Another interesting addition involves a slight change of theme - assisted
  flying, rather than fully automated.
- This involves the AI 'watching' the human fly, and providing assistance
- as needed.
+ This involves the AI watching the human fly, and providing assistance as
+ needed.
  In our particular case, we decided to go for an approach that would aim
  to prevent crashing into walls.
 \end_layout
@@ -4094,7 +4075,9 @@ key "Kinectfusion"
 
 ), and then attempting to reconstruct large, flat, vertical planes, it was
  possible to obtain a good abstract representation of the walls in the scene.
- 
+ In our initial proof-of-concept, we only performed analysis on the far-wall
+ away from the helicopter, taking three separate points and constructing
+ the equation of the plane for the wall relative to the camera.
 \begin_inset Newline newline
 \end_inset
 
@@ -4131,9 +4114,7 @@ Movement in one, two and three dimensions.
 \end_layout
 
 \begin_layout Standard
-I believe that these three points establish the 'baseline' of the functionality
- I should achieve.
- Successful execution of these should demonstrate complexity in computer
+Successful execution of these points should demonstrate complexity in computer
  vision, AI and general design, and should be sufficiently challenging to
  perform.
  
@@ -4152,12 +4133,12 @@ It should prove to be quite simple to ascertain the quality of the functionality
 Observation It will be fairly evident from how the helicopter flies according
  to the given instructions how well the project is performing.
  For instance, a steady, certain flight path would be good whereas a juddering
- path, or even crashing, would indicate bad performance!
+ path, or even crashing, would indicate bad performance.
 \end_layout
 
 \begin_layout Description
 Execution The ability to execute more and more complicated intentions.
- Simply hovering in a given position should prove to be a (comparatively)
+ Simply hovering in any one position should prove to be a (comparatively)
  simple feat, whereas flying from one position to another is more demanding.
  Extending this to customisable paths in three dimensional space would show
  that the underlying mechanisms are of high quality and performance.
@@ -4372,7 +4353,7 @@ To improve detection, and thus speed up development of the rest of the project,
 \begin_inset Newline newline
 \end_inset
 
-With the addition of the 'wings', the following detection percentages were
+With the addition of the wings, the following detection percentages were
  achieved:
 \end_layout
 
@@ -4768,7 +4749,7 @@ Throttle adaption
 
 \begin_layout Standard
 As a rough starting point, the helicopter begins with a starting assumed
- 'stable' Throttle of 80.
+ stable Throttle of 80.
  This is the throttle at which the helicopter perfectly retains height,
  working against gravity.
  As battery power fluctuates, the stable Throttle also changes.
@@ -4935,7 +4916,7 @@ Remarks
 \end_layout
 
 \begin_layout Standard
-The graph in 5.2 indicates a few things:
+The graph in 5.3 indicates a few things:
 \end_layout
 
 \begin_layout Itemize
@@ -5240,8 +5221,8 @@ Over the flight time of the helicopter, it gradually loses battery power.
  After a certain critical point of battery level, the helicopter will be
  unable to generate any upwards thrust at all, and will stop functioning
  entirely.
- In this experiment, we measured the 'stable' throttle value from fully
- charged until failure, and recorded the time of failure.
+ In this experiment, we measured the stable throttle value from fully charged
+ until failure, and recorded the time of failure.
 \begin_inset Float figure
 wide false
 sideways false
@@ -5278,8 +5259,8 @@ Average stable throttle over time from fully charged.
 \end_inset
 
 Once the throttle reaches 127, the helicopter is incapable of achieving
- any more upwards thrust (as 127 is the maximum sendable Throttle value),
- and thus it slowly descends to the ground.
+ any more upwards thrust (as 127 is the maximum throttle value), and thus
+ it slowly descends to the ground.
  The curve appears to be very close to linear in nature, with perhaps a
  subtle S-curve shape.
  
@@ -5385,7 +5366,7 @@ Works well in almost any static indoor environment
 The system is constructed with little prior assumptions on the indoor environmen
 t, besides that it must be static in nature.
  This means that it should work in any indoor room.
- Of course, there are levels of 'working', but for the most-part the helicopter
+ Of course, there are levels of working, but for the most-part the helicopter
  performs as expected.
 \end_layout
 
@@ -5773,18 +5754,6 @@ SP/LectureNew10.pdf.
 \begin_layout Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
-key "Least squares wiki"
-
-\end_inset
-
-En.wikipedia.org (2012) Least squares - Wikipedia, the free encyclopedia.
- [online] Available at: http://en.wikipedia.org/wiki/Least_squares [Accessed:
- 4 Jan 2013].
-\end_layout
-
-\begin_layout Bibliography
-\begin_inset CommandInset bibitem
-LatexCommand bibitem
 key "OpenCV book"
 
 \end_inset
@@ -5887,18 +5856,6 @@ key "Kalman wiki"
 En.wikipedia.org (1960) Kalman filter - Wikipedia, the free encyclopedia.
  [online] Available at: http://en.wikipedia.org/wiki/Kalman_filter [Accessed:
  16 Jan 2013].
-\end_layout
-
-\begin_layout Bibliography
-\begin_inset CommandInset bibitem
-LatexCommand bibitem
-key "kalman tutorial"
-
-\end_inset
-
-Cs.unc.edu (2012) The Kalman Filter.
- [online] Available at: http://www.cs.unc.edu/~welch/kalman/ [Accessed: 16
- Jan 2013].
 \end_layout
 
 \begin_layout Bibliography
@@ -6160,7 +6117,7 @@ Manual Flight
 
 \begin_layout Standard
 This is flying just as if you were using the original remote control.
- Different orders can be sent by using keypresses, described below.
+ Different orders can be sent by using key presses, described below.
 \end_layout
 
 \begin_layout Standard
