@@ -65,8 +65,8 @@ getSurfs = getSurfs' `fmap` getSurfacesResponse
 -- | Starts an instance of the helicopter communication protocol.
 startHelicopter :: IO Helicopter
 startHelicopter = do
-  --surfaces <- getSurfs
-  let surfaces = []
+  surfaces <- getSurfs
+  --let surfaces = []
   --putStrLn $ show surfaces
   
   var <- (atomically $ newTVar Map.empty)
@@ -93,7 +93,6 @@ instance Flyable Helicopter where
   setFlyMany h vs = dropValM $ setMany h vs
   fly h = return ()
   observe h = do
-    putStrLn "OBSERVE"
     (x,y,z,o,v) <- get
     let optVar = getCurrentOptions h
     pwr <- fmap (Map.! Throttle) $ atomically $ readTVar optVar

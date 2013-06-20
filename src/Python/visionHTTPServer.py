@@ -100,12 +100,12 @@ else:
   try:
     if 'vision' in sys.argv:
       server2.serve_forever()
-    elif 'surface' in sys.argv:
-      server1.serve_forever()
+    #elif 'surface' in sys.argv:
+      #server1.serve_forever()
   except:
     print "Bye :("
-    server1.socket.close()
-    server1.shutdown()
+    #server1.socket.close()
+    #server1.shutdown()
     server2.socket.close()
     server2.shutdown()
     if rec != None:

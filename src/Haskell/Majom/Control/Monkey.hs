@@ -63,6 +63,7 @@ runMonkey' flyer = do
   putStrLn "Let's gooooo!"
   milliSleep 1000
   --putStrLn $ show (filter sSpecial surfaces)
+  --let landPos = Position (vector [2,0,2]) undefined
   let hIntent = hoverAt $ Position desiredPos undefined
   let lIntent = landOn $ landPos
   --let intent = keepDoing $ withTiming (1000, waitTime)  $ doAll <&> hIntent <&> lIntent <&> hIntent
@@ -75,6 +76,7 @@ runMonkey' flyer = do
         else lIntent)
   -}
   let intent = keepDoing $ withTiming (1000, waitTime) $ doAll <&> lIntent <&> hIntent
+  --let intent = keepDoing $ doAll <&> hIntent
   milliSleep waitTime
   (_, pos) <- observe flyer
 
