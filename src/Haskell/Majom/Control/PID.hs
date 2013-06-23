@@ -1,3 +1,4 @@
+-- | Module for PID control.
 module Majom.Control.PID (
   PID(getKP, getKI, getKD),
   getMV,
@@ -6,6 +7,7 @@ module Majom.Control.PID (
 
 import Majom.Common
 
+-- | Data structure for holding various PID parameters
 data PID = PID {
   lastErr :: Double, 
   sumErrs :: Double,
@@ -14,6 +16,7 @@ data PID = PID {
   getKD :: Double}
   deriving (Show)
 
+-- | Get the next input given an error
 getMV :: PID -> Double -> (PID, Double)
 getMV pid err = (pid', out)
   where
@@ -24,5 +27,6 @@ getMV pid err = (pid', out)
     ki = getKI pid
     kd = getKD pid
 
+-- | Creates a new blank PID controller
 newPID :: PID
 newPID = PID 0 0 0 0 0

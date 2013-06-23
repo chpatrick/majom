@@ -48,6 +48,7 @@
 -- -- This is sometimes known as do-while-do.  Note that like other monad
 -- -- transformers, you'll either need to explicitly lift the actions from the
 -- -- transformed monad, or use an mtl-style type-class to do so.
+-- | LoopWhile module
 module Majom.Lang.LoopWhile (LoopWhileT, loop, while) where
 
 import Control.Applicative (Applicative(..))

@@ -33,25 +33,25 @@ execMonkeyBrainT :: MonkeyBrainT -> Brain -> IO Brain
 execMonkeyBrainT mk k = execStateT mk k
 
 -- | Brain that holds all the relevant data for the monkey brain.
-data Brain = Brain { --brainIntent :: LandIntent,
-                     --brainIntent :: HoverIntent,
+data Brain = Brain { 
                      brainIntent :: MultiIntent,
                      brainLast :: (Position, Power) }
 
 desiredPos :: Vector
-desiredPos = vector [0, 0.2, -1.7]
+desiredPos = vector [0.1, 0.2, -1.7]
 
 -- | Starts the monkey (starts te flyer too)
 runMonkey :: (Flyable a) => a -> IO Brain
 runMonkey flyer = do
   forkIO $ fly flyer
-  --putStrLn "I am a monkey"
 
   runMonkey' flyer
 
 -- | Runs the monkey (internal function).
 runMonkey' :: (Flyable a) => a -> IO Brain
 runMonkey' flyer = do
+  {-
+
   putStrLn "Please place the helicopter where you wish the landing position to be"
   takeWhileIO not $
     repeat (fmap (== '\n') getChar)
@@ -63,20 +63,14 @@ runMonkey' flyer = do
   putStrLn "Let's gooooo!"
   milliSleep 1000
   --putStrLn $ show (filter sSpecial surfaces)
-  --let landPos = Position (vector [2,0,2]) undefined
-  let hIntent = hoverAt $ Position desiredPos undefined
-  let lIntent = landOn $ landPos
-  --let intent = keepDoing $ withTiming (1000, waitTime)  $ doAll <&> hIntent <&> lIntent <&> hIntent
-  {-
-  let 
-    intent = doAll 
-      <&> hIntent
-      <&> (if (length $ filter sSpecial surfaces) > 0
-        then (landOn $ Position (sPoint $ head $ filter sSpecial surfaces) undefined)
-        else lIntent)
   -}
-  let intent = keepDoing $ withTiming (1000, waitTime) $ doAll <&> lIntent <&> hIntent
-  --let intent = keepDoing $ doAll <&> hIntent
+
+  let hIntent = hoverAt $ Position desiredPos undefined
+
+  --let lIntent = landOn $ landPos
+  --let intent = keepDoing $ withTiming (1000, waitTime)  $ doAll <&> hIntent <&> lIntent
+  let intent = keepDoing $ doAll <&> hIntent
+
   milliSleep waitTime
   (_, pos) <- observe flyer
 

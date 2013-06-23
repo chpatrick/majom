@@ -67,7 +67,7 @@ startHelicopter :: IO Helicopter
 startHelicopter = do
   surfaces <- getSurfs
   --let surfaces = []
-  --putStrLn $ show surfaces
+  putStrLn $ show surfaces
   
   var <- (atomically $ newTVar Map.empty)
   s <- openSerial port defaultSerialSettings { 

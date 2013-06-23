@@ -14,6 +14,7 @@ class Intent a where
   enactIntent :: (Flyable b) => a -> b -> Position -> Velocity -> IO a
   success :: a -> Bool
 
+-- | Gets the yaw for a desired orientation given a current position
 getYaw :: Vector -> Position -> Int
 getYaw v pos =
   if abs (degDiff o o') > 20

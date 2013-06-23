@@ -1,3 +1,4 @@
+-- | Intent that handles landing in a position.
 module Majom.Control.Monkey.LandIntent (
   landOn,
   LandIntent,
@@ -45,6 +46,7 @@ instance Intent LandIntent where
         if xzDist < 0.2 then return i { hoverPosition = newHover } else return i
   success = landed
 
+-- | Get the next velocity for a current position
 getVel :: LandIntent -> Position -> Velocity
 getVel intent pos = 
   ((vectorUnit (getVec dir)) |*| s) 
@@ -55,6 +57,7 @@ getVel intent pos =
     q = landPosition intent
     s = speedMax * (if dist > stop then 1.0 else (dist/stop))
 
+-- | Gets the next heading to arrive at a position
 getHeading :: LandIntent -> Position -> Vector
 getHeading i pos = getVec $ (landPosition i) - pos
 
@@ -62,9 +65,11 @@ getHeading i pos = getVec $ (landPosition i) - pos
 speedMax :: Double
 speedMax = 1
 
+-- | The base throttle to start on
 base :: Power
 base = 80
 
+-- | Land at a specific point
 landOn :: Position -> LandIntent
 landOn p@(Position v o) =
   LandIntent p False $ Position (vector [vectorX v, 0.2, vectorZ v]) o

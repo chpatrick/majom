@@ -24,6 +24,7 @@ execWatcherBrainT mk k = execStateT mk k
 
 data Brain = Brain  { brainLast :: Position }
 
+-- | Runs the watcher control method
 runWatcher :: (Flyable a) => a -> IO Brain
 runWatcher flyer = do
   let (f1, f2) = startDuoCopter flyer [Yaw,Pitch,Throttle,Correction]
@@ -35,6 +36,7 @@ runWatcher flyer = do
   putStrLn "Go!"
   execWatcherBrainT (forever $ watch flyer) initBrain
 
+-- | The main loop for watching the helicopter
 watch :: (Flyable a) => a -> WatcherBrainT 
 watch flyer = do
   (Brain pos) <- get
@@ -51,9 +53,11 @@ watch flyer = do
   lift $ putStrLn $ prettyPos pos'
   lift $ milliSleep waitTime
 
+-- | The wait time between iterations
 waitTime :: Int
 waitTime = 50
 
+-- | Works out if the helicopter will intersect with a surface
 onIntersection :: Position -> Velocity -> Surface -> (Bool,Double)
 onIntersection p v s 
   | vectorSize v' == 0 = (False,0)
@@ -69,5 +73,6 @@ onIntersection p v s
     n   = sNorm s
     d   = (vecDot (p0 - l0) n) / (vecDot l n)
 
+-- | Converts the waittime from ms to secs
 wt :: Double
 wt = (fromIntegral waitTime) / 1000.0

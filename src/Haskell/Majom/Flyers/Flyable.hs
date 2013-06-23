@@ -17,6 +17,7 @@ import Majom.Control.PID
 data Option = Yaw | Pitch | Throttle | Correction
   deriving (Eq, Ord, Show, Enum)
 
+-- | Initiates the default flyer options
 flyerInit :: [(Option, Int)]
 flyerInit = [(Yaw, 63), (Pitch, 63), (Throttle, 0), (Correction, 63)]
 

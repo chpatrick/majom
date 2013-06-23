@@ -1,4 +1,5 @@
 {-# LANGUAGE ExistentialQuantification #-}
+-- | Module for chaining multiple basic intents together
 module Majom.Control.Monkey.MultiIntent (
   MultiIntent,
   (<&>),
@@ -15,7 +16,9 @@ import Majom.Flyers.Flyable
 
 import Control.Concurrent
 
+-- | Coverall structure for any intent
 data AnyIntent = forall a. Intent a => AnyIntent a
+-- | MultiIntent consisting of its individual intents and the timings (desired time, wait time between iters)
 data MultiIntent = MultiIntent { actions :: [AnyIntent], timings :: (Int, Int) }
 
 instance Intent MultiIntent where
@@ -37,14 +40,18 @@ instance Intent AnyIntent where
     fmap AnyIntent $ enactIntent i flyer pos vel
   success (AnyIntent i) = success i
 
+-- | Concats two multiintents.
 (<&>) :: (Intent a) => MultiIntent -> a -> MultiIntent
 (<&>) m i = m { actions = (actions m) ++ [AnyIntent i] }
 
+-- | Base multiintent
 doAll :: MultiIntent
 doAll = MultiIntent [] 0
 
+-- | Repeats all of the given intents forever
 keepDoing :: MultiIntent -> MultiIntent
 keepDoing m = m { actions = (cycle $ actions m) }
 
+-- | Adds a timing to a multiintent
 withTiming :: (Int, Int) -> MultiIntent -> MultiIntent
 withTiming t m = m { timings = t }

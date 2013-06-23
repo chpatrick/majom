@@ -61,18 +61,12 @@ vectorY = (V.! 1)
 vectorZ :: Vector -> Double
 vectorZ = (V.! 2)
 
+-- | Gets the dot product of two vectors
 vecDot :: Vector -> Vector -> Double
 vecDot v1 v2 =
   V.sum (v1 * v2)
 
-getDirection :: Vector -> Int
-getDirection v
-  | y == 0  = 0
-  | y > 0   = 1
-  | y < 1   = -1
-  where
-    y = vectorY v
-
+-- | Print a vector in a Python readable form
 prettyVec :: Vector -> String
 prettyVec v = 
   if V.length v /= 3
@@ -80,6 +74,7 @@ prettyVec v =
     else foldl1 ((++) . (++ ",")) $ map (show . (sigFigs 5)) 
       [v V.! 0, v V.! 1, v V.! 2]
 
+-- | Print a position in a nice way
 prettyPos :: Position -> String
 prettyPos p = (prettyVec $ getVec p) ++ "," ++ (show $ getFacing p) 
 
@@ -90,16 +85,20 @@ type Vector = V.Vector Double
 data Position = Position { getVec :: Vector, getFacing :: Double }
   deriving (Eq, Show)
 
+-- | Convert degrees to radians
 radians :: Double -> Double
 radians x = x*pi/180
 
+-- | Convert radians to degrees
 degrees :: Double -> Double
 degrees x = x*180/pi
 
+-- | Normalises degrees to 0 - 360
 degNorm :: Double -> Double
 degNorm x = 
   head $ dropWhile (< 0) $ iterate (+360) $ head $ dropWhile (>360) $ iterate (flip (-)360) x
 
+-- | Gets the difference (min) between two degrees.
 degDiff :: Double -> Double -> Double
 degDiff x y
   | abs (x-y) > 180 = (if x > y then 1 else -1) * ((360 - max x y) + min x y)
@@ -113,6 +112,7 @@ instance Num (Position) where
   abs m = m { getVec = abs (getVec m) }
   signum _ = 1
 
+-- | Position data structure
 (<+>) :: Position -> Vector -> Position
 (<+>) p v = p { getVec = ((getVec p) + v) }
 
@@ -131,6 +131,7 @@ type Time = Double
 -- | Power from the controller
 type Power = Int
 
+-- | Surface data structure
 data Surface = Surface { sPoint :: Vector, sNorm :: Vector, sSpecial :: Bool }
   deriving (Show, Read)
 
@@ -138,7 +139,7 @@ data Surface = Surface { sPoint :: Vector, sNorm :: Vector, sSpecial :: Bool }
 gravity :: Force
 gravity = vector [0, (-9.8), 0]
 
--- | Calcules the acceleration at a given observation time, given 
+-- | Calculates the acceleration at a given observation time, given 
 -- a string of observed events.
 -- There is an implicit ordering, with newest observations at the front.
 calcObservedAccel :: [(Power, Position, Time)] -> [(Power, Acceleration)]
@@ -164,10 +165,12 @@ tolerance = 1e-5
 (~=) :: Double -> Double -> Bool
 (~=) a b = abs (a - b) < tolerance
 
+-- | Rounds a number to a certain number of significant figures.
 sigFigs :: (RealFrac a) => Int -> a -> a
 sigFigs d n = (fromIntegral (round (n * p))) / p
   where 
     p = 10 ^ (d-1)
 
+-- | Sleeps for x milliseconds.
 milliSleep :: Int -> IO ()
 milliSleep = threadDelay . (*) 1000

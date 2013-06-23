@@ -189,6 +189,7 @@ def diffdiff2(b, filt=None, imgBase=None, history=[]):
         if d:
           drawArrow(img, (320,100), 100, d)
       img.show()
+      img.save("detected.png")
 
       return (round(x,4), round(y,4), round(z,4), d, 0)
     else:
