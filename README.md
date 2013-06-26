@@ -4,6 +4,8 @@ majom
 Helicopter-flying-thinkerings
 
 Check out the final report for this project here! https://www.dropbox.com/s/4sp2h3qg3g08tf5/report.pdf
+And some videos of it in action... https://drive.google.com/folderview?id=0B6FZEpnvdjNfRDU1NVcwdzd6R3M&usp=sharing
+
 
 
 Arduino Setup
